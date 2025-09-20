@@ -61,7 +61,7 @@ const Register = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("http://localhost:5000/api/register", {
+      const response = await fetch("https://sp-club-backend.vercel.app/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
