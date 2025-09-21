@@ -23,9 +23,13 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary to-red-600 rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">SP</span>
-            </div>
+            {/* START: Changed Code */}
+            <img
+              src="/Logo.png" // Path for images in the 'public' folder
+              alt="SP Club Logo"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            {/* END: Changed Code */}
             <div>
               <h1 className="text-xl font-bold text-gradient-hero">SP Club</h1>
               <p className="text-xs text-muted-foreground">Sports Excellence</p>
@@ -38,11 +42,10 @@ const Header = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`font-medium transition-colors hover:text-primary ${
-                  isActive(link.path)
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-foreground"
-                }`}
+                className={`font-medium transition-colors hover:text-primary ${isActive(link.path)
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-foreground"
+                  }`}
               >
                 {link.name}
               </Link>
@@ -69,9 +72,8 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`font-medium transition-colors hover:text-primary ${
-                    isActive(link.path) ? "text-primary" : "text-foreground"
-                  }`}
+                  className={`font-medium transition-colors hover:text-primary ${isActive(link.path) ? "text-primary" : "text-foreground"
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.name}
