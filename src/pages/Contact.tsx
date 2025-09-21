@@ -38,7 +38,7 @@ const Contact = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("https://sp-club-backend.vercel.app/api/contact", { // <--- Backend API endpoint
+      const response = await fetch("https://sp-club-backend.onrender.com/api/contact", { // <--- Backend API endpoint
         method: "POST",
         headers: {
           "Content-Type": "application/json",
