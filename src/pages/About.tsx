@@ -48,12 +48,12 @@ const About = () => {
               <div>
                 <h2 className="text-4xl font-bold mb-6 text-gradient-hero">Our Mission</h2>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  To create a vibrant sports community that nurtures talent, builds character, 
-                  and promotes the values of teamwork, discipline, and excellence. We believe 
+                  To create a vibrant sports community that nurtures talent, builds character,
+                  and promotes the values of teamwork, discipline, and excellence. We believe
                   every individual has the potential to be a champion, both on and off the field.
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary mb-2">500+</div>
@@ -124,15 +124,15 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-12 text-gradient-hero">Our Journey</h2>
-            
+
             <div className="space-y-8">
               <div className="flex items-start space-x-4">
                 <Badge className="bg-primary text-primary-foreground min-w-fit">2010</Badge>
                 <div>
                   <h3 className="text-xl font-bold mb-2">Foundation</h3>
                   <p className="text-muted-foreground">
-                    SP Club was founded with a vision to create a premier sports facility 
-                    in Mumbai, starting with just 50 members and 3 sports disciplines.
+                    SP Club was founded with a vision to create a premier sports facility
+                    in Dhanbad, starting with just 50 members and 3 sports disciplines.
                   </p>
                 </div>
               </div>
@@ -142,7 +142,7 @@ const About = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Expansion</h3>
                   <p className="text-muted-foreground">
-                    Expanded to include 10 sports disciplines and opened our state-of-the-art 
+                    Expanded to include 10 sports disciplines and opened our state-of-the-art
                     training facility. Membership grew to 200+ active participants.
                   </p>
                 </div>
@@ -153,7 +153,7 @@ const About = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Digital Transformation</h3>
                   <p className="text-muted-foreground">
-                    Adapted to the digital age with online training programs and virtual 
+                    Adapted to the digital age with online training programs and virtual
                     competitions, maintaining community spirit during challenging times.
                   </p>
                 </div>
@@ -164,7 +164,7 @@ const About = () => {
                 <div>
                   <h3 className="text-xl font-bold mb-2">Championship Era</h3>
                   <p className="text-muted-foreground">
-                    Reached 500+ members and won multiple state-level championships. 
+                    Reached 500+ members and won multiple state-level championships.
                     Established youth development programs and community outreach initiatives.
                   </p>
                 </div>
