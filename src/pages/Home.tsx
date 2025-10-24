@@ -11,7 +11,7 @@ const Home = () => {
   const heroVideoUrl = "/home.mp4";
 
   // 2. "Our Story" Section Video
-  const storyVideoUrl = "https://videos.pexels.com/video-files/3254013/3254013-hd_1920_1080_25fps.mp4";
+  const storyVideoUrl = "https://www.pexels.com/video/34430850/";
 
   // 3. "Hall of Fame" Photo Gallery
   const galleryImages = [
