@@ -1,4 +1,4 @@
-import { useState } from "react"; // Kept for consistency, though formState.isSubmitting handles submission state
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,13 +20,13 @@ import { cn } from "@/lib/utils";
 const formSchema = z.object({
   name: z.string().min(2, "Please enter your full name"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')), // Make phone truly optional at Zod level, allowing empty string
+  phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
   role: z.string().min(1, "Please select your role"),
   ageGroup: z.string().optional().or(z.literal('')),
   experience: z.string().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
   dob: z.date({ required_error: "Please select your date of birth" }),
-  aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"), // Added regex for digits
+  aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
   message: z.string().optional().or(z.literal('')),
   newsletter: z.boolean().default(true),
@@ -56,7 +56,6 @@ const Register = () => {
     },
   });
 
-  // Accessing isSubmitting from formState directly
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (data: FormData) => {
@@ -66,7 +65,6 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        // Ensure dob is formatted as an ISO string for the backend
         body: JSON.stringify({
           ...data,
           dob: data.dob.toISOString(),
@@ -78,12 +76,11 @@ const Register = () => {
       if (response.ok) {
         toast({
           title: "Registration Successful! 🎉",
-          description: result.message || "Welcome to SP Kabaddi Group! We'll contact you within 24 hours.",
-          variant: "default", // You might define a 'success' variant in your toast setup
+          description: result.message || "Welcome to SP Club! We'll contact you within 24 hours.",
+          variant: "default",
         });
-        form.reset(); // Reset the form after successful submission
+        form.reset();
       } else {
-        // Handle backend errors
         toast({
           title: "Registration Failed ❌",
           description: result.message || "An unexpected error occurred. Please try again.",
@@ -125,60 +122,89 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary to-red-600 text-primary-foreground py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-              Join <span className="text-accent">SP Kabaddi Group</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/90 animate-fade-in-up">
-              Register as a player or fan and be part of our growing Kabaddi community
-            </p>
-          </div>
+    <div className="min-h-screen bg-[#0a192f]">
+      {/* Hero Section with Background Container */}
+      <div className="relative">
+        {/* START: Background Element */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* 
+            ============================================================
+            == PASTE YOUR IMAGE OR VIDEO TAG HERE                       ==
+            ==                                                          ==
+            == Example Image:                                           ==
+            == <img src="/your-background-image.jpg" alt="Background" className="w-full h-full object-cover" /> ==
+            ==                                                          ==
+            == Example Video:                                           ==
+            == <video                                                   ==
+            ==   src="/your-background-video.mp4"                       ==
+            ==   autoPlay                                               ==
+            ==   loop                                                   ==
+            ==   muted                                                  ==
+            ==   className="w-full h-full object-cover"                 ==
+            == />                                                       ==
+            ============================================================
+          */}
+
+          {/* This dark overlay improves text readability over the background. Adjust opacity as needed. */}
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          <img src="/register.png" alt="Background" className="w-full h-full object-cover" />
         </div>
-      </section>
+        {/* END: Background Element */}
+
+        {/* Hero Section Content */}
+        <section className="relative z-10 bg-transparent text-white py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
+                Join <span className="text-[#facc15]">SP Club</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
+                Register as a player or fan and be part of our growing community
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gradient-hero mb-4">Registration Form</h2>
-            <p className="text-lg text-muted-foreground">
-              Fill out the form below to register with SP Kabaddi Group. Fields marked with <span className="text-destructive">*</span> are required.
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Registration Form</h2>
+            <p className="text-lg text-gray-400">
+              Fill out the form below to register with SP Club. Fields marked with <span className="text-red-500">*</span> are required.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Why Register Benefits */}
             <div className="space-y-6">
-              <Card className="card-athletic">
+              <Card className="bg-[#1e3a5f] border-gray-700 text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center text-xl">
-                    <Trophy className="w-6 h-6 mr-3 text-accent" />
+                    <Trophy className="w-6 h-6 mr-3 text-[#facc15]" />
                     Why Register with Us?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-3 text-sm">
+                  <ul className="space-y-3 text-sm text-gray-300">
                     <li className="flex items-start">
-                      <Star className="w-4 h-4 mt-1 mr-2 text-primary flex-shrink-0" />
-                      Get access to exclusive Kabaddi tournaments and events
+                      <Star className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Get access to exclusive tournaments and events
                     </li>
                     <li className="flex items-start">
-                      <Users className="w-4 h-4 mt-1 mr-2 text-primary flex-shrink-0" />
+                      <Users className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
                       Receive regular updates about upcoming matches and training sessions
                     </li>
                     <li className="flex items-start">
-                      <Target className="w-4 h-4 mt-1 mr-2 text-primary flex-shrink-0" />
-                      Connect with other Kabaddi enthusiasts and players
+                      <Target className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Connect with other sports enthusiasts and players
                     </li>
                     <li className="flex items-start">
-                      <Shield className="w-4 h-4 mt-1 mr-2 text-primary flex-shrink-0" />
+                      <Shield className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
                       Opportunity to participate in our community programs
                     </li>
                     <li className="flex items-start">
-                      <CalendarIcon className="w-4 h-4 mt-1 mr-2 text-primary flex-shrink-0" />
+                      <CalendarIcon className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
                       Access to coaching and training resources
                     </li>
                   </ul>
@@ -187,28 +213,28 @@ const Register = () => {
 
               {/* Testimonials */}
               <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gradient-hero">What Our Members Say</h3>
+                <h3 className="text-xl font-bold text-white">What Our Members Say</h3>
 
-                <Card className="card-champion">
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white">
                   <CardContent className="p-4">
-                    <p className="text-sm italic mb-3">
-                      "Joining SP Kabaddi Group has been a game-changer for me. The coaching is excellent, and I've improved my skills significantly."
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "Joining SP Club has been a game-changer for me. The coaching is excellent, and I've improved my skills significantly."
                     </p>
                     <div className="text-xs">
-                      <p className="font-semibold">Rajesh Kumar</p>
-                      <p className="text-muted-foreground">Player, Member since 2020</p>
+                      <p className="font-semibold text-white">Rajesh Kumar</p>
+                      <p className="text-gray-400">Player, Member since 2020</p>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="card-athletic">
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white">
                   <CardContent className="p-4">
-                    <p className="text-sm italic mb-3">
-                      "As a Kabaddi fan, I wanted to be more involved with the sport. SP Kabaddi Group organizes regular events that are always exciting!"
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "As a fan, I wanted to be more involved with the sport. SP Club organizes regular events that are always exciting!"
                     </p>
                     <div className="text-xs">
-                      <p className="font-semibold">Priya Singh</p>
-                      <p className="text-muted-foreground">Fan, Member since 2021</p>
+                      <p className="font-semibold text-white">Priya Singh</p>
+                      <p className="text-gray-400">Fan, Member since 2021</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -217,11 +243,11 @@ const Register = () => {
 
             {/* Registration Form */}
             <div className="lg:col-span-2">
-              <Card className="card-athletic">
+              <Card className="bg-[#1e3a5f] border-gray-700 text-white">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gradient-hero flex items-center">
-                    <UserPlus className="w-8 h-8 mr-3" />
-                    Join SP Kabaddi Group
+                  <CardTitle className="text-2xl text-white flex items-center">
+                    <UserPlus className="w-8 h-8 mr-3 text-[#facc15]" />
+                    Join SP Club
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -233,9 +259,9 @@ const Register = () => {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
+                            <FormLabel className="text-gray-300">Full Name <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter your full name" {...field} />
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your full name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -249,9 +275,9 @@ const Register = () => {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address <span className="text-destructive">*</span></FormLabel>
+                              <FormLabel className="text-gray-300">Email Address <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="Enter your email address" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="email" placeholder="Enter your email address" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -263,9 +289,9 @@ const Register = () => {
                           name="phone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Phone Number</FormLabel>
+                              <FormLabel className="text-gray-300">Phone Number</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your phone number" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your phone number" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -280,14 +306,14 @@ const Register = () => {
                           name="role"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Register As <span className="text-destructive">*</span></FormLabel>
+                              <FormLabel className="text-gray-300">Register As <span className="text-red-500">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
                                     <SelectValue placeholder="Select your role" />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
                                   {roles.map((role) => (
                                     <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
                                   ))}
@@ -303,14 +329,14 @@ const Register = () => {
                           name="ageGroup"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Age Group</FormLabel>
+                              <FormLabel className="text-gray-300">Age Group</FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
                                     <SelectValue placeholder="Select your age group" />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
                                   {ageGroups.map((age) => (
                                     <SelectItem key={age.value} value={age.value}>{age.label}</SelectItem>
                                   ))}
@@ -329,15 +355,15 @@ const Register = () => {
                           name="dob"
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
-                              <FormLabel>Date of Birth <span className="text-destructive">*</span></FormLabel>
+                              <FormLabel className="text-gray-300">Date of Birth <span className="text-red-500">*</span></FormLabel>
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
                                     <Button
                                       variant={"outline"}
                                       className={cn(
-                                        "pl-3 text-left font-normal",
-                                        !field.value && "text-muted-foreground"
+                                        "pl-3 text-left font-normal bg-[#0a192f] border-gray-600 text-white hover:bg-[#1e3a5f] hover:text-white",
+                                        !field.value && "text-gray-400"
                                       )}
                                     >
                                       {field.value ? (
@@ -350,7 +376,6 @@ const Register = () => {
                                   </FormControl>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
-                                  {/* START: Changed Code */}
                                   <Calendar
                                     mode="single"
                                     selected={field.value}
@@ -364,7 +389,6 @@ const Register = () => {
                                     initialFocus
                                     className={cn("p-3 pointer-events-auto")}
                                   />
-                                  {/* END: Changed Code */}
                                 </PopoverContent>
                               </Popover>
                               <FormMessage />
@@ -377,9 +401,9 @@ const Register = () => {
                           name="aadharNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Aadhar Number <span className="text-destructive">*</span></FormLabel>
+                              <FormLabel className="text-gray-300">Aadhar Number <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter 12-digit Aadhar number" maxLength={12} {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter 12-digit Aadhar number" maxLength={12} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -393,14 +417,14 @@ const Register = () => {
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Kabaddi Experience</FormLabel>
+                            <FormLabel className="text-gray-300">Sports Experience</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
                                   <SelectValue placeholder="Select your experience level" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
                                 {experienceLevels.map((level) => (
                                   <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                                 ))}
@@ -417,9 +441,9 @@ const Register = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel className="text-gray-300">Address</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter your address" {...field} />
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your address" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -432,11 +456,11 @@ const Register = () => {
                         name="clubDetails"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Why do you want to join SP Kabaddi Group? <span className="text-destructive">*</span></FormLabel>
+                            <FormLabel className="text-gray-300">Why do you want to join SP Club? <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Share your motivation, goals, or what you hope to achieve by joining our club..."
-                                className="min-h-[100px]"
+                                className="min-h-[100px] bg-[#0a192f] border-gray-600 text-white placeholder-gray-400"
                                 {...field}
                               />
                             </FormControl>
@@ -451,10 +475,11 @@ const Register = () => {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Additional Information</FormLabel>
+                            <FormLabel className="text-gray-300">Additional Information</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Share any additional information or questions you have"
+                                className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400"
                                 {...field}
                               />
                             </FormControl>
@@ -476,7 +501,7 @@ const Register = () => {
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
+                              <FormLabel className="text-gray-300">
                                 Subscribe to our newsletter for updates on events, matches, and community activities
                               </FormLabel>
                             </div>
@@ -497,8 +522,8 @@ const Register = () => {
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                I agree to the <a href="#" className="text-primary underline">Terms and Conditions</a> and <a href="#" className="text-primary underline">Privacy Policy</a> <span className="text-destructive">*</span>
+                              <FormLabel className="text-gray-300">
+                                I agree to the <a href="#" className="text-[#facc15] underline">Terms and Conditions</a> and <a href="#" className="text-[#facc15] underline">Privacy Policy</a> <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormMessage />
                             </div>
@@ -509,8 +534,8 @@ const Register = () => {
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full btn-hero text-lg py-6"
-                        disabled={isSubmitting} // Use isSubmitting from form.formState
+                        className="w-full bg-[#facc15] text-[#0a192f] hover:bg-yellow-400 text-lg py-6"
+                        disabled={isSubmitting}
                       >
                         {isSubmitting ? "Processing..." : "Register Now"}
                       </Button>

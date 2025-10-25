@@ -1,4 +1,4 @@
-import { useState } from "react"; // Kept for consistency, though formState.isSubmitting handles submission state
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -33,12 +33,11 @@ const Contact = () => {
     },
   });
 
-  // Accessing isSubmitting from formState directly
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("https://sp-club-backend.onrender.com/api/contact", { // <--- Backend API endpoint
+      const response = await fetch("https://sp-club-backend.onrender.com/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,11 +51,10 @@ const Contact = () => {
         toast({
           title: "Message Sent Successfully! 📧",
           description: result.message || "We'll get back to you within 24 hours.",
-          variant: "default", // You might define a 'success' variant in your toast setup
+          variant: "default",
         });
-        form.reset(); // Reset the form after successful submission
+        form.reset();
       } else {
-        // Handle backend errors
         toast({
           title: "Failed to Send Message ❌",
           description: result.message || "Something went wrong. Please try again.",
@@ -74,24 +72,37 @@ const Contact = () => {
   };
 
   const googleMapsLink = "https://www.google.com/maps/search/?api=1&query=QCJF%2BF93+SP+Kabaddi+Group+Dhanbad%2C+Shakti+Mandir+Path%2C+Dhanbad%2C+Jharkhand+826007";
-  const mapAddress = "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007";
-
+  const mapAddress = "SP Club, Shakti Mandir Path, Dhanbad, Jharkhand 826007";
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#0a192f] text-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-secondary to-blue-700 text-secondary-foreground py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-              Contact <span className="text-accent">SP Club</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-secondary-foreground/90 animate-fade-in-up">
-              Get in touch with us - we're here to help you succeed
-            </p>
-          </div>
+      <div className="relative">
+        {/* START: Background Element */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* 
+            ============================================================
+            == PASTE YOUR IMAGE OR VIDEO TAG HERE                       ==
+            == Example: <img src="/images/your-contact-bg.jpg" alt="Background" className="w-full h-full object-cover" /> ==
+            ============================================================
+          */}
+          <div className="absolute inset-0 bg-black opacity-60"></div>
         </div>
-      </section>
+        {/* END: Background Element */}
+
+        <section className="relative z-10 bg-transparent text-white py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
+                Contact <span className="text-[#facc15]">SP Club</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
+                Get in touch with us - we're here to help you succeed
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -99,23 +110,23 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-gradient-hero mb-6">Get in Touch</h2>
-                <p className="text-muted-foreground text-lg">
+                <h2 className="text-3xl font-bold text-white mb-6">Get in Touch</h2>
+                <p className="text-gray-400 text-lg">
                   Ready to start your sporting journey? Have questions about our programs?
                   We'd love to hear from you!
                 </p>
               </div>
 
               <div className="space-y-6">
-                <Card className="card-athletic">
+                <Card className="bg-[#1e3a5f] border-gray-700">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-primary-foreground" />
+                      <div className="w-12 h-12 bg-[#facc15] rounded-lg flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-[#0a192f]" />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg mb-2">Visit Us</h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-gray-300">
                           {mapAddress.split(', ').map((line, index) => (
                             <span key={index}>{line}<br /></span>
                           ))}
@@ -125,15 +136,15 @@ const Contact = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="card-champion">
+                <Card className="bg-[#1e3a5f] border-gray-700">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
-                        <Phone className="w-6 h-6 text-accent-foreground" />
+                      <div className="w-12 h-12 bg-[#facc15] rounded-lg flex items-center justify-center">
+                        <Phone className="w-6 h-6 text-[#0a192f]" />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg mb-2">Call Us</h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-gray-300">
                           Main Office: +91 9876543210<br />
                           Membership: +91 9876543211
                         </p>
@@ -142,15 +153,15 @@ const Contact = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="card-athletic">
+                <Card className="bg-[#1e3a5f] border-gray-700">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
-                        <Mail className="w-6 h-6 text-secondary-foreground" />
+                      <div className="w-12 h-12 bg-[#facc15] rounded-lg flex items-center justify-center">
+                        <Mail className="w-6 h-6 text-[#0a192f]" />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg mb-2">Email Us</h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-gray-300">
                           General: info@spclub.in<br />
                           Membership: join@spclub.in<br />
                           Coaching: coaches@spclub.in
@@ -160,15 +171,15 @@ const Contact = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="card-champion">
+                <Card className="bg-[#1e3a5f] border-gray-700">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-primary-foreground" />
+                      <div className="w-12 h-12 bg-[#facc15] rounded-lg flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-[#0a192f]" />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg mb-2">Operating Hours</h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-gray-300">
                           Monday - Friday: 6:00 AM - 10:00 PM<br />
                           Saturday - Sunday: 7:00 AM - 9:00 PM<br />
                           Public Holidays: 8:00 AM - 6:00 PM
@@ -182,11 +193,10 @@ const Contact = () => {
 
             {/* Contact Form and Map */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Contact Form */}
-              <Card className="card-athletic">
+              <Card className="bg-[#1e3a5f] border-gray-700">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gradient-hero flex items-center">
-                    <Send className="w-8 h-8 mr-3" />
+                  <CardTitle className="text-2xl text-white flex items-center">
+                    <Send className="w-8 h-8 mr-3 text-[#facc15]" />
                     Send us a Message
                   </CardTitle>
                 </CardHeader>
@@ -199,23 +209,22 @@ const Contact = () => {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Full Name</FormLabel>
+                              <FormLabel className="text-gray-300">Full Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter your full name" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your full name" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
                         <FormField
                           control={form.control}
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address</FormLabel>
+                              <FormLabel className="text-gray-300">Email Address</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="your.email@example.com" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="email" placeholder="your.email@example.com" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -228,9 +237,9 @@ const Contact = () => {
                         name="subject"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Subject</FormLabel>
+                            <FormLabel className="text-gray-300">Subject</FormLabel>
                             <FormControl>
-                              <Input placeholder="What is your message about?" {...field} />
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="What is your message about?" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -242,11 +251,11 @@ const Contact = () => {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Message</FormLabel>
+                            <FormLabel className="text-gray-300">Message</FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Tell us more about your inquiry..."
-                                className="min-h-[120px]"
+                                className="min-h-[120px] bg-[#0a192f] border-gray-600 text-white placeholder-gray-400"
                                 {...field}
                               />
                             </FormControl>
@@ -258,8 +267,8 @@ const Contact = () => {
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full btn-hero text-lg py-6"
-                        disabled={isSubmitting} // Use isSubmitting from form.formState
+                        className="w-full bg-[#facc15] text-[#0a192f] hover:bg-yellow-400 text-lg py-6"
+                        disabled={isSubmitting}
                       >
                         {isSubmitting ? "Sending..." : "Send Message"}
                       </Button>
@@ -269,21 +278,21 @@ const Contact = () => {
               </Card>
 
               {/* Map Section */}
-              <Card className="card-athletic">
+              <Card className="bg-[#1e3a5f] border-gray-700">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gradient-hero">Find Us on Map</CardTitle>
+                  <CardTitle className="text-2xl text-white">Find Us on Map</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center">
+                  <div className="aspect-video bg-[#0a192f] rounded-lg flex items-center justify-center p-4">
                     <div className="text-center">
-                      <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
+                      <MapPin className="w-16 h-16 text-[#facc15] mx-auto mb-4" />
                       <h3 className="text-xl font-bold mb-2">SP Club Sports Complex</h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-gray-300 mb-4">
                         {mapAddress.split(', ').map((line, index) => (
                           <span key={index}>{line}<br /></span>
                         ))}
                       </p>
-                      <Button asChild variant="outline" className="hover:bg-primary hover:text-primary-foreground">
+                      <Button asChild className="bg-transparent border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0a192f]">
                         <a href={googleMapsLink} target="_blank" rel="noopener noreferrer">
                           Open in Google Maps
                         </a>
@@ -298,50 +307,50 @@ const Contact = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-[#071425]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-gradient-hero">Frequently Asked Questions</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
+            <p className="text-xl text-gray-400">
               Quick answers to common questions about SP Club
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="card-athletic">
+            <Card className="bg-[#1e3a5f] border-gray-700">
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-3">What sports do you offer?</h3>
-                <p className="text-muted-foreground">
+                <h3 className="font-bold text-lg mb-3 text-white">What sports do you offer?</h3>
+                <p className="text-gray-300">
                   We offer training in Cricket, Football, Basketball, Swimming, Tennis, Badminton,
                   Athletics, Boxing, Wrestling, and Volleyball.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="card-athletic">
+            <Card className="bg-[#1e3a5f] border-gray-700">
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-3">What are the membership fees?</h3>
-                <p className="text-muted-foreground">
+                <h3 className="font-bold text-lg mb-3 text-white">What are the membership fees?</h3>
+                <p className="text-gray-300">
                   Our memberships start from ₹2,000/month for basic access. Premium and Elite
                   memberships offer additional benefits and personalized training.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="card-athletic">
+            <Card className="bg-[#1e3a5f] border-gray-700">
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-3">Do you provide equipment?</h3>
-                <p className="text-muted-foreground">
+                <h3 className="font-bold text-lg mb-3 text-white">Do you provide equipment?</h3>
+                <p className="text-gray-300">
                   Basic equipment is available for use. Elite members get complimentary
                   equipment. Personal gear can be purchased through our pro shop.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="card-athletic">
+            <Card className="bg-[#1e3a5f] border-gray-700">
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-3">Are trial sessions available?</h3>
-                <p className="text-muted-foreground">
+                <h3 className="font-bold text-lg mb-3 text-white">Are trial sessions available?</h3>
+                <p className="text-gray-300">
                   Yes! We offer free trial sessions for new members. Contact us to schedule
                   your trial and experience our facilities firsthand.
                 </p>

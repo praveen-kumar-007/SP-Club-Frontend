@@ -4,19 +4,113 @@ import { X, ArrowLeft, ArrowRight, Camera } from "lucide-react";
 // --- DUMMY DATA ---
 // In a real-world app, you'd fetch this from a CMS or API.
 // Images are from Pexels.com
+
+
+
 const galleryItems = [
-  { id: 1, title: "State Championship Victory", category: "championships", description: "The unforgettable moment our cricket team lifted the state championship trophy after a hard-fought final.", image: "https://images.pexels.com/photos/2444852/pexels-photo-2444852.jpeg", thumbnail: "https://images.pexels.com/photos/2444852/pexels-photo-2444852.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 2, title: "Morning Training Session", category: "training", description: "Early morning dedication. Our athletes pushing their limits during a high-intensity fitness session.", image: "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg", thumbnail: "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 3, title: "Community Sports Festival", category: "events", description: "Bringing the community together through the power of sports at our annual family-friendly festival.", image: "https://images.pexels.com/photos/1571739/pexels-photo-1571739.jpeg", thumbnail: "https://images.pexels.com/photos/1571739/pexels-photo-1571739.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 4, title: "Inter-Club Football Match", category: "matches", description: "Action from the thrilling inter-club football final, where teamwork and strategy were on full display.", image: "https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg", thumbnail: "https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 5, title: "Swimming Championship Heats", category: "championships", description: "Our swimmers showcasing their power and grace at the regional swimming championships hosted at our club.", image: "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg", thumbnail: "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 6, title: "Youth Basketball Clinic", category: "training", description: "Nurturing the next generation. Young athletes learning the fundamentals of basketball from our expert coaches.", image: "https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg", thumbnail: "https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 7, title: "Annual Awards Gala", category: "events", description: "A night of celebration. Honoring the hard work and outstanding achievements of our athletes at the annual awards ceremony.", image: "https://images.pexels.com/photos/3171837/pexels-photo-3171837.jpeg", thumbnail: "https://images.pexels.com/photos/3171837/pexels-photo-3171837.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 8, title: "Cricket Net Practice", category: "training", description: "Perfecting technique. A focused net practice session for our senior cricket team ahead of the new season.", image: "https://images.pexels.com/photos/1604730/pexels-photo-1604730.jpeg", thumbnail: "https://images.pexels.com/photos/1604730/pexels-photo-1604730.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 9, title: "Volleyball Tournament Finals", category: "matches", description: "The final, breathtaking point of the inter-club volleyball tournament.", image: "https://images.pexels.com/photos/6203520/pexels-photo-6203520.jpeg", thumbnail: "https://images.pexels.com/photos/6203520/pexels-photo-6203520.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 10, title: "Victory Parade", category: "championships", description: "Celebrating our national hockey title with the entire community during a memorable victory parade.", image: "https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg", thumbnail: "https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 11, title: "Athlete of the Year", category: "events", description: "Presenting the 'Athlete of the Year' award to our most outstanding performer.", image: "https://images.pexels.com/photos/716281/pexels-photo-716281.jpeg", thumbnail: "https://images.pexels.com/photos/716281/pexels-photo-716281.jpeg?auto=compress&cs=tinysrgb&w=600" },
-  { id: 12, title: "Dawn Runners Club", category: "training", description: "The dedicated members of our running club hitting the track as the sun rises.", image: "https://images.pexels.com/photos/11552553/pexels-photo-11552553.jpeg", thumbnail: "https://images.pexels.com/photos/11552553/pexels-photo-11552553.jpeg?auto=compress&cs=tinysrgb&w=600" },
+  // Championships (grouped)
+  {
+    id: 1,
+    title: "State Championship Victory",
+    category: "championships",
+    description: "Celebrating success! Our girls' Kabaddi team after winning the State Championship.",
+    image: "/home_assets/girls_state2nd.jpg",
+    thumbnail: "/home_assets/girls_state2nd.jpg"
+  },
+  {
+    id: 2,
+    title: "Champion Boys Team",
+    category: "championships",
+    description: "Proud champions! Our boys' Kabaddi team celebrating their Tournaments.",
+    image: "/home_assets/win_bihar_state.jpg",
+    thumbnail: "/home_assets/win_bihar_state.jpg"
+  },
+  {
+    id: 3,
+    title: "Winning 1st SP Club Kabaddi Team ",
+    category: "championships",
+    description: "Victory pose! Our Kabaddi team after clinching the championship title.",
+    image: "/home_assets/win_holi.jpg",
+    thumbnail: "/home_assets/win_holi.jpg"
+  },
+
+  // Training
+  {
+    id: 4,
+    title: "Training Session",
+    category: "training",
+    description: "Lion Jump Drills in action. Our athletes pushing their limits during an intense training session.",
+    image: "/home_assets/jump_lion.jpg",
+    thumbnail: "/home_assets/jump_lion.jpg"
+  },
+  {
+    id: 5,
+    title: "Hard Practice of Kabaddi by Junior Team",
+    category: "training",
+    description: "Focused and determined. Our junior Kabaddi team honing their skills during a rigorous practice session.",
+    image: "/home_assets/practice_session.jpg",
+    thumbnail: "/home_assets/practice_session.jpg"
+  },
+  {
+    id: 6,
+    title: "Senior Kabaddi Boys Team",
+    category: "training",
+    description: "Our senior Kabaddi Team Going For Jharkhand Senior State Champhionship.",
+    image: "/home_assets/boys_senior.jpg",
+    thumbnail: "/home_assets/boys_senior.jpg"
+  },
+  {
+    id: 7,
+    title: "Senior Kabaddi Girls Team",
+    category: "training",
+    description: "Our Senior Kabaddi Girls Team Going For Jharkhand Senior State Champhionship.",
+    image: "/home_assets/girls_senior.jpg",
+    thumbnail: "/home_assets/girls_senior.jpg"
+  },
+
+  // Matches
+  {
+    id: 8,
+    title: "Dhanbad Districs Kabaddi Trial Final",
+    category: "matches",
+    description: "Intense moments from the Dhanbad Districts Kabaddi Trial Final, showcasing skill and determination on the field.",
+    image: "/home_assets/trial.jpg",
+    thumbnail: "/home_assets/trial.jpg"
+  },
+  {
+    id: 9,
+    title: "Kabaddi is Going to be played",
+    category: "matches",
+    description: "Exciting moment as the Kabaddi match is about to begin, with players ready to showcase their skills and agility.",
+    image: "/home_assets/team_stand_g.jpg",
+    thumbnail: "/home_assets/team_stand_g.jpg"
+  },
+
+  // Events
+  {
+    id: 10,
+    title: "Diwali Sports Festival",
+    category: "events",
+    description: "Celebrating Diwali with sports and camaraderie. Our club members enjoying various games and activities during the festival.",
+    image: "/home_assets/diwali.jpg",
+    thumbnail: "/home_assets/diwali.jpg"
+  },
+  {
+    id: 11,
+    title: "Holi Sports Event",
+    category: "events",
+    description: "Colorful moments from our Holi Sports Event, where fun and fitness come together in a vibrant celebration.",
+    image: "/home_assets/win_holi.jpg",
+    thumbnail: "/home_assets/win_holi.jpg"
+  },
+  {
+    id: 12,
+    title: "Worship of Kabaddi Court",
+    category: "events",
+    description: "Blessings for the game! Our club members performing a traditional worship ceremony for the Kabaddi court before the season begins.",
+    image: "/home_assets/worship_court.jpg",
+    thumbnail: "/home_assets/worship_court.jpg"
+  }
 ];
 
 const categories = [

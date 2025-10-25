@@ -1,6 +1,7 @@
 import { Play, Users, Trophy, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   // #################################################################
@@ -8,7 +9,7 @@ const Home = () => {
   // #################################################################
 
   // 1. Hero Section Background Video
-  const heroVideoUrl = "/home.mp4";
+  const heroVideoUrl = "/home_assets/main.mp4";
 
   // 2. "Our Story" Section Video
   const storyVideoUrl = "https://www.pexels.com/video/34430850/";
@@ -17,23 +18,23 @@ const Home = () => {
   const galleryImages = [
     {
       id: 1,
-      src: "https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      src: "/home_assets/win_bihar_state.jpg",
       alt: "Celebrating a hard-earned victory.",
     },
     {
       id: 2,
-      src: "https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      alt: "Soaring high for the dunk.",
+      src: "/home_assets/girls_state2nd.jpg",
+      alt: "Celebrating Girl's Team State Runner-Up.",
     },
     {
       id: 3,
-      src: "https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      alt: "The moment before the kick-off.",
+      src: "/home_assets/win_holi.jpg",
+      alt: "The First Team of SP Club.",
     },
     {
       id: 4,
-      src: "https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      alt: "Pushing the limits in the water.",
+      src: "/home_assets/celebrate_birthday_coach.jpg",
+      alt: "Celebrating Birthday of Head Coach.",
     },
   ];
 
@@ -58,12 +59,16 @@ const Home = () => {
             Where Champions Are Forged and Legacies Are Built
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in delay-400">
-            <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
-              Become a Champion
-            </Button>
-            <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
-              Our Legacy
-            </Button>
+            <Link to="/Register">
+              <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
+                Become a Champion
+              </Button>
+            </Link>
+            <Link to="/Gallery">
+              <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
+                Our Legacy
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -180,12 +185,16 @@ const Home = () => {
             Take the first step towards achieving your sporting dreams with SP Club.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
-              Start Your Journey
-            </Button>
-            <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
-              Learn More
-            </Button>
+            <Link to="/Register">
+              <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
+                Start Your Journey
+              </Button>
+            </Link>
+            <Link to="/About">
+              <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

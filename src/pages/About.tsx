@@ -65,30 +65,30 @@ const About = () => {
   // Data for the team members - easy to update
   const teamMembers = [
     {
-      name: "Rajesh Kumar",
+      name: "Pappu Kumar Yadav",
       role: "Founder & Head Coach",
-      bio: "With over 15 years of experience, Rajesh founded SP Club to create a new generation of champions.",
-      image: "https://images.pexels.com/photos/837358/pexels-photo-837358.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      bio: "With over 15 years of experience, Pappu founded SP Club to create a new generation of champions.",
+      image: "/pappu_yadav.png",
       social: {
         linkedin: "#",
         twitter: "#",
       },
     },
     {
-      name: "Priya Sharma",
-      role: "Sports Director",
-      bio: "Priya oversees all athletic programs, ensuring excellence and innovation in our training methodologies.",
-      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      name: "Sunny Rai",
+      role: "Tresurer & Operations Manager",
+      bio: "Sunny ensures the smooth operation of SP Club, managing finances and logistics with precision.",
+      image: "/about_assets/sunny.jpg",
       social: {
         linkedin: "#",
         twitter: "#",
       },
     },
     {
-      name: "Amit Singh",
-      role: "Youth Development Lead",
-      bio: "Amit is passionate about nurturing young talent and heads our youth development programs.",
-      image: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      name: "Deepak Kumar",
+      role: "Senior Player & Mentor",
+      bio: "A seasoned athlete, Deepak mentors our young talents, sharing his wealth of experience.",
+      image: "/about_assets/deepak.jpg",
       social: {
         linkedin: "#",
         twitter: "#",
@@ -123,7 +123,7 @@ const About = () => {
   return (
     <div className="bg-slate-900 text-white">
       {/* Hero Section */}
-      <section className="relative py-32 bg-cover bg-center" style={{ backgroundImage: "url('https://images.pexels.com/photos/1618269/pexels-photo-1618269.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')" }}>
+      <section className="relative py-32 bg-cover bg-center" style={{ backgroundImage: "url('/about.png')" }}>
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight">About <span className="text-amber-400">SP Club</span></h1>
@@ -196,7 +196,7 @@ const About = () => {
       <section className="py-24 bg-white text-slate-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Meet Our Champions</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Meet our Managing Team</h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">The dedicated professionals who embody our spirit of excellence and drive our mission forward.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
