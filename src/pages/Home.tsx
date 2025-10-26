@@ -1,3 +1,4 @@
+// ...existing code...
 import { Play, Users, Trophy, Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,8 +12,28 @@ const Home = () => {
   // 1. Hero Section Background Video
   const heroVideoUrl = "/home_assets/main.mp4";
 
-  // 2. "Our Story" Section Video
-  const storyVideoUrl = "https://www.pexels.com/video/34430850/";
+  // 2. "Our Story" Section Video (any YouTube URL — will be converted to embed)
+  const storyVideoUrl = "https://youtu.be/Xh0fFo3rsG4?si=SRhJWgB1U1zgBRqC";
+
+  // convert common YouTube URL formats to embed URL
+  const toEmbedUrl = (url: string) => {
+    try {
+      // try to extract 11-char video id with regex (works for most formats)
+      const idMatch = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:\b|$)/);
+      if (idMatch && idMatch[1]) return `https://www.youtube.com/embed/${idMatch[1]}`;
+
+      // fallback for youtu.be short link
+      const shortMatch = url.match(/youtu\.be\/([0-9A-Za-z_-]{11})/);
+      if (shortMatch && shortMatch[1]) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+
+      // if already an embed URL or unknown, return as-is
+      return url;
+    } catch {
+      return url;
+    }
+  };
+
+  const embedStoryUrl = toEmbedUrl(storyVideoUrl);
 
   // 3. "Hall of Fame" Photo Gallery
   const galleryImages = [
@@ -86,12 +107,19 @@ const Home = () => {
                 Explore Our History <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
+
+            {/* embed responsive YouTube iframe instead of <video> */}
             <div className="relative rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500 group">
-              <video
-                className="w-full h-full object-cover"
-                src={storyVideoUrl}
-                controls
-              />
+              <div className="w-full h-0 pb-[56.25%] relative"> {/* 16:9 box */}
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={embedStoryUrl}
+                  title="SP Club Story"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <Play size={64} className="text-white bg-amber-500/80 p-4 rounded-full" />
               </div>
@@ -202,4 +230,5 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;
+// ...existing code...
