@@ -10,7 +10,7 @@ const Home = () => {
   // #################################################################
 
   // 1. Hero Section Background Video
-  const heroVideoUrl = "/home_assets/main.mp4";
+  const heroVideoUrl = "/home_assets/home_back.mp4";
 
   // 2. "Our Story" Section Video (any YouTube URL — will be converted to embed)
   const storyVideoUrl = "https://youtu.be/Xh0fFo3rsG4?si=SRhJWgB1U1zgBRqC";
