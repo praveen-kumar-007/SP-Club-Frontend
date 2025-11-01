@@ -75,7 +75,7 @@ const About = () => {
       },
     },
     {
-      name: "Sunny Rai",
+      name: "Sunny Ray",
       role: "Tresurer & Operations Manager",
       bio: "Sunny ensures the smooth operation of SP Club, managing finances and logistics with precision.",
       image: "/about_assets/sunny.jpg",
