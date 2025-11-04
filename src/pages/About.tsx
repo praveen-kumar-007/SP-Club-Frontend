@@ -78,7 +78,7 @@ const About = () => {
       name: "Sunny Ray",
       role: "Tresurer & Operations Manager",
       bio: "Sunny ensures the smooth operation of SP Club, managing finances and logistics with precision.",
-      image: "/about_assets/sunny.jpg",
+      image: "/about_assets/sunny.jpg.jpg",
       social: {
         linkedin: "#",
         twitter: "#",
@@ -88,7 +88,7 @@ const About = () => {
       name: "Deepak Kumar",
       role: "Senior Player & Mentor",
       bio: "A seasoned athlete, Deepak mentors our young talents, sharing his wealth of experience.",
-      image: "/about_assets/deepak.jpg",
+      image: "/about_assets/deepak.jpg.jpg",
       social: {
         linkedin: "#",
         twitter: "#",
