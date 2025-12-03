@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ArrowLeft, ArrowRight, Camera } from "lucide-react";
+import Seo from "@/components/Seo";
 
 // --- DUMMY DATA ---
 // In a real-world app, you'd fetch this from a CMS or API.
@@ -208,6 +209,13 @@ const Gallery = () => {
 
   return (
     <div className="bg-slate-900 min-h-screen text-white">
+      <Seo
+        title="Gallery"
+        description="Gallery — Photos from SP Club (SP Kabaddi Group Dhanbad) showcasing training, matches, championships, and events."
+        url="https://spkabaddi.me/gallery"
+        image="https://spkabaddi.me/Logo.png"
+        keywords="SP Club gallery, SP Kabaddi Group Dhanbad photos, spkg gallery"
+      />
       {/* Hero Section */}
       <section className="relative py-32 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://images.pexels.com/photos/220201/pexels-photo-220201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')" }}>
         <div className="absolute inset-0 bg-black/60"></div>

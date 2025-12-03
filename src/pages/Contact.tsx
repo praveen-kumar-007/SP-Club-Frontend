@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import Seo from "@/components/Seo";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -76,6 +77,13 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-[#0a192f] text-white">
+      <Seo
+        title="Contact"
+        description="Contact SP Club (SP Kabaddi Group Dhanbad) — get in touch to join, enquire about coaching, events, or membership."
+        url="https://spkabaddi.me/contact"
+        image="https://spkabaddi.me/Logo.png"
+        keywords="contact SP Club, SP Kabaddi Group Dhanbad contact, spkg contact"
+      />
       {/* Hero Section */}
       <div className="relative">
         {/* START: Background Element */}

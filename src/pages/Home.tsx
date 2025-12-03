@@ -1,5 +1,6 @@
 // ...existing code...
 import { Play, Users, Trophy, Calendar, ArrowRight } from "lucide-react";
+import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -61,6 +62,13 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <Seo
+        title="Home"
+        description="SP Club (SP Kabaddi Group Dhanbad) — training champions since 2010. Join our programs, events, and community."
+        url="https://spkabaddi.me/"
+        image="https://spkabaddi.me/Logo.png"
+        keywords="SP Club, SP Kabaddi Group Dhanbad, kabaddi Dhanbad, sports club Dhanbad, spkg"
+      />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-white">
         <video

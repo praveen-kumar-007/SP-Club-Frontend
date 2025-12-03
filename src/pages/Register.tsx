@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Star, Shield, Calendar as CalendarIcon, Users, Trophy, Target } from "lucide-react";
+import Seo from "@/components/Seo";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -123,6 +124,13 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-[#0a192f]">
+      <Seo
+        title="Register"
+        description="Register with SP Club (SP Kabaddi Group Dhanbad) to join training, events, and community programs."
+        url="https://spkabaddi.me/register"
+        image="https://spkabaddi.me/Logo.png"
+        keywords="register SP Club, join SP Kabaddi Group Dhanbad, spkg register"
+      />
       {/* Hero Section with Background Container */}
       <div className="relative">
         {/* START: Background Element */}

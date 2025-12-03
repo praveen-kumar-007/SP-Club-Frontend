@@ -61,6 +61,8 @@ const AnimatedCounter = ({ endValue }: { endValue: number }) => {
 };
 
 
+import Seo from "@/components/Seo";
+
 const About = () => {
   // Data for the team members - easy to update
   const teamMembers = [
@@ -122,6 +124,13 @@ const About = () => {
 
   return (
     <div className="bg-slate-900 text-white">
+      <Seo
+        title="About"
+        description="Learn about SP Club (SP Kabaddi Group Dhanbad) — our mission, history, and core team dedicated to building champions."
+        url="https://spkabaddi.me/about"
+        image="https://spkabaddi.me/Logo.png"
+        keywords="about SP Club, SP Kabaddi Group Dhanbad, sports history Dhanbad, spkg"
+      />
       {/* Hero Section */}
       <section className="relative py-32 bg-cover bg-center" style={{ backgroundImage: "url('/about.png')" }}>
         <div className="absolute inset-0 bg-black/60"></div>
