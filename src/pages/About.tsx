@@ -96,6 +96,16 @@ const About = () => {
         twitter: "#",
       },
     },
+    {
+      name: "Praveen Kumar",
+      role: "Senior Player & Mentor | Digital Architect",
+      bio: "A skilled and dedicated athlete, Praveen is instrumental in shaping the next generation of Kabaddi champions. Beyond the ground, he architected and developed this entire digital platform—bringing SP Club's vision to life through innovative technology and seamless user experiences. His dual expertise in athletic excellence and digital innovation makes him the creative force driving both our physical and digital legacy.",
+      image: "/about_assets/praveen.png",
+      social: {
+        linkedin: "#",
+        twitter: "#",
+      },
+    },
   ];
 
   // Data for the timeline - easy to update
