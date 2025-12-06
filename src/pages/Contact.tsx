@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import Seo from "@/components/Seo";
+import { API_ENDPOINTS } from "@/config/api";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -38,7 +39,7 @@ const Contact = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("https://sp-club-backend.onrender.com/api/contact", {
+      const response = await fetch(API_ENDPOINTS.CONTACT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

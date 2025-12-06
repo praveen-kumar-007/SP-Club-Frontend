@@ -12,10 +12,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Star, Shield, Calendar as CalendarIcon, Users, Trophy, Target } from "lucide-react";
+import { UserPlus, Star, Shield, Calendar as CalendarIcon, Users, Trophy, Target, X } from "lucide-react";
 import Seo from "@/components/Seo";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { API_ENDPOINTS } from "@/config/api";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -30,6 +31,8 @@ const formSchema = z.object({
   aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
   message: z.string().optional().or(z.literal('')),
+  photo: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Passport photo is required"),
+  kabaddiPositions: z.array(z.string()).optional(),
   newsletter: z.boolean().default(true),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms and conditions"),
 });
@@ -38,6 +41,7 @@ type FormData = z.infer<typeof formSchema>;
 
 const Register = () => {
   const { toast } = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -52,6 +56,7 @@ const Register = () => {
       aadharNumber: "",
       clubDetails: "",
       message: "",
+      kabaddiPositions: [],
       newsletter: true,
       terms: false,
     },
@@ -61,15 +66,46 @@ const Register = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("https://sp-club-backend.onrender.com/api/register", {
+      // Validate photo is uploaded
+      if (!selectedFile) {
+        toast({
+          title: "Error",
+          description: "Please upload your passport size photo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      
+      // Append all text fields
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('phone', data.phone || '');
+      formData.append('role', data.role);
+      formData.append('ageGroup', data.ageGroup || '');
+      formData.append('experience', data.experience || '');
+      formData.append('address', data.address || '');
+      formData.append('dob', data.dob.toISOString());
+      formData.append('aadharNumber', data.aadharNumber);
+      formData.append('clubDetails', data.clubDetails);
+      formData.append('message', data.message || '');
+      formData.append('newsletter', String(data.newsletter));
+      formData.append('terms', String(data.terms));
+      
+      // Append kabaddi positions as JSON string
+      if (data.kabaddiPositions && data.kabaddiPositions.length > 0) {
+        formData.append('kabaddiPositions', JSON.stringify(data.kabaddiPositions));
+      }
+      
+      // Append photo if selected
+      if (selectedFile) {
+        formData.append('photo', selectedFile);
+      }
+
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          dob: data.dob.toISOString(),
-        }),
+        body: formData, // Don't set Content-Type header, browser will set it with boundary
       });
 
       const result = await response.json();
@@ -81,6 +117,7 @@ const Register = () => {
           variant: "default",
         });
         form.reset();
+        setSelectedFile(null);
       } else {
         toast({
           title: "Registration Failed ❌",
@@ -120,6 +157,17 @@ const Register = () => {
     { value: "advanced", label: "Advanced" },
     { value: "professional", label: "Professional" },
     { value: "none", label: "No Experience" }
+  ];
+
+  const kabaddiPositions = [
+    { id: "raider", label: "Raider" },
+    { id: "rightCorner", label: "Right Corner" },
+    { id: "leftCorner", label: "Left Corner" },
+    { id: "rightIn", label: "Right In" },
+    { id: "leftIn", label: "Left In" },
+    { id: "leftCover", label: "Left Cover" },
+    { id: "rightCover", label: "Right Cover" },
+    { id: "allRounder", label: "All-Rounder" },
   ];
 
   return (
@@ -472,6 +520,124 @@ const Register = () => {
                                 {...field}
                               />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Passport Photo Upload */}
+                      <FormField
+                        control={form.control}
+                        name="photo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">
+                              Upload Passport Size Photo <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <div className="space-y-6">
+                                {/* File Upload */}
+                                <div className="py-2">
+                                  <Input
+                                    type="file"
+                                    accept="image/*"
+                                    required
+                                    className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15] file:text-[#0a192f] hover:file:bg-yellow-400"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        setSelectedFile(file);
+                                        field.onChange(file);
+                                      }
+                                    }}
+                                  />
+                                </div>
+
+                                {/* Preview uploaded image */}
+                                {selectedFile && (
+                                  <div className="bg-[#1e3a5f] p-6 rounded-lg border border-gray-600 mt-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                      <span className="text-sm font-medium text-white">
+                                        Uploaded Photo
+                                      </span>
+                                      <Button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedFile(null);
+                                          field.onChange(null);
+                                        }}
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-7 text-xs border-gray-600 text-white hover:bg-red-600 hover:border-red-600"
+                                      >
+                                        <X className="w-3 h-3 mr-1" />
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    <div className="relative w-full max-w-sm mx-auto mt-4">
+                                      <img
+                                        src={URL.createObjectURL(selectedFile)}
+                                        alt="Photo Preview"
+                                        className="w-full h-64 object-contain rounded-lg border-2 border-[#facc15] bg-[#0a192f] p-2"
+                                      />
+                                      <div className="mt-3 text-xs text-gray-400 text-center">
+                                        File: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Kabaddi Positions */}
+                      <FormField
+                        control={form.control}
+                        name="kabaddiPositions"
+                        render={() => (
+                          <FormItem>
+                            <div className="mb-4">
+                              <FormLabel className="text-gray-300">Kabaddi Positions (Select all that apply)</FormLabel>
+                              <p className="text-xs text-gray-400 mt-1">Optional - Select if you play kabaddi</p>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                              {kabaddiPositions.map((position) => (
+                                <FormField
+                                  key={position.id}
+                                  control={form.control}
+                                  name="kabaddiPositions"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={position.id}
+                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(position.id)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...(field.value || []), position.id])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== position.id
+                                                    )
+                                                  );
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="text-sm font-normal text-gray-300">
+                                          {position.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
