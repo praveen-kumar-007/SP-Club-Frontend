@@ -347,21 +347,6 @@ const RegistrationDetail = () => {
                       </div>
                     )}
                   </div>
-                  
-                  {/* Download Both Button */}
-                  {registration.aadharFront && registration.aadharBack && (
-                    <Button
-                      variant="default"
-                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg"
-                      onClick={() => {
-                        window.open(registration.aadharFront, '_blank');
-                        setTimeout(() => window.open(registration.aadharBack, '_blank'), 500);
-                      }}
-                    >
-                      <Download size={18} className="mr-2" />
-                      Download Both Sides
-                    </Button>
-                  )}
                 </CardContent>
               </Card>
             )}
