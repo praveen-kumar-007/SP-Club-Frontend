@@ -38,6 +38,7 @@ interface Registration {
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
   approvedAt?: string;
+  rejectedAt?: string;
   rejectionReason?: string;
   newsletter: boolean;
   terms: boolean;
@@ -518,18 +519,37 @@ const RegistrationDetail = () => {
             {/* Delete Action - Available for all statuses */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Delete Registration</CardTitle>
+                <CardTitle className="text-lg">
+                  {registration.status === 'rejected' ? 'Permanent Deletion' : 'Delete Registration'}
+                </CardTitle>
               </CardHeader>
               <CardContent>
+                {registration.status === 'rejected' && (
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Rejected Registration:</strong> This registration is stored in rejected status. 
+                      You can permanently delete it from the database if needed.
+                    </p>
+                    {registration.rejectionReason && (
+                      <p className="text-xs text-yellow-700 mt-2">
+                        <strong>Reason:</strong> {registration.rejectionReason}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <Button
                   variant="destructive"
                   className="w-full"
                   onClick={handleDelete}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Permanently
+                  {registration.status === 'rejected' ? 'Delete from Database Permanently' : 'Delete Permanently'}
                 </Button>
-                <p className="text-xs text-gray-500 mt-2">This action cannot be undone.</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  {registration.status === 'rejected' 
+                    ? 'This will permanently remove the rejected registration from the database.' 
+                    : 'This action cannot be undone.'}
+                </p>
               </CardContent>
             </Card>
 

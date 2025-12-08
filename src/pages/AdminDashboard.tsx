@@ -168,7 +168,7 @@ const AdminDashboard = () => {
       
       toast({
         title: "Success",
-        description: "Registration permanently deleted from database",
+        description: "Registration rejected and stored in database",
       });
       fetchRegistrations();
       fetchStats();
