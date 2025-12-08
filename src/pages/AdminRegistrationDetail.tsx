@@ -489,7 +489,7 @@ const RegistrationDetail = () => {
             {registration.status === 'pending' && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Actions</CardTitle>
+                  <CardTitle className="text-lg">Pending Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
@@ -531,6 +531,28 @@ const RegistrationDetail = () => {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Actions for Rejected Registrations */}
+            {registration.status === 'rejected' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Reconsider Application</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Rejection Reason:</strong> {registration.rejectionReason}
+                    </p>
+                  </div>
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={handleApprove}
+                  >
+                    Approve This Application
+                  </Button>
                 </CardContent>
               </Card>
             )}
