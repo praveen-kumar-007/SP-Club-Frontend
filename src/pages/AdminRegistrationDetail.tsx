@@ -53,6 +53,7 @@ const RegistrationDetail = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [expandedDetails, setExpandedDetails] = useState(false);
 
   const token = localStorage.getItem("adminToken");
 
@@ -354,10 +355,20 @@ const RegistrationDetail = () => {
             {/* Personal Information */}
             <Card>
               <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Personal Information</CardTitle>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="md:hidden"
+                    onClick={() => setExpandedDetails(!expandedDetails)}
+                  >
+                    {expandedDetails ? 'Hide' : 'View'} Details
+                  </Button>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
+              <CardContent className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Full Name</p>
                     <p className="font-medium">{registration.name}</p>
@@ -399,7 +410,7 @@ const RegistrationDetail = () => {
             </Card>
 
             {/* Club Details */}
-            <Card>
+            <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
               <CardHeader>
                 <CardTitle>Club Information</CardTitle>
               </CardHeader>
@@ -419,9 +430,9 @@ const RegistrationDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Kabaddi Positions */}
+            {/* Kabaddi Positions - Hidden on mobile unless expanded */}
             {registration.kabaddiPositions && registration.kabaddiPositions.length > 0 && (
-              <Card>
+              <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
                 <CardHeader>
                   <CardTitle>Kabaddi Positions</CardTitle>
                 </CardHeader>
@@ -435,9 +446,9 @@ const RegistrationDetail = () => {
               </Card>
             )}
 
-            {/* Additional Message */}
+            {/* Additional Message - Hidden on mobile unless expanded */}
             {registration.message && (
-              <Card>
+              <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
                 <CardHeader>
                   <CardTitle>Additional Message</CardTitle>
                 </CardHeader>
@@ -553,6 +564,54 @@ const RegistrationDetail = () => {
                   >
                     Approve This Application
                   </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Actions for Approved Registrations */}
+            {registration.status === 'approved' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Reconsider Approval</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-green-800">
+                      <strong>Approved on:</strong> {registration.approvedAt ? new Date(registration.approvedAt).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
+                  <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        Reject This Approval
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Reject Approved Registration</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Textarea
+                          placeholder="Enter reason for rejection..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          className="min-h-24"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={handleReject}
+                          disabled={isRejecting}
+                        >
+                          {isRejecting ? "Rejecting..." : "Reject"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             )}
