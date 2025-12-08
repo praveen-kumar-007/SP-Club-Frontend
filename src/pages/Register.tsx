@@ -807,8 +807,9 @@ const Register = () => {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                               <FormLabel className="text-gray-300">
-                                I agree to the <a href="#" className="text-[#facc15] underline">Terms and Conditions</a> and <a href="#" className="text-[#facc15] underline">Privacy Policy</a> <span className="text-red-500">*</span>
+                                I agree to the <a href="/terms-conditions" target="_blank" className="text-[#facc15] underline hover:text-yellow-300">Terms and Conditions</a> and <a href="/terms-conditions" target="_blank" className="text-[#facc15] underline hover:text-yellow-300">Privacy Policy</a> <span className="text-red-500">*</span>
                               </FormLabel>
+                              <p className="text-xs text-gray-400 mt-1">Including 14-day notice period, AKFI regulations, and NOC requirements for playing with other clubs</p>
                               <FormMessage />
                             </div>
                           </FormItem>

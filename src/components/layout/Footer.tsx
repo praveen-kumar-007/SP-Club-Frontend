@@ -90,9 +90,9 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Legal</h4>
             <ul className="space-y-3">
-              <li><a href="/privacy-policy" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
-              <li><a href="/terms-of-service" className="hover:text-amber-400 transition-colors duration-300">Terms of Service</a></li>
-              <li><a href="/sitemap" className="hover:text-amber-400 transition-colors duration-300">Sitemap</a></li>
+              <li><a href="/terms-conditions" className="hover:text-amber-400 transition-colors duration-300">Terms & Conditions</a></li>
+              <li><a href="/terms-conditions" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="https://spkabaddi.me/sitemap.xml" className="hover:text-amber-400 transition-colors duration-300">Sitemap</a></li>
             </ul>
           </div>
         </div>

@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Gallery from "./pages/Gallery";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
+import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/register" element={<Register />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/terms-conditions" element={<TermsConditions />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
