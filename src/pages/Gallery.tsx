@@ -56,7 +56,7 @@ const galleryItems = [
     id: 6,
     title: "Senior Kabaddi Boys Team",
     category: "training",
-    description: "Our senior Kabaddi Team Going For Jharkhand Senior State Champhionship.",
+    description: "Our senior Kabaddi team heading to the Jharkhand Senior State Championship.",
     image: "/home_assets/boys_senior.jpg",
     thumbnail: "/home_assets/boys_senior.jpg"
   },
@@ -64,7 +64,7 @@ const galleryItems = [
     id: 7,
     title: "Senior Kabaddi Girls Team",
     category: "training",
-    description: "Our Senior Kabaddi Girls Team Going For Jharkhand Senior State Champhionship.",
+    description: "Our senior Kabaddi girls team heading to the Jharkhand Senior State Championship.",
     image: "/home_assets/girls_senior.jpg",
     thumbnail: "/home_assets/girls_senior.jpg"
   },

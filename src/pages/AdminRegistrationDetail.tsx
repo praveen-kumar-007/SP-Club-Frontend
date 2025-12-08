@@ -144,7 +144,7 @@ const RegistrationDetail = () => {
       
       toast({
         title: "Success",
-        description: "Registration rejected and permanently removed from database",
+        description: "Registration rejected and stored in database",
       });
       setShowRejectDialog(false);
       setTimeout(() => navigate("/admin/dashboard"), 1500);
