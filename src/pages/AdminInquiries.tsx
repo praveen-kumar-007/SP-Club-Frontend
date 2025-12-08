@@ -96,12 +96,23 @@ const AdminInquiries = () => {
   const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter') => {
     try {
       const endpoint = type === 'contact' ? '/api/contact/admin' : '/api/newsletter/admin';
+      console.log('Marking as complete:', `${API_BASE_URL}${endpoint}/${id}`);
+      
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
         method: "PATCH",
-        headers: { "Authorization": `Bearer ${token}` },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to mark as completed");
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to mark as completed' }));
+        console.error('Error response:', errorData);
+        throw new Error(errorData.message || "Failed to mark as completed");
+      }
 
       toast({
         title: "Success",
@@ -109,6 +120,7 @@ const AdminInquiries = () => {
       });
       fetchInquiries();
     } catch (error) {
+      console.error('Mark complete error:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to update",
@@ -124,12 +136,23 @@ const AdminInquiries = () => {
 
     try {
       const endpoint = type === 'contact' ? '/api/contact/admin' : '/api/newsletter/admin';
+      console.log('Deleting:', `${API_BASE_URL}${endpoint}/${id}`);
+      
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
         method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to delete");
+      console.log('Delete response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to delete' }));
+        console.error('Delete error response:', errorData);
+        throw new Error(errorData.message || "Failed to delete");
+      }
 
       toast({
         title: "Success",
@@ -137,6 +160,7 @@ const AdminInquiries = () => {
       });
       fetchInquiries();
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to delete",
