@@ -341,6 +341,7 @@ const AdminDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
+                          <TableHead>Photo</TableHead>
                           <TableHead>Name</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Phone</TableHead>
@@ -352,6 +353,19 @@ const AdminDashboard = () => {
                       <TableBody>
                         {registrations.map((reg) => (
                           <TableRow key={reg._id} className="hover:bg-gray-50">
+                            <TableCell>
+                              {reg.photo ? (
+                                <img 
+                                  src={reg.photo} 
+                                  alt={reg.name}
+                                  className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                  <span className="text-gray-400 text-xs">No Photo</span>
+                                </div>
+                              )}
+                            </TableCell>
                             <TableCell>
                               <p className="font-medium">{reg.name}</p>
                             </TableCell>
@@ -369,11 +383,11 @@ const AdminDashboard = () => {
                             </TableCell>
                             <TableCell className="text-right">
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
                                 onClick={() => navigate(`/admin/registration/${reg._id}`)}
                               >
-                                <Eye size={16} />
+                                View
                               </Button>
                               {reg.status === 'pending' && (
                                 <>
