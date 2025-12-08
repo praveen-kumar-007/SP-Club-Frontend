@@ -55,6 +55,9 @@ const Register = () => {
   const [showAadharFrontCamera, setShowAadharFrontCamera] = useState(false);
   const [showAadharBackCamera, setShowAadharBackCamera] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  
+  // Calendar popover state
+  const [dobPopoverOpen, setDobPopoverOpen] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -563,7 +566,7 @@ const Register = () => {
                           render={({ field }) => (
                             <FormItem className="flex flex-col">
                               <FormLabel className="text-gray-300">Date of Birth <span className="text-red-500">*</span></FormLabel>
-                              <Popover>
+                              <Popover open={dobPopoverOpen} onOpenChange={setDobPopoverOpen}>
                                 <PopoverTrigger asChild>
                                   <FormControl>
                                     <Button
@@ -586,7 +589,10 @@ const Register = () => {
                                   <Calendar
                                     mode="single"
                                     selected={field.value}
-                                    onSelect={field.onChange}
+                                    onSelect={(date) => {
+                                      field.onChange(date);
+                                      setDobPopoverOpen(false);
+                                    }}
                                     captionLayout="dropdown-buttons"
                                     fromYear={1950}
                                     toYear={new Date().getFullYear()}

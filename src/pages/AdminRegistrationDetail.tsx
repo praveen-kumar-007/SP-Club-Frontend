@@ -283,48 +283,66 @@ const RegistrationDetail = () => {
             {(registration.aadharFront || registration.aadharBack) && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Aadhar Card Documents</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Aadhar Card Documents</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Aadhar Front */}
                     {registration.aadharFront && (
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">Aadhar Front Side</h3>
-                        <img
-                          src={registration.aadharFront}
-                          alt="Aadhar Front"
-                          className="w-full h-auto rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow"
-                        />
+                      <div className="space-y-3 bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border-2 border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-bold text-blue-900">Front Side</h3>
+                          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Verified</span>
+                        </div>
+                        <div className="relative group">
+                          <img
+                            src={registration.aadharFront}
+                            alt="Aadhar Front"
+                            className="w-full h-48 object-contain rounded-lg border-2 border-white shadow-lg bg-white hover:scale-105 transition-transform cursor-pointer"
+                            onClick={() => window.open(registration.aadharFront, '_blank')}
+                          />
+                          <div className="absolute inset-0 bg-blue-600 bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all flex items-center justify-center">
+                            <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-semibold">Click to view full size</span>
+                          </div>
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700"
+                          className="w-full bg-white hover:bg-blue-50 text-blue-700 border-blue-300 font-medium"
                           onClick={() => window.open(registration.aadharFront, '_blank')}
                         >
                           <Download size={16} className="mr-2" />
-                          Download Front
+                          Download Front Side
                         </Button>
                       </div>
                     )}
 
                     {/* Aadhar Back */}
                     {registration.aadharBack && (
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">Aadhar Back Side</h3>
-                        <img
-                          src={registration.aadharBack}
-                          alt="Aadhar Back"
-                          className="w-full h-auto rounded-lg border-2 border-purple-200 shadow-sm hover:shadow-md transition-shadow"
-                        />
+                      <div className="space-y-3 bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border-2 border-purple-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-bold text-purple-900">Back Side</h3>
+                          <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full">Verified</span>
+                        </div>
+                        <div className="relative group">
+                          <img
+                            src={registration.aadharBack}
+                            alt="Aadhar Back"
+                            className="w-full h-48 object-contain rounded-lg border-2 border-white shadow-lg bg-white hover:scale-105 transition-transform cursor-pointer"
+                            onClick={() => window.open(registration.aadharBack, '_blank')}
+                          />
+                          <div className="absolute inset-0 bg-purple-600 bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all flex items-center justify-center">
+                            <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-semibold">Click to view full size</span>
+                          </div>
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700"
+                          className="w-full bg-white hover:bg-purple-50 text-purple-700 border-purple-300 font-medium"
                           onClick={() => window.open(registration.aadharBack, '_blank')}
                         >
                           <Download size={16} className="mr-2" />
-                          Download Back
+                          Download Back Side
                         </Button>
                       </div>
                     )}
@@ -334,7 +352,7 @@ const RegistrationDetail = () => {
                   {registration.aadharFront && registration.aadharBack && (
                     <Button
                       variant="default"
-                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg"
                       onClick={() => {
                         window.open(registration.aadharFront, '_blank');
                         setTimeout(() => window.open(registration.aadharBack, '_blank'), 500);
