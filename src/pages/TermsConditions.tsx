@@ -116,17 +116,20 @@ const TermsConditions = () => {
             </div>
 
             <div className="space-y-6 text-slate-300">
-              <p className="text-slate-300 leading-relaxed">
-                All SP Club members participating in kabaddi activities must adhere to the rules and regulations established by the Amateur Kabaddi Federation of India (AKFI).
-              </p>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+                <p className="text-slate-300 leading-relaxed">
+                  <strong className="text-white">Important:</strong> SP Club follows all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). While we do not directly register players with AKFI, all our training, tournaments, and activities comply with AKFI standards. Members are expected to adhere to these regulations.
+                </p>
+              </div>
 
               <div className="pl-6 border-l-2 border-blue-500/50">
-                <h3 className="text-xl font-semibold text-white mb-3">2.1 Player Eligibility</h3>
+                <h3 className="text-xl font-semibold text-white mb-3">2.1 AKFI Compliance</h3>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li>Players must be registered with AKFI through SP Club to participate in official tournaments.</li>
-                  <li>Age verification documents must be submitted as per AKFI requirements.</li>
-                  <li>Players must maintain amateur status as defined by AKFI regulations.</li>
-                  <li>Medical fitness certificates may be required for tournament participation.</li>
+                  <li>All training and matches follow AKFI-approved kabaddi rules</li>
+                  <li>Age verification documents must be submitted as per AKFI standards</li>
+                  <li>Players must maintain amateur status as defined by AKFI regulations</li>
+                  <li>Medical fitness certificates may be required for tournament participation</li>
+                  <li>Players can view detailed <Link to="/kabaddi-rules" className="text-blue-400 hover:text-blue-300 underline">SP Club Kabaddi Rules</Link> (based on AKFI)</li>
                 </ul>
               </div>
 

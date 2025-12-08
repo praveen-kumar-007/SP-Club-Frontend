@@ -92,6 +92,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li><a href="/terms-conditions" className="hover:text-amber-400 transition-colors duration-300">Terms & Conditions</a></li>
               <li><a href="/privacy-policy" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="/kabaddi-rules" className="hover:text-amber-400 transition-colors duration-300">Kabaddi Rules</a></li>
               <li><a href="https://spkabaddi.me/sitemap.xml" className="hover:text-amber-400 transition-colors duration-300">Sitemap</a></li>
             </ul>
           </div>

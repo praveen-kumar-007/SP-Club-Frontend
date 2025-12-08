@@ -92,7 +92,6 @@ const PrivacyPolicy = () => {
               <ul className="space-y-2 list-disc list-inside">
                 <li><strong>Membership Management:</strong> Processing registrations, renewals, and maintaining member records</li>
                 <li><strong>Training Services:</strong> Scheduling training sessions, tracking attendance, evaluating performance</li>
-                <li><strong>AKFI Registration:</strong> Submitting member information to All India Kabaddi Federation for official registration and tournament participation</li>
                 <li><strong>Tournament Participation:</strong> Registering members for local, state, and national competitions</li>
                 <li><strong>Communication:</strong> Sending important updates, training schedules, event notifications, and club announcements</li>
                 <li><strong>Financial Management:</strong> Processing membership fees, training fees, and maintaining payment records</li>
@@ -127,7 +126,6 @@ const PrivacyPolicy = () => {
             <div className="pl-6 border-l-2 border-amber-500/50">
               <h3 className="text-xl font-semibold text-white mb-3">3.1 When We Share Information</h3>
               <ul className="space-y-2 list-disc list-inside">
-                <li><strong>AKFI Registration:</strong> Member details are shared with All India Kabaddi Federation for official player registration and certification</li>
                 <li><strong>Tournament Organizers:</strong> Information required for tournament registration and participation</li>
                 <li><strong>Insurance Providers:</strong> Medical and personal information for sports insurance coverage (with consent)</li>
                 <li><strong>Legal Authorities:</strong> When required by law, court orders, or government regulations</li>
