@@ -53,7 +53,6 @@ const RegistrationDetail = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
-  const [expandedDetails, setExpandedDetails] = useState(false);
 
   const token = localStorage.getItem("adminToken");
 
@@ -355,19 +354,9 @@ const RegistrationDetail = () => {
             {/* Personal Information */}
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Personal Information</CardTitle>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="md:hidden"
-                    onClick={() => setExpandedDetails(!expandedDetails)}
-                  >
-                    {expandedDetails ? 'Hide' : 'View'} Details
-                  </Button>
-                </div>
+                <CardTitle>Personal Information</CardTitle>
               </CardHeader>
-              <CardContent className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
+              <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Full Name</p>
@@ -410,7 +399,7 @@ const RegistrationDetail = () => {
             </Card>
 
             {/* Club Details */}
-            <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
+            <Card>
               <CardHeader>
                 <CardTitle>Club Information</CardTitle>
               </CardHeader>
@@ -430,9 +419,9 @@ const RegistrationDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Kabaddi Positions - Hidden on mobile unless expanded */}
+            {/* Kabaddi Positions */}
             {registration.kabaddiPositions && registration.kabaddiPositions.length > 0 && (
-              <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
+              <Card>
                 <CardHeader>
                   <CardTitle>Kabaddi Positions</CardTitle>
                 </CardHeader>
@@ -446,9 +435,9 @@ const RegistrationDetail = () => {
               </Card>
             )}
 
-            {/* Additional Message - Hidden on mobile unless expanded */}
+            {/* Additional Message */}
             {registration.message && (
-              <Card className={`${!expandedDetails ? 'hidden md:block' : 'block'}`}>
+              <Card>
                 <CardHeader>
                   <CardTitle>Additional Message</CardTitle>
                 </CardHeader>

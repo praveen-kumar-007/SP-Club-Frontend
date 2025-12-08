@@ -382,33 +382,33 @@ const AdminDashboard = () => {
                               {getStatusBadge(reg.status)}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => navigate(`/admin/registration/${reg._id}`)}
-                              >
-                                View
-                              </Button>
-                              {reg.status === 'pending' && (
-                                <>
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  onClick={() => navigate(`/admin/registration/${reg._id}`)}
+                                >
+                                  View Details
+                                </Button>
+                                {reg.status === 'pending' && (
                                   <Button
                                     size="sm"
-                                    className="bg-green-500 hover:bg-green-600"
+                                    className="bg-green-600 hover:bg-green-700 text-white"
                                     onClick={() => handleApprove(reg._id)}
                                   >
                                     Approve
                                   </Button>
-                                </>
-                              )}
-                              {(reg.status === 'approved' || reg.status === 'rejected') && (
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => handleDelete(reg._id, reg.name)}
-                                >
-                                  <Trash2 size={16} />
-                                </Button>
-                              )}
+                                )}
+                                {(reg.status === 'approved' || reg.status === 'rejected') && (
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDelete(reg._id, reg.name)}
+                                  >
+                                    <Trash2 size={16} />
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
