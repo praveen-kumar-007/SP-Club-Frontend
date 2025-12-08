@@ -186,7 +186,9 @@ const Register = () => {
   // Camera capture functions
   const startCamera = async (cameraType: 'photo' | 'aadharFront' | 'aadharBack') => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      // Use front camera for photo, back camera for aadhar documents
+      const facingMode = cameraType === 'photo' ? 'user' : 'environment';
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
       setCameraStream(stream);
       
       // Set the stream to the video element after state is updated
