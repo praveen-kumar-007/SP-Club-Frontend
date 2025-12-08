@@ -21,14 +21,17 @@ import { API_ENDPOINTS } from "@/config/api";
 // Define the form schema using Zod
 const formSchema = z.object({
   name: z.string().min(2, "Please enter your full name"),
+  fathersName: z.string().min(2, "Please enter father's name"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
+  gender: z.string().min(1, "Please select your gender"),
+  bloodGroup: z.string().min(1, "Please select your blood group"),
+  dob: z.date({ required_error: "Please select your date of birth" }),
+  aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   role: z.string().min(1, "Please select your role"),
   ageGroup: z.string().optional().or(z.literal('')),
   experience: z.string().optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
-  dob: z.date({ required_error: "Please select your date of birth" }),
-  aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
   message: z.string().optional().or(z.literal('')),
   photo: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Passport photo is required"),
@@ -47,12 +50,16 @@ const Register = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      fathersName: "",
       email: "",
       phone: "",
+      gender: "",
+      bloodGroup: "",
       role: "",
       ageGroup: "",
       experience: "",
       address: "",
+      dob: undefined,
       aadharNumber: "",
       clubDetails: "",
       message: "",
@@ -80,8 +87,11 @@ const Register = () => {
       
       // Append all text fields
       formData.append('name', data.name);
+      formData.append('fathersName', data.fathersName);
       formData.append('email', data.email);
       formData.append('phone', data.phone || '');
+      formData.append('gender', data.gender);
+      formData.append('bloodGroup', data.bloodGroup);
       formData.append('role', data.role);
       formData.append('ageGroup', data.ageGroup || '');
       formData.append('experience', data.experience || '');
@@ -324,6 +334,21 @@ const Register = () => {
                         )}
                       />
 
+                      {/* Father's Name */}
+                      <FormField
+                        control={form.control}
+                        name="fathersName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Father's Name <span className="text-red-500">*</span></FormLabel>
+                            <FormControl>
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your father's name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       {/* Email and Phone */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
@@ -355,24 +380,24 @@ const Register = () => {
                         />
                       </div>
 
-                      {/* Role and Age Group */}
+                      {/* Gender and Blood Group */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
                           control={form.control}
-                          name="role"
+                          name="gender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Register As <span className="text-red-500">*</span></FormLabel>
+                              <FormLabel className="text-gray-300">Gender <span className="text-red-500">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                    <SelectValue placeholder="Select your role" />
+                                    <SelectValue placeholder="Select your gender" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  {roles.map((role) => (
-                                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
-                                  ))}
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -382,20 +407,25 @@ const Register = () => {
 
                         <FormField
                           control={form.control}
-                          name="ageGroup"
+                          name="bloodGroup"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Age Group</FormLabel>
+                              <FormLabel className="text-gray-300">Blood Group <span className="text-red-500">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                    <SelectValue placeholder="Select your age group" />
+                                    <SelectValue placeholder="Select your blood group" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  {ageGroups.map((age) => (
-                                    <SelectItem key={age.value} value={age.value}>{age.label}</SelectItem>
-                                  ))}
+                                  <SelectItem value="A+">A+</SelectItem>
+                                  <SelectItem value="A-">A-</SelectItem>
+                                  <SelectItem value="B+">B+</SelectItem>
+                                  <SelectItem value="B-">B-</SelectItem>
+                                  <SelectItem value="AB+">AB+</SelectItem>
+                                  <SelectItem value="AB-">AB-</SelectItem>
+                                  <SelectItem value="O+">O+</SelectItem>
+                                  <SelectItem value="O-">O-</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -461,6 +491,55 @@ const Register = () => {
                               <FormControl>
                                 <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter 12-digit Aadhar number" maxLength={12} {...field} />
                               </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Role and Age Group */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="role"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Register As <span className="text-red-500">*</span></FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select your role" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  {roles.map((role) => (
+                                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="ageGroup"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Age Group</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select your age group" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  {ageGroups.map((age) => (
+                                    <SelectItem key={age.value} value={age.value}>{age.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -535,30 +614,38 @@ const Register = () => {
                               Upload Passport Size Photo <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
-                              <div className="space-y-6">
-                                {/* File Upload */}
-                                <div className="py-2">
-                                  <Input
-                                    type="file"
-                                    accept="image/*"
-                                    required
-                                    className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15] file:text-[#0a192f] hover:file:bg-yellow-400"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        setSelectedFile(file);
-                                        field.onChange(file);
-                                      }
-                                    }}
-                                  />
-                                </div>
+                              <div className="space-y-4">
+                                {/* File Upload Area */}
+                                {!selectedFile ? (
+                                  <div className="relative">
+                                    <Input
+                                      type="file"
+                                      accept="image/*"
+                                      required
+                                      className="bg-[#0a192f] border-2 border-dashed border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15] file:text-[#0a192f] hover:file:bg-yellow-400 h-32 cursor-pointer"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          setSelectedFile(file);
+                                          field.onChange(file);
+                                        }
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 text-sm">
+                                      <div className="text-center">
+                                        <p className="font-semibold">Click to upload or drag and drop</p>
+                                        <p className="text-xs text-gray-500">PNG, JPG, JPEG (max. 5MB)</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : null}
 
                                 {/* Preview uploaded image */}
                                 {selectedFile && (
-                                  <div className="bg-[#1e3a5f] p-6 rounded-lg border border-gray-600 mt-6">
+                                  <div className="bg-[#1e3a5f] p-6 rounded-lg border-2 border-[#facc15]">
                                     <div className="flex items-center justify-between mb-4">
-                                      <span className="text-sm font-medium text-white">
-                                        Uploaded Photo
+                                      <span className="text-sm font-semibold text-white">
+                                        ✓ Photo Selected
                                       </span>
                                       <Button
                                         type="button"
@@ -568,20 +655,31 @@ const Register = () => {
                                         }}
                                         size="sm"
                                         variant="outline"
-                                        className="h-7 text-xs border-gray-600 text-white hover:bg-red-600 hover:border-red-600"
+                                        className="h-8 text-xs border-red-600 text-white hover:bg-red-600 hover:border-red-600 hover:text-white"
                                       >
                                         <X className="w-3 h-3 mr-1" />
-                                        Remove
+                                        Change Photo
                                       </Button>
                                     </div>
-                                    <div className="relative w-full max-w-sm mx-auto mt-4">
-                                      <img
-                                        src={URL.createObjectURL(selectedFile)}
-                                        alt="Photo Preview"
-                                        className="w-full h-64 object-contain rounded-lg border-2 border-[#facc15] bg-[#0a192f] p-2"
-                                      />
-                                      <div className="mt-3 text-xs text-gray-400 text-center">
-                                        File: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                                    <div className="flex gap-4">
+                                      <div className="flex-shrink-0">
+                                        <img
+                                          src={URL.createObjectURL(selectedFile)}
+                                          alt="Photo Preview"
+                                          className="h-40 w-32 object-cover rounded-lg border-2 border-[#facc15] bg-[#0a192f] p-1"
+                                        />
+                                      </div>
+                                      <div className="flex-grow flex flex-col justify-center">
+                                        <p className="text-sm text-gray-300 font-medium">File Details:</p>
+                                        <p className="text-xs text-gray-400 mt-2">
+                                          <span className="font-semibold">Name:</span> {selectedFile.name}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                          <span className="font-semibold">Size:</span> {(selectedFile.size / 1024).toFixed(2)} KB
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                          <span className="font-semibold">Type:</span> {selectedFile.type}
+                                        </p>
                                       </div>
                                     </div>
                                   </div>
