@@ -182,16 +182,23 @@ const AdminInquiries = () => {
   };
 
   const filteredContacts = contacts.filter((contact) => {
-    const matchesSearch = 
-      contact.name.toLowerCase().includes(search.toLowerCase()) ||
-      contact.email.toLowerCase().includes(search.toLowerCase()) ||
-      contact.phone.includes(search);
+    const term = (search || '').toLowerCase().trim();
+    const name = contact?.name?.toLowerCase?.() || '';
+    const email = contact?.email?.toLowerCase?.() || '';
+    const phone = contact?.phone || '';
+
+    const matchesSearch = term === '' ||
+      name.includes(term) ||
+      email.includes(term) ||
+      phone.includes(term);
     const matchesStatus = currentStatus === 'all' || contact.status === currentStatus;
     return matchesSearch && matchesStatus;
   });
 
   const filteredNewsletters = newsletters.filter((newsletter) => {
-    const matchesSearch = newsletter.email.toLowerCase().includes(search.toLowerCase());
+    const term = (search || '').toLowerCase().trim();
+    const email = newsletter?.email?.toLowerCase?.() || '';
+    const matchesSearch = term === '' || email.includes(term);
     const matchesStatus = currentStatus === 'all' || newsletter.status === currentStatus;
     return matchesSearch && matchesStatus;
   });
