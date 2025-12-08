@@ -237,20 +237,43 @@ const TermsConditions = () => {
             <div className="space-y-6 text-slate-300">
               <div className="pl-6 border-l-2 border-purple-500/50">
                 <h3 className="text-xl font-semibold text-white mb-3">4.1 Membership Fees</h3>
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-white">Annual Membership Fee:</span>
+                    <span className="text-2xl font-bold text-purple-400">₹645/-</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-white">Monthly Training Fee:</span>
+                    <span className="text-2xl font-bold text-purple-400">₹200/-</span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-3">*Fees are subject to change with prior notice</p>
+                </div>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li>Membership fees must be paid in full at the time of registration or renewal.</li>
+                  <li>Membership fee of ₹645/- must be paid at the time of registration or annual renewal.</li>
+                  <li>Monthly training fee of ₹200/- is to be paid by the 5th day of each month.</li>
                   <li>Fees are non-refundable except in cases of membership rejection by the club.</li>
-                  <li>The club reserves the right to modify fee structure with prior notice.</li>
-                  <li>Late payment may result in temporary suspension of membership privileges.</li>
+                  <li>The club reserves the right to modify fee structure with 30 days prior written notice.</li>
+                  <li>Late payment beyond the 10th of the month may result in temporary suspension of training privileges.</li>
+                  <li>Members with outstanding dues for more than 2 months will have their membership suspended.</li>
                 </ul>
               </div>
 
               <div className="pl-6 border-l-2 border-purple-500/50">
                 <h3 className="text-xl font-semibold text-white mb-3">4.2 Additional Charges</h3>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li>Tournament entry fees, travel expenses, and uniform costs are separate from membership fees.</li>
-                  <li>Members will be notified of any additional charges in advance.</li>
+                  <li>Tournament entry fees, travel expenses, and uniform costs are separate from membership and training fees.</li>
+                  <li>Members will be notified of any additional charges in advance with cost breakdown.</li>
                   <li>Payment deadlines must be strictly adhered to for event participation.</li>
+                  <li>Optional facilities and services may incur additional charges as per club policy.</li>
+                </ul>
+              </div>
+
+              <div className="pl-6 border-l-2 border-purple-500/50">
+                <h3 className="text-xl font-semibold text-white mb-3">4.3 Payment Methods</h3>
+                <ul className="space-y-2 list-disc list-inside">
+                  <li>Payments can be made via cash, bank transfer, UPI, or other methods specified by the club.</li>
+                  <li>Payment receipts must be retained for record-keeping and verification purposes.</li>
+                  <li>Any disputes regarding payments must be raised within 7 days of transaction.</li>
                 </ul>
               </div>
             </div>
