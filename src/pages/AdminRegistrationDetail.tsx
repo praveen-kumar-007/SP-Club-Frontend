@@ -243,22 +243,38 @@ const RegistrationDetail = () => {
             {registration.photo && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Passport Photo</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Passport Size Photo</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <img
-                    src={registration.photo}
-                    alt="Passport"
-                    className="w-full max-w-xs h-auto rounded-lg border"
-                  />
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => window.open(registration.photo, '_blank')}
-                  >
-                    <Download size={18} className="mr-2" />
-                    Download
-                  </Button>
+                  <div className="flex items-start gap-6">
+                    <div className="relative">
+                      <img
+                        src={registration.photo}
+                        alt="Passport"
+                        className="w-48 h-56 object-cover rounded-lg border-2 border-gray-300 shadow-md"
+                      />
+                      <div className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow">
+                        Verified
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-gray-700 mb-2">Photo Details</h4>
+                        <div className="space-y-1 text-sm text-gray-600">
+                          <p><span className="font-medium">Format:</span> JPG/PNG</p>
+                          <p><span className="font-medium">Status:</span> <span className="text-green-600 font-medium">Uploaded</span></p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => window.open(registration.photo, '_blank')}
+                      >
+                        <Download size={18} className="mr-2" />
+                        Download Photo
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}

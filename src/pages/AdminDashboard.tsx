@@ -341,83 +341,101 @@ const AdminDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Photo</TableHead>
-                          <TableHead>Name</TableHead>
+                          <TableHead className="w-[250px]">Applicant</TableHead>
                           <TableHead>Contact</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Documents</TableHead>
+                          <TableHead>Role & Documents</TableHead>
                           <TableHead>Status</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Actions</TableHead>
+                          <TableHead>Registered</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {registrations.map((reg) => (
-                          <TableRow key={reg._id}>
+                          <TableRow key={reg._id} className="hover:bg-gray-50">
                             <TableCell>
-                              {reg.photo && (
-                                <img 
-                                  src={reg.photo} 
-                                  alt={reg.name}
-                                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
-                                />
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                <p className="font-medium">{reg.name}</p>
-                                <p className="text-xs text-gray-500">{reg.fathersName}</p>
+                              <div className="flex items-center gap-3">
+                                {reg.photo ? (
+                                  <img 
+                                    src={reg.photo} 
+                                    alt={reg.name}
+                                    className="w-14 h-14 rounded-lg object-cover border-2 border-gray-200 shadow-sm"
+                                  />
+                                ) : (
+                                  <div className="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs">No Photo</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-semibold text-gray-900">{reg.name}</p>
+                                  <p className="text-xs text-gray-500">Father: {reg.fathersName || 'N/A'}</p>
+                                  <p className="text-xs text-gray-400 mt-0.5">
+                                    {reg.gender && <span className="capitalize">{reg.gender}</span>}
+                                    {reg.bloodGroup && <span className="ml-2">• {reg.bloodGroup}</span>}
+                                  </p>
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="text-sm">
-                                <p>{reg.email}</p>
-                                <p className="text-gray-500">{reg.phone}</p>
+                              <div className="text-sm space-y-1">
+                                <p className="text-gray-900 truncate max-w-[200px]">{reg.email}</p>
+                                <p className="text-gray-600">{reg.phone || 'N/A'}</p>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge variant="outline">{reg.role}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-1">
-                                {reg.aadharFront && (
-                                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Front</Badge>
-                                )}
-                                {reg.aadharBack && (
-                                  <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">Back</Badge>
-                                )}
+                              <div className="space-y-2">
+                                <Badge variant="outline" className="font-medium">{reg.role}</Badge>
+                                <div className="flex gap-1 flex-wrap">
+                                  {reg.aadharFront && (
+                                    <Badge className="bg-blue-50 text-blue-700 border border-blue-200 text-xs">
+                                      Front ✓
+                                    </Badge>
+                                  )}
+                                  {reg.aadharBack && (
+                                    <Badge className="bg-purple-50 text-purple-700 border border-purple-200 text-xs">
+                                      Back ✓
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell>{getStatusBadge(reg.status)}</TableCell>
-                            <TableCell>{new Date(reg.registeredAt).toLocaleDateString()}</TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
+                              <span className="text-sm text-gray-600">
+                                {new Date(reg.registeredAt).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric', 
+                                  year: 'numeric' 
+                                })}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1.5 justify-end">
                                 <Button
                                   size="sm"
                                   variant="outline"
+                                  className="text-xs"
                                   onClick={() => navigate(`/admin/registration/${reg._id}`)}
                                 >
-                                  <Eye className="w-4 h-4 mr-1" />
+                                  <Eye className="w-3.5 h-3.5 mr-1" />
                                   View
                                 </Button>
                                 {reg.status === 'pending' && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      className="bg-green-600 hover:bg-green-700"
-                                      onClick={() => handleApprove(reg._id)}
-                                    >
-                                      <CheckCircle className="w-4 h-4 mr-1" />
-                                      Approve
-                                    </Button>
-                                  </>
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-xs"
+                                    onClick={() => handleApprove(reg._id)}
+                                  >
+                                    <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                                    Approve
+                                  </Button>
                                 )}
                                 <Button
                                   size="sm"
                                   variant="destructive"
+                                  className="text-xs"
                                   onClick={() => handleDelete(reg._id, reg.name)}
                                 >
-                                  <Trash2 className="w-4 h-4 mr-1" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                   Delete
                                 </Button>
                               </div>
