@@ -23,7 +23,7 @@ interface Registration {
   fathersName: string;
   email: string;
   phone: string;
-  phoneAlt: string;
+  parentsPhone: string;
   gender: string;
   bloodGroup: string;
   role: string;
@@ -376,7 +376,7 @@ const AdminDashboard = () => {
                             <TableCell>
                               <div className="text-sm space-y-0.5">
                                 <p>{reg.phone || 'N/A'}</p>
-                                {reg.phoneAlt && <p className="text-gray-500">{reg.phoneAlt}</p>}
+                                {reg.parentsPhone && <p className="text-gray-500">{reg.parentsPhone}</p>}
                               </div>
                             </TableCell>
                             <TableCell>

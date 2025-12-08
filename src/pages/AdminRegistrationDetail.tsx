@@ -22,7 +22,7 @@ interface Registration {
   fathersName: string;
   email: string;
   phone: string;
-  phoneAlt: string;
+  parentsPhone: string;
   gender: string;
   bloodGroup: string;
   role: string;
@@ -376,8 +376,8 @@ const RegistrationDetail = () => {
                     <p className="font-medium">{registration.phone || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Alternate Phone</p>
-                    <p className="font-medium">{registration.phoneAlt || 'N/A'}</p>
+                    <p className="text-sm text-gray-600">Parents Phone</p>
+                    <p className="font-medium">{registration.parentsPhone || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Gender</p>

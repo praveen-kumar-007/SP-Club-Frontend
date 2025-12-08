@@ -24,7 +24,7 @@ const formSchema = z.object({
   fathersName: z.string().min(2, "Please enter father's name"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
-  phoneAlt: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
+  parentsPhone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
   gender: z.string().min(1, "Please select your gender"),
   bloodGroup: z.string().min(1, "Please select your blood group"),
   dob: z.date({ required_error: "Please select your date of birth" }),
@@ -67,7 +67,7 @@ const Register = () => {
       fathersName: "",
       email: "",
       phone: "",
-      phoneAlt: "",
+      parentsPhone: "",
       gender: "",
       bloodGroup: "",
       role: "",
@@ -125,7 +125,7 @@ const Register = () => {
       formData.append('fathersName', data.fathersName);
       formData.append('email', data.email);
       formData.append('phone', data.phone || '');
-      formData.append('phoneAlt', data.phoneAlt || '');
+      formData.append('parentsPhone', data.parentsPhone || '');
       formData.append('gender', data.gender);
       formData.append('bloodGroup', data.bloodGroup);
       formData.append('role', data.role);
@@ -508,12 +508,12 @@ const Register = () => {
 
                         <FormField
                           control={form.control}
-                          name="phoneAlt"
+                          name="parentsPhone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Alternate Phone Number</FormLabel>
+                              <FormLabel className="text-gray-300">Parents Phone Number</FormLabel>
                               <FormControl>
-                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter alternate phone number" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter parents phone number" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
