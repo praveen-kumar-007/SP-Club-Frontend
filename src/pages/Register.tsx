@@ -23,22 +23,22 @@ const formSchema = z.object({
   name: z.string().min(2, "Please enter your full name"),
   fathersName: z.string().min(2, "Please enter father's name"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
-  parentsPhone: z.string().min(10, "Please enter a valid phone number").optional().or(z.literal('')),
+  phone: z.string().min(10, "Please enter a valid phone number"),
+  parentsPhone: z.string().min(10, "Please enter a valid phone number"),
   gender: z.string().min(1, "Please select your gender"),
   bloodGroup: z.string().min(1, "Please select your blood group"),
   dob: z.date({ required_error: "Please select your date of birth" }),
   aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   role: z.string().min(1, "Please select your role"),
-  ageGroup: z.string().optional().or(z.literal('')),
-  experience: z.string().optional().or(z.literal('')),
-  address: z.string().optional().or(z.literal('')),
+  ageGroup: z.string().min(1, "Please select your age group"),
+  experience: z.string().min(1, "Please select your experience"),
+  address: z.string().min(5, "Please enter your address"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
-  message: z.string().optional().or(z.literal('')),
+  message: z.string().min(1, "Please provide a message"),
   photo: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Passport photo is required"),
   aadharFront: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Aadhar front image is required"),
   aadharBack: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Aadhar back image is required"),
-  kabaddiPositions: z.array(z.string()).optional(),
+  kabaddiPositions: z.array(z.string()).min(1, "Please select at least one kabaddi position"),
   newsletter: z.boolean().default(true),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms and conditions"),
 });
@@ -497,7 +497,7 @@ const Register = () => {
                           name="phone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Phone Number</FormLabel>
+                              <FormLabel className="text-gray-300">Phone Number <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
                                 <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your phone number" {...field} />
                               </FormControl>
@@ -511,7 +511,7 @@ const Register = () => {
                           name="parentsPhone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Parents Phone Number</FormLabel>
+                              <FormLabel className="text-gray-300">Parents Phone Number <span className="text-red-500">*</span></FormLabel>
                               <FormControl>
                                 <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter parents phone number" {...field} />
                               </FormControl>
@@ -671,7 +671,7 @@ const Register = () => {
                           name="ageGroup"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Age Group</FormLabel>
+                              <FormLabel className="text-gray-300">Age Group <span className="text-red-500">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
@@ -696,7 +696,7 @@ const Register = () => {
                         name="experience"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Sports Experience</FormLabel>
+                            <FormLabel className="text-gray-300">Sports Experience <span className="text-red-500">*</span></FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
@@ -720,7 +720,7 @@ const Register = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Address</FormLabel>
+                            <FormLabel className="text-gray-300">Address <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your address" {...field} />
                             </FormControl>
@@ -1127,7 +1127,7 @@ const Register = () => {
                         render={() => (
                           <FormItem>
                             <div className="mb-4">
-                              <FormLabel className="text-gray-300">Kabaddi Positions (Select all that apply)</FormLabel>
+                              <FormLabel className="text-gray-300">Kabaddi Positions (Select all that apply) <span className="text-red-500">*</span></FormLabel>
                               <p className="text-xs text-gray-400 mt-1">Optional - Select if you play kabaddi</p>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -1176,7 +1176,7 @@ const Register = () => {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Additional Information</FormLabel>
+                            <FormLabel className="text-gray-300">Additional Information <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Share any additional information or questions you have"
