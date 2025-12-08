@@ -189,6 +189,15 @@ const Register = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
       setCameraStream(stream);
       
+      // Set the stream to the video element after state is updated
+      setTimeout(() => {
+        const video = document.querySelector(`video[data-camera="${cameraType}"]`) as HTMLVideoElement;
+        if (video) {
+          video.srcObject = stream;
+          video.play().catch(err => console.error("Play error:", err));
+        }
+      }, 0);
+      
       if (cameraType === 'photo') setShowPhotoCamera(true);
       else if (cameraType === 'aadharFront') setShowAadharFrontCamera(true);
       else if (cameraType === 'aadharBack') setShowAadharBackCamera(true);
@@ -743,8 +752,7 @@ const Register = () => {
                                       <Button
                                         type="button"
                                         onClick={() => stopCamera('photo')}
-                                        variant="outline"
-                                        className="flex-1 text-white border-gray-600"
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                                       >
                                         Cancel
                                       </Button>
@@ -779,8 +787,7 @@ const Register = () => {
                                     <Button
                                       type="button"
                                       onClick={() => startCamera('photo')}
-                                      variant="outline"
-                                      className="w-full text-white border-blue-600 hover:bg-blue-600/20"
+                                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                                     >
                                       <Camera className="w-4 h-4 mr-2" />
                                       Capture from Camera
@@ -871,8 +878,7 @@ const Register = () => {
                                       <Button
                                         type="button"
                                         onClick={() => stopCamera('aadharFront')}
-                                        variant="outline"
-                                        className="flex-1 text-white border-gray-600"
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                                       >
                                         Cancel
                                       </Button>
@@ -907,8 +913,7 @@ const Register = () => {
                                     <Button
                                       type="button"
                                       onClick={() => startCamera('aadharFront')}
-                                      variant="outline"
-                                      className="w-full text-white border-blue-600 hover:bg-blue-600/20"
+                                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                                     >
                                       <Camera className="w-4 h-4 mr-2" />
                                       Capture from Camera
@@ -996,8 +1001,7 @@ const Register = () => {
                                       <Button
                                         type="button"
                                         onClick={() => stopCamera('aadharBack')}
-                                        variant="outline"
-                                        className="flex-1 text-white border-gray-600"
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                                       >
                                         Cancel
                                       </Button>
@@ -1032,8 +1036,7 @@ const Register = () => {
                                     <Button
                                       type="button"
                                       onClick={() => startCamera('aadharBack')}
-                                      variant="outline"
-                                      className="w-full text-white border-purple-600 hover:bg-purple-600/20"
+                                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                                     >
                                       <Camera className="w-4 h-4 mr-2" />
                                       Capture from Camera
