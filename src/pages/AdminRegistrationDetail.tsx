@@ -19,8 +19,11 @@ import {
 interface Registration {
   _id: string;
   name: string;
+  fathersName: string;
   email: string;
   phone: string;
+  gender: string;
+  bloodGroup: string;
   role: string;
   ageGroup: string;
   dob: string;
@@ -29,6 +32,8 @@ interface Registration {
   clubDetails: string;
   message: string;
   photo: string;
+  aadharFront: string;
+  aadharBack: string;
   kabaddiPositions: string[];
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
@@ -257,6 +262,75 @@ const RegistrationDetail = () => {
               </Card>
             )}
 
+            {/* Aadhar Documents */}
+            {(registration.aadharFront || registration.aadharBack) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Aadhar Card Documents</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Aadhar Front */}
+                    {registration.aadharFront && (
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">Aadhar Front Side</h3>
+                        <img
+                          src={registration.aadharFront}
+                          alt="Aadhar Front"
+                          className="w-full h-auto rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700"
+                          onClick={() => window.open(registration.aadharFront, '_blank')}
+                        >
+                          <Download size={16} className="mr-2" />
+                          Download Front
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Aadhar Back */}
+                    {registration.aadharBack && (
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">Aadhar Back Side</h3>
+                        <img
+                          src={registration.aadharBack}
+                          alt="Aadhar Back"
+                          className="w-full h-auto rounded-lg border-2 border-purple-200 shadow-sm hover:shadow-md transition-shadow"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700"
+                          onClick={() => window.open(registration.aadharBack, '_blank')}
+                        >
+                          <Download size={16} className="mr-2" />
+                          Download Back
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Download Both Button */}
+                  {registration.aadharFront && registration.aadharBack && (
+                    <Button
+                      variant="default"
+                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      onClick={() => {
+                        window.open(registration.aadharFront, '_blank');
+                        setTimeout(() => window.open(registration.aadharBack, '_blank'), 500);
+                      }}
+                    >
+                      <Download size={18} className="mr-2" />
+                      Download Both Sides
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Personal Information */}
             <Card>
               <CardHeader>
@@ -269,12 +343,24 @@ const RegistrationDetail = () => {
                     <p className="font-medium">{registration.name}</p>
                   </div>
                   <div>
+                    <p className="text-sm text-gray-600">Father's Name</p>
+                    <p className="font-medium">{registration.fathersName || 'N/A'}</p>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-600">Email</p>
                     <p className="font-medium">{registration.email}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Phone</p>
                     <p className="font-medium">{registration.phone || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Gender</p>
+                    <p className="font-medium capitalize">{registration.gender || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Blood Group</p>
+                    <p className="font-medium">{registration.bloodGroup || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Date of Birth</p>

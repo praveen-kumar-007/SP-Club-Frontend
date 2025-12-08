@@ -20,13 +20,18 @@ import {
 interface Registration {
   _id: string;
   name: string;
+  fathersName: string;
   email: string;
   phone: string;
+  gender: string;
+  bloodGroup: string;
   role: string;
   aadharNumber: string;
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
   photo: string;
+  aadharFront: string;
+  aadharBack: string;
 }
 
 interface Stats {
@@ -336,9 +341,11 @@ const AdminDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
+                          <TableHead>Photo</TableHead>
                           <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
+                          <TableHead>Contact</TableHead>
                           <TableHead>Role</TableHead>
+                          <TableHead>Documents</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Date</TableHead>
                           <TableHead>Actions</TableHead>
@@ -347,9 +354,40 @@ const AdminDashboard = () => {
                       <TableBody>
                         {registrations.map((reg) => (
                           <TableRow key={reg._id}>
-                            <TableCell className="font-medium">{reg.name}</TableCell>
-                            <TableCell>{reg.email}</TableCell>
-                            <TableCell>{reg.role}</TableCell>
+                            <TableCell>
+                              {reg.photo && (
+                                <img 
+                                  src={reg.photo} 
+                                  alt={reg.name}
+                                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
+                                />
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{reg.name}</p>
+                                <p className="text-xs text-gray-500">{reg.fathersName}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">
+                                <p>{reg.email}</p>
+                                <p className="text-gray-500">{reg.phone}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{reg.role}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                {reg.aadharFront && (
+                                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Front</Badge>
+                                )}
+                                {reg.aadharBack && (
+                                  <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">Back</Badge>
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell>{getStatusBadge(reg.status)}</TableCell>
                             <TableCell>{new Date(reg.registeredAt).toLocaleDateString()}</TableCell>
                             <TableCell>
