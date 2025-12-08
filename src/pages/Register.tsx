@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Star, Shield, Calendar as CalendarIcon, Users, Trophy, Target, X } from "lucide-react";
+import { UserPlus, Star, Shield, Calendar as CalendarIcon, Users, Trophy, Target, X, Camera } from "lucide-react";
 import Seo from "@/components/Seo";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,8 @@ const formSchema = z.object({
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
   message: z.string().optional().or(z.literal('')),
   photo: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Passport photo is required"),
+  aadharFront: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Aadhar front image is required"),
+  aadharBack: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Aadhar back image is required"),
   kabaddiPositions: z.array(z.string()).optional(),
   newsletter: z.boolean().default(true),
   terms: z.boolean().refine(val => val === true, "You must agree to the terms and conditions"),
@@ -45,6 +47,14 @@ type FormData = z.infer<typeof formSchema>;
 const Register = () => {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedAadharFront, setSelectedAadharFront] = useState<File | null>(null);
+  const [selectedAadharBack, setSelectedAadharBack] = useState<File | null>(null);
+  
+  // Camera capture states
+  const [showPhotoCamera, setShowPhotoCamera] = useState(false);
+  const [showAadharFrontCamera, setShowAadharFrontCamera] = useState(false);
+  const [showAadharBackCamera, setShowAadharBackCamera] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -83,6 +93,26 @@ const Register = () => {
         return;
       }
 
+      // Validate Aadhar front is uploaded
+      if (!selectedAadharFront) {
+        toast({
+          title: "Error",
+          description: "Please upload Aadhar front image",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate Aadhar back is uploaded
+      if (!selectedAadharBack) {
+        toast({
+          title: "Error",
+          description: "Please upload Aadhar back image",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const formData = new FormData();
       
       // Append all text fields
@@ -108,9 +138,15 @@ const Register = () => {
         formData.append('kabaddiPositions', JSON.stringify(data.kabaddiPositions));
       }
       
-      // Append photo if selected
+      // Append photos if selected
       if (selectedFile) {
         formData.append('photo', selectedFile);
+      }
+      if (selectedAadharFront) {
+        formData.append('aadharFront', selectedAadharFront);
+      }
+      if (selectedAadharBack) {
+        formData.append('aadharBack', selectedAadharBack);
       }
 
       const response = await fetch(API_ENDPOINTS.REGISTER, {
@@ -128,6 +164,8 @@ const Register = () => {
         });
         form.reset();
         setSelectedFile(null);
+        setSelectedAadharFront(null);
+        setSelectedAadharBack(null);
       } else {
         toast({
           title: "Registration Failed ❌",
@@ -143,6 +181,63 @@ const Register = () => {
         variant: "destructive",
       });
     }
+  };
+
+  // Camera capture functions
+  const startCamera = async (cameraType: 'photo' | 'aadharFront' | 'aadharBack') => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      setCameraStream(stream);
+      
+      if (cameraType === 'photo') setShowPhotoCamera(true);
+      else if (cameraType === 'aadharFront') setShowAadharFrontCamera(true);
+      else if (cameraType === 'aadharBack') setShowAadharBackCamera(true);
+    } catch (error) {
+      toast({
+        title: "Camera Error",
+        description: "Could not access camera. Please check permissions.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const capturePhoto = (cameraType: 'photo' | 'aadharFront' | 'aadharBack') => {
+    const video = document.querySelector(`video[data-camera="${cameraType}"]`) as HTMLVideoElement;
+    if (video) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `capture-${cameraType}.jpg`, { type: 'image/jpeg' });
+            
+            if (cameraType === 'photo') {
+              setSelectedFile(file);
+            } else if (cameraType === 'aadharFront') {
+              setSelectedAadharFront(file);
+            } else if (cameraType === 'aadharBack') {
+              setSelectedAadharBack(file);
+            }
+            
+            stopCamera(cameraType);
+          }
+        });
+      }
+    }
+  };
+
+  const stopCamera = (cameraType: 'photo' | 'aadharFront' | 'aadharBack') => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    
+    if (cameraType === 'photo') setShowPhotoCamera(false);
+    else if (cameraType === 'aadharFront') setShowAadharFrontCamera(false);
+    else if (cameraType === 'aadharBack') setShowAadharBackCamera(false);
   };
 
   const roles = [
@@ -627,28 +722,69 @@ const Register = () => {
                             </FormLabel>
                             <FormControl>
                               <div className="space-y-4">
-                                {/* File Upload Area */}
-                                {!selectedFile ? (
-                                  <div className="relative">
-                                    <Input
-                                      type="file"
-                                      accept="image/*"
-                                      required
-                                      className="bg-[#0a192f] border-2 border-dashed border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15] file:text-[#0a192f] hover:file:bg-yellow-400 h-32 cursor-pointer"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          setSelectedFile(file);
-                                          field.onChange(file);
-                                        }
-                                      }}
+                                {/* Camera Capture View */}
+                                {showPhotoCamera && (
+                                  <div className="bg-[#0a192f] rounded-lg p-4 space-y-4">
+                                    <video
+                                      data-camera="photo"
+                                      autoPlay
+                                      playsInline
+                                      className="w-full h-64 bg-black rounded-lg object-cover"
                                     />
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 text-sm">
-                                      <div className="text-center">
-                                        <p className="font-semibold">Click to upload or drag and drop</p>
-                                        <p className="text-xs text-gray-500">PNG, JPG, JPEG (max. 5MB)</p>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        type="button"
+                                        onClick={() => capturePhoto('photo')}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                      >
+                                        <Camera className="w-4 h-4 mr-2" />
+                                        Capture Photo
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        onClick={() => stopCamera('photo')}
+                                        variant="outline"
+                                        className="flex-1 text-white border-gray-600"
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* File Upload Area */}
+                                {!selectedFile && !showPhotoCamera ? (
+                                  <div className="space-y-3">
+                                    <div className="relative">
+                                      <Input
+                                        type="file"
+                                        accept="image/*"
+                                        required
+                                        className="bg-[#0a192f] border-2 border-dashed border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#facc15] file:text-[#0a192f] hover:file:bg-yellow-400 h-32 cursor-pointer"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            setSelectedFile(file);
+                                            field.onChange(file);
+                                          }
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 text-sm">
+                                        <div className="text-center">
+                                          <p className="font-semibold">Click to upload or drag and drop</p>
+                                          <p className="text-xs text-gray-500">PNG, JPG, JPEG (max. 5MB)</p>
+                                        </div>
                                       </div>
                                     </div>
+                                    <Button
+                                      type="button"
+                                      onClick={() => startCamera('photo')}
+                                      variant="outline"
+                                      className="w-full text-white border-blue-600 hover:bg-blue-600/20"
+                                    >
+                                      <Camera className="w-4 h-4 mr-2" />
+                                      Capture from Camera
+                                    </Button>
                                   </div>
                                 ) : null}
 
@@ -691,6 +827,256 @@ const Register = () => {
                                         </p>
                                         <p className="text-xs text-gray-400">
                                           <span className="font-semibold">Type:</span> {selectedFile.type}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Aadhar Front Upload */}
+                      <FormField
+                        control={form.control}
+                        name="aadharFront"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">
+                              Upload Aadhar Front Side <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <div className="space-y-4">
+                                {/* Camera Capture View */}
+                                {showAadharFrontCamera && (
+                                  <div className="bg-[#0a192f] rounded-lg p-4 space-y-4">
+                                    <video
+                                      data-camera="aadharFront"
+                                      autoPlay
+                                      playsInline
+                                      className="w-full h-64 bg-black rounded-lg object-cover"
+                                    />
+                                    <div className="flex gap-2">
+                                      <Button
+                                        type="button"
+                                        onClick={() => capturePhoto('aadharFront')}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                      >
+                                        <Camera className="w-4 h-4 mr-2" />
+                                        Capture Aadhar Front
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        onClick={() => stopCamera('aadharFront')}
+                                        variant="outline"
+                                        className="flex-1 text-white border-gray-600"
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* File Upload Area */}
+                                {!selectedAadharFront && !showAadharFrontCamera ? (
+                                  <div className="space-y-3">
+                                    <div className="relative">
+                                      <Input
+                                        type="file"
+                                        accept="image/*"
+                                        required
+                                        className="bg-[#0a192f] border-2 border-dashed border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 h-32 cursor-pointer"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            setSelectedAadharFront(file);
+                                            field.onChange(file);
+                                          }
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 text-sm">
+                                        <div className="text-center">
+                                          <p className="font-semibold">Click to upload Aadhar front</p>
+                                          <p className="text-xs text-gray-500">PNG, JPG, JPEG (max. 5MB)</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      onClick={() => startCamera('aadharFront')}
+                                      variant="outline"
+                                      className="w-full text-white border-blue-600 hover:bg-blue-600/20"
+                                    >
+                                      <Camera className="w-4 h-4 mr-2" />
+                                      Capture from Camera
+                                    </Button>
+                                  </div>
+                                ) : null}
+
+                                {/* Preview uploaded image */}
+                                {selectedAadharFront && (
+                                  <div className="bg-[#1e3a5f] p-6 rounded-lg border-2 border-blue-500">
+                                    <div className="flex items-center justify-between mb-4">
+                                      <span className="text-sm font-semibold text-white">
+                                        ✓ Aadhar Front Uploaded
+                                      </span>
+                                      <Button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedAadharFront(null);
+                                          field.onChange(null);
+                                        }}
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 text-xs bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700"
+                                      >
+                                        <X className="w-3 h-3 mr-1" />
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    <div className="flex gap-4">
+                                      <div className="flex-shrink-0">
+                                        <img
+                                          src={URL.createObjectURL(selectedAadharFront)}
+                                          alt="Aadhar Front Preview"
+                                          className="h-40 w-56 object-cover rounded-lg border-2 border-blue-500 bg-[#0a192f] p-1"
+                                        />
+                                      </div>
+                                      <div className="flex-grow flex flex-col justify-center">
+                                        <p className="text-sm text-gray-300 font-medium">File Details:</p>
+                                        <p className="text-xs text-gray-400 mt-2">
+                                          <span className="font-semibold">Name:</span> {selectedAadharFront.name}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                          <span className="font-semibold">Size:</span> {(selectedAadharFront.size / 1024).toFixed(2)} KB
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Aadhar Back Upload */}
+                      <FormField
+                        control={form.control}
+                        name="aadharBack"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">
+                              Upload Aadhar Back Side <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <div className="space-y-4">
+                                {/* Camera Capture View */}
+                                {showAadharBackCamera && (
+                                  <div className="bg-[#0a192f] rounded-lg p-4 space-y-4">
+                                    <video
+                                      data-camera="aadharBack"
+                                      autoPlay
+                                      playsInline
+                                      className="w-full h-64 bg-black rounded-lg object-cover"
+                                    />
+                                    <div className="flex gap-2">
+                                      <Button
+                                        type="button"
+                                        onClick={() => capturePhoto('aadharBack')}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                      >
+                                        <Camera className="w-4 h-4 mr-2" />
+                                        Capture Aadhar Back
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        onClick={() => stopCamera('aadharBack')}
+                                        variant="outline"
+                                        className="flex-1 text-white border-gray-600"
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* File Upload Area */}
+                                {!selectedAadharBack && !showAadharBackCamera ? (
+                                  <div className="space-y-3">
+                                    <div className="relative">
+                                      <Input
+                                        type="file"
+                                        accept="image/*"
+                                        required
+                                        className="bg-[#0a192f] border-2 border-dashed border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 h-32 cursor-pointer"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            setSelectedAadharBack(file);
+                                            field.onChange(file);
+                                          }
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-400 text-sm">
+                                        <div className="text-center">
+                                          <p className="font-semibold">Click to upload Aadhar back</p>
+                                          <p className="text-xs text-gray-500">PNG, JPG, JPEG (max. 5MB)</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      onClick={() => startCamera('aadharBack')}
+                                      variant="outline"
+                                      className="w-full text-white border-purple-600 hover:bg-purple-600/20"
+                                    >
+                                      <Camera className="w-4 h-4 mr-2" />
+                                      Capture from Camera
+                                    </Button>
+                                  </div>
+                                ) : null}
+
+                                {/* Preview uploaded image */}
+                                {selectedAadharBack && (
+                                  <div className="bg-[#1e3a5f] p-6 rounded-lg border-2 border-purple-500">
+                                    <div className="flex items-center justify-between mb-4">
+                                      <span className="text-sm font-semibold text-white">
+                                        ✓ Aadhar Back Uploaded
+                                      </span>
+                                      <Button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedAadharBack(null);
+                                          field.onChange(null);
+                                        }}
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 text-xs bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700"
+                                      >
+                                        <X className="w-3 h-3 mr-1" />
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    <div className="flex gap-4">
+                                      <div className="flex-shrink-0">
+                                        <img
+                                          src={URL.createObjectURL(selectedAadharBack)}
+                                          alt="Aadhar Back Preview"
+                                          className="h-40 w-56 object-cover rounded-lg border-2 border-purple-500 bg-[#0a192f] p-1"
+                                        />
+                                      </div>
+                                      <div className="flex-grow flex flex-col justify-center">
+                                        <p className="text-sm text-gray-300 font-medium">File Details:</p>
+                                        <p className="text-xs text-gray-400 mt-2">
+                                          <span className="font-semibold">Name:</span> {selectedAadharBack.name}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                          <span className="font-semibold">Size:</span> {(selectedAadharBack.size / 1024).toFixed(2)} KB
                                         </p>
                                       </div>
                                     </div>
