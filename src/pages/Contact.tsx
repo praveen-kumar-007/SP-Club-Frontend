@@ -220,9 +220,9 @@ const Contact = () => {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Full Name</FormLabel>
+                              <FormLabel className="text-gray-300">Full Name <span className="text-red-400">*</span></FormLabel>
                               <FormControl>
-                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your full name" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="Enter your full name" required {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -233,9 +233,9 @@ const Contact = () => {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Email Address</FormLabel>
+                              <FormLabel className="text-gray-300">Email Address <span className="text-red-400">*</span></FormLabel>
                               <FormControl>
-                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="email" placeholder="your.email@example.com" {...field} />
+                                <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="email" placeholder="your.email@example.com" required {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -248,9 +248,9 @@ const Contact = () => {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Phone Number</FormLabel>
+                            <FormLabel className="text-gray-300">Phone Number <span className="text-red-400">*</span></FormLabel>
                             <FormControl>
-                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="tel" placeholder="Enter your phone number" {...field} />
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" type="tel" placeholder="Enter your phone number" required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -262,9 +262,9 @@ const Contact = () => {
                         name="subject"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Subject</FormLabel>
+                            <FormLabel className="text-gray-300">Subject <span className="text-red-400">*</span></FormLabel>
                             <FormControl>
-                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="What is your message about?" {...field} />
+                              <Input className="bg-[#0a192f] border-gray-600 text-white placeholder-gray-400" placeholder="What is your message about?" required {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -276,11 +276,12 @@ const Contact = () => {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Message</FormLabel>
+                            <FormLabel className="text-gray-300">Message <span className="text-red-400">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Tell us more about your inquiry..."
                                 className="min-h-[120px] bg-[#0a192f] border-gray-600 text-white placeholder-gray-400"
+                                required
                                 {...field}
                               />
                             </FormControl>
