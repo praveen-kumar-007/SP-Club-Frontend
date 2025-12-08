@@ -411,8 +411,8 @@ const KabaddiRules = () => {
             <div className="pl-6 border-l-2 border-red-500/50">
               <h3 className="text-xl font-semibold text-white mb-3">8.2 Card System</h3>
               <div className="space-y-3">
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-                  <p className="font-semibold text-yellow-400 mb-2">🟨 GREEN CARD (Warning)</p>
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <p className="font-semibold text-green-400 mb-2">🟢 GREEN CARD (Warning)</p>
                   <ul className="space-y-1 ml-4 text-sm">
                     <li>• First offense for minor violations</li>
                     <li>• Official warning recorded</li>
