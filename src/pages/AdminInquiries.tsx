@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, Trash2, LogOut, Search, Mail, Phone } from "lucide-react";
+import { CheckCircle, Trash2, LogOut, Search, Mail, Phone, ArrowLeft } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import {
   Table,
@@ -181,10 +181,16 @@ const AdminInquiries = () => {
             <h1 className="text-2xl font-bold">Inquiries & Submissions</h1>
             <p className="text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
           </div>
-          <Button variant="destructive" onClick={handleLogout}>
-            <LogOut size={18} className="mr-2" />
-            Logout
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate("/admin/dashboard")}>
+              <ArrowLeft size={18} className="mr-2" />
+              Back to Dashboard
+            </Button>
+            <Button variant="destructive" onClick={handleLogout}>
+              <LogOut size={18} className="mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
 
