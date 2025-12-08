@@ -655,7 +655,7 @@ const Register = () => {
                                         }}
                                         size="sm"
                                         variant="outline"
-                                        className="h-8 text-xs border-red-600 text-white hover:bg-red-600 hover:border-red-600 hover:text-white"
+                                        className="h-8 text-xs bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700"
                                       >
                                         <X className="w-3 h-3 mr-1" />
                                         Change Photo
