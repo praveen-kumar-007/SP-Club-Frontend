@@ -341,11 +341,11 @@ const AdminDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-[250px]">Applicant</TableHead>
-                          <TableHead>Contact</TableHead>
-                          <TableHead>Role & Documents</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Phone</TableHead>
+                          <TableHead>Role</TableHead>
                           <TableHead>Status</TableHead>
-                          <TableHead>Registered</TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -353,92 +353,48 @@ const AdminDashboard = () => {
                         {registrations.map((reg) => (
                           <TableRow key={reg._id} className="hover:bg-gray-50">
                             <TableCell>
-                              <div className="flex items-center gap-3">
-                                {reg.photo ? (
-                                  <img 
-                                    src={reg.photo} 
-                                    alt={reg.name}
-                                    className="w-14 h-14 rounded-lg object-cover border-2 border-gray-200 shadow-sm"
-                                  />
-                                ) : (
-                                  <div className="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center">
-                                    <span className="text-gray-400 text-xs">No Photo</span>
-                                  </div>
-                                )}
-                                <div>
-                                  <p className="font-semibold text-gray-900">{reg.name}</p>
-                                  <p className="text-xs text-gray-500">Father: {reg.fathersName || 'N/A'}</p>
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {reg.gender && <span className="capitalize">{reg.gender}</span>}
-                                    {reg.bloodGroup && <span className="ml-2">• {reg.bloodGroup}</span>}
-                                  </p>
-                                </div>
-                              </div>
+                              <p className="font-medium">{reg.name}</p>
                             </TableCell>
                             <TableCell>
-                              <div className="text-sm space-y-1">
-                                <p className="text-gray-900 truncate max-w-[200px]">{reg.email}</p>
-                                <p className="text-gray-600">{reg.phone || 'N/A'}</p>
-                              </div>
+                              <p className="text-sm">{reg.email}</p>
                             </TableCell>
                             <TableCell>
-                              <div className="space-y-2">
-                                <Badge variant="outline" className="font-medium">{reg.role}</Badge>
-                                <div className="flex gap-1 flex-wrap">
-                                  {reg.aadharFront && (
-                                    <Badge className="bg-blue-50 text-blue-700 border border-blue-200 text-xs">
-                                      Front ✓
-                                    </Badge>
-                                  )}
-                                  {reg.aadharBack && (
-                                    <Badge className="bg-purple-50 text-purple-700 border border-purple-200 text-xs">
-                                      Back ✓
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>{getStatusBadge(reg.status)}</TableCell>
-                            <TableCell>
-                              <span className="text-sm text-gray-600">
-                                {new Date(reg.registeredAt).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric', 
-                                  year: 'numeric' 
-                                })}
-                              </span>
+                              <p className="text-sm">{reg.phone || 'N/A'}</p>
                             </TableCell>
                             <TableCell>
-                              <div className="flex gap-1.5 justify-end">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-xs"
-                                  onClick={() => navigate(`/admin/registration/${reg._id}`)}
-                                >
-                                  <Eye className="w-3.5 h-3.5 mr-1" />
-                                  View
-                                </Button>
-                                {reg.status === 'pending' && (
+                              <Badge variant="outline">{reg.role}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(reg.status)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate(`/admin/registration/${reg._id}`)}
+                              >
+                                <Eye size={16} />
+                              </Button>
+                              {reg.status === 'pending' && (
+                                <>
                                   <Button
                                     size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-xs"
+                                    className="bg-green-500 hover:bg-green-600"
                                     onClick={() => handleApprove(reg._id)}
                                   >
-                                    <CheckCircle className="w-3.5 h-3.5 mr-1" />
                                     Approve
                                   </Button>
-                                )}
+                                </>
+                              )}
+                              {(reg.status === 'approved' || reg.status === 'rejected') && (
                                 <Button
-                                  size="sm"
                                   variant="destructive"
-                                  className="text-xs"
+                                  size="sm"
                                   onClick={() => handleDelete(reg._id, reg.name)}
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  Delete
+                                  <Trash2 size={16} />
                                 </Button>
-                              </div>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))}
