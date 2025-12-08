@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, XCircle, Clock, LogOut, Search, Eye, Trash2, Mail } from "lucide-react";
+import { CheckCircle, XCircle, Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import {
   Table,
@@ -45,15 +46,23 @@ interface Stats {
 const AdminDashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, approved: 0, rejected: 0 });
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
-  const [isLoading, setIsLoading] = useState(true);
-  const [adminUser, setAdminUser] = useState<any>(null);
   const [page, setPage] = useState(1);
+  const [adminUser, setAdminUser] = useState<any>(null);
 
   const token = localStorage.getItem("adminToken");
+
+  // Debounce search input (wait 500ms after user stops typing)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     if (!token) {
@@ -64,54 +73,54 @@ const AdminDashboard = () => {
     if (admin) {
       setAdminUser(JSON.parse(admin));
     }
-    fetchStats();
-    fetchRegistrations();
-  }, [token, navigate, currentStatus, page]);
+  }, [token, navigate]);
 
-  const fetchStats = async () => {
-    try {
+  // Fetch stats with React Query
+  const { data: statsData } = useQuery({
+    queryKey: ['admin-stats', token],
+    queryFn: async () => {
       const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         headers: { "Authorization": `Bearer ${token}` },
       });
-
       if (!response.ok) throw new Error("Failed to fetch stats");
-      const data = await response.json();
-      setStats(data.stats);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      return response.json();
+    },
+    staleTime: 30000, // Cache for 30 seconds
+    enabled: !!token,
+  });
 
-  const fetchRegistrations = async () => {
-    setIsLoading(true);
-    try {
+  // Fetch registrations with React Query
+  const { data: registrationsData, isLoading } = useQuery({
+    queryKey: ['admin-registrations', currentStatus, page, debouncedSearch, token],
+    queryFn: async () => {
       const query = new URLSearchParams({
         status: currentStatus,
         page: page.toString(),
         limit: "10",
-        search: search,
+        search: debouncedSearch,
       });
-
       const response = await fetch(
         `${API_BASE_URL}/api/admin/registrations?${query}`,
         {
           headers: { "Authorization": `Bearer ${token}` },
         }
       );
-
       if (!response.ok) throw new Error("Failed to fetch registrations");
-      const data = await response.json();
-      setRegistrations(data.registrations);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch registrations",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      return response.json();
+    },
+    staleTime: 20000, // Cache for 20 seconds
+    enabled: !!token,
+  });
+
+  const stats = statsData?.stats ?? { total: 0, pending: 0, approved: 0, rejected: 0 };
+  const registrations = registrationsData?.registrations ?? [];
+  const pagination = registrationsData?.pagination ?? { total: 0, pages: 1 };
+
+  // Memoize refetch functions to avoid unnecessary re-renders
+  const refetchData = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['admin-registrations'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+  }, [queryClient]);
 
   const handleApprove = async (id: string) => {
     try {
@@ -128,8 +137,7 @@ const AdminDashboard = () => {
         title: "Success",
         description: "Registration approved successfully",
       });
-      fetchRegistrations();
-      fetchStats();
+      refetchData();
     } catch (error) {
       toast({
         title: "Error",
@@ -169,10 +177,9 @@ const AdminDashboard = () => {
       
       toast({
         title: "Success",
-        description: "Registration rejected and stored in database",
+        description: "Registration rejected successfully",
       });
-      fetchRegistrations();
-      fetchStats();
+      refetchData();
     } catch (error) {
       console.error('Reject error:', error);
       toast({
@@ -208,8 +215,7 @@ const AdminDashboard = () => {
         title: "Success",
         description: "Registration deleted permanently",
       });
-      fetchRegistrations();
-      fetchStats();
+      refetchData();
     } catch (error) {
       console.error('Delete error:', error);
       toast({
@@ -338,93 +344,129 @@ const AdminDashboard = () => {
 
               <TabsContent value={currentStatus} className="mt-4">
                 {isLoading ? (
-                  <div className="text-center py-8">Loading...</div>
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="inline-block">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                    </div>
+                    <p className="mt-2">Loading registrations...</p>
+                  </div>
                 ) : registrations.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No registrations found
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Photo</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Phone</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {registrations.map((reg) => (
-                          <TableRow key={reg._id} className="hover:bg-gray-50">
-                            <TableCell>
-                              {reg.photo ? (
-                                <img 
-                                  src={reg.photo} 
-                                  alt={reg.name}
-                                  className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
-                                  <span className="text-gray-400 text-xs">No Photo</span>
-                                </div>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <p className="font-medium">{reg.name}</p>
-                            </TableCell>
-                            <TableCell>
-                              <p className="text-sm">{reg.email}</p>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-sm space-y-0.5">
-                                <p>{reg.phone || 'N/A'}</p>
-                                {reg.parentsPhone && <p className="text-gray-500">{reg.parentsPhone}</p>}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{reg.role}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(reg.status)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
-                                <Button
-                                  size="sm"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                                  onClick={() => navigate(`/admin/registration/${reg._id}`)}
-                                >
-                                  View Details
-                                </Button>
-                                {reg.status === 'pending' && (
-                                  <Button
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                    onClick={() => handleApprove(reg._id)}
-                                  >
-                                    Approve
-                                  </Button>
-                                )}
-                                {(reg.status === 'approved' || reg.status === 'rejected') && (
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => handleDelete(reg._id, reg.name)}
-                                  >
-                                    <Trash2 size={16} />
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
+                  <>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Photo</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        </TableHeader>
+                        <TableBody>
+                          {registrations.map((reg) => (
+                            <TableRow key={reg._id} className="hover:bg-gray-50">
+                              <TableCell>
+                                {reg.photo ? (
+                                  <img 
+                                    src={reg.photo} 
+                                    alt={reg.name}
+                                    className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs">No Photo</span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <p className="font-medium">{reg.name}</p>
+                              </TableCell>
+                              <TableCell>
+                                <p className="text-sm">{reg.email}</p>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm space-y-0.5">
+                                  <p>{reg.phone || 'N/A'}</p>
+                                  {reg.parentsPhone && <p className="text-gray-500">{reg.parentsPhone}</p>}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{reg.role}</Badge>
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(reg.status)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    size="sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    onClick={() => navigate(`/admin/registration/${reg._id}`)}
+                                  >
+                                    View Details
+                                  </Button>
+                                  {reg.status === 'pending' && (
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white"
+                                      onClick={() => handleApprove(reg._id)}
+                                    >
+                                      Approve
+                                    </Button>
+                                  )}
+                                  {(reg.status === 'approved' || reg.status === 'rejected') && (
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => handleDelete(reg._id, reg.name)}
+                                    >
+                                      <Trash2 size={16} />
+                                    </Button>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    {/* Pagination Controls */}
+                    {pagination.pages > 1 && (
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                        <div className="text-sm text-gray-600">
+                          Page {pagination.currentPage} of {pagination.pages} ({pagination.total} total)
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={pagination.currentPage === 1}
+                            onClick={() => setPage(Math.max(1, page - 1))}
+                          >
+                            <ChevronLeft size={16} className="mr-1" />
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={pagination.currentPage === pagination.pages}
+                            onClick={() => setPage(Math.min(pagination.pages, page + 1))}
+                          >
+                            Next
+                            <ChevronRight size={16} className="ml-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </TabsContent>
             </Tabs>
