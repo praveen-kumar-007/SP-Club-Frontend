@@ -281,26 +281,38 @@ const Register = () => {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-white">What Our Members Say</h3>
 
-                <Card className="bg-[#1e3a5f] border-gray-700 text-white">
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "Joining SP Club has been a game-changer for me. The coaching is excellent, and I've improved my skills significantly."
+                      "SP Club has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
                     </p>
                     <div className="text-xs">
-                      <p className="font-semibold text-white">Rajesh Kumar</p>
-                      <p className="text-gray-400">Player, Member since 2020</p>
+                      <p className="font-semibold text-white">Vikram Singh</p>
+                      <p className="text-yellow-400">Raider, Member since 2018</p>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-[#1e3a5f] border-gray-700 text-white">
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "As a fan, I wanted to be more involved with the sport. SP Club organizes regular events that are always exciting!"
+                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Club's championship run in 2024 was the highlight of my sports career."
                     </p>
                     <div className="text-xs">
-                      <p className="font-semibold text-white">Priya Singh</p>
-                      <p className="text-gray-400">Fan, Member since 2021</p>
+                      <p className="font-semibold text-white">Aditya Kumar</p>
+                      <p className="text-yellow-400">Defender, Member since 2019</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
+                  <CardContent className="p-4">
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "Joined as a beginner with no kabaddi experience. The patience and dedication of coaches like Praveen helped me become a state-level competitor within two years."
+                    </p>
+                    <div className="text-xs">
+                      <p className="font-semibold text-white">Sneha Sharma</p>
+                      <p className="text-yellow-400">All-rounder, Member since 2022</p>
                     </div>
                   </CardContent>
                 </Card>
