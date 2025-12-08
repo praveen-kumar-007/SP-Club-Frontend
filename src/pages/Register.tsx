@@ -227,10 +227,13 @@ const Register = () => {
             
             if (cameraType === 'photo') {
               setSelectedFile(file);
+              form.setValue('photo', file);
             } else if (cameraType === 'aadharFront') {
               setSelectedAadharFront(file);
+              form.setValue('aadharFront', file);
             } else if (cameraType === 'aadharBack') {
               setSelectedAadharBack(file);
+              form.setValue('aadharBack', file);
             }
             
             stopCamera(cameraType);
