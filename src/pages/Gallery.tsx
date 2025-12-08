@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ArrowLeft, ArrowRight, Camera } from "lucide-react";
 import Seo from "@/components/Seo";
+import OptimizedImage from "@/components/OptimizedImage";
 
 // --- DUMMY DATA ---
 // In a real-world app, you'd fetch this from a CMS or API.
@@ -152,11 +153,11 @@ const Lightbox = ({ item, onClose, onNext, onPrev }: { item: any, onClose: () =>
         </button>
 
         {/* Image and Content */}
-        <div className="relative max-w-5xl max-h-[90vh] flex flex-col items-center animate-scale-in">
-          <img src={item.image} alt={item.title} className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
-          <div className="text-center text-white mt-4 p-4 bg-black/50 rounded-b-lg">
-            <h3 className="text-2xl font-bold">{item.title}</h3>
-            <p className="text-slate-300 mt-1 max-w-2xl">{item.description}</p>
+        <div className=\"relative max-w-5xl max-h-[90vh] flex flex-col items-center animate-scale-in\">
+          <OptimizedImage src={item.image} alt={item.title} className=\"max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl\" />
+          <div className=\"text-center text-white mt-4 p-4 bg-black/50 rounded-b-lg\">
+            <h3 className=\"text-2xl font-bold\">{item.title}</h3>
+            <p className=\"text-slate-300 mt-1 max-w-2xl\">{item.description}</p>
           </div>
         </div>
       </div>
@@ -255,7 +256,7 @@ const Gallery = () => {
                 onClick={() => openLightbox(index)}
                 style={{ animationDelay: `${(index % ITEMS_PER_PAGE) * 100}ms` }}
               >
-                <img src={item.thumbnail} alt={item.title} className="w-full h-auto block transition-transform duration-500 group-hover:scale-110" />
+                <OptimizedImage src={item.thumbnail} alt={item.title} className="w-full h-auto block transition-transform duration-500 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 p-4">
                     <h3 className="font-bold text-white">{item.title}</h3>

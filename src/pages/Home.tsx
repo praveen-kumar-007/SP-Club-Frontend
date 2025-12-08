@@ -70,14 +70,17 @@ const Home = () => {
         keywords="SP Club, SP Kabaddi Group Dhanbad, kabaddi Dhanbad, sports club Dhanbad, spkg"
       />
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-white">
+      <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
         <video
           className="absolute top-0 left-0 w-full h-full object-cover"
           src={heroVideoUrl}
+          poster="/home_assets/poster.jpg"
           autoPlay
           loop
           muted
           playsInline
+          loading="lazy"
+          preload="metadata"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
