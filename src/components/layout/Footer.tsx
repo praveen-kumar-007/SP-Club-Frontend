@@ -22,8 +22,20 @@ const Footer = () => {
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
+      console.log('Submitting to:', `${API_BASE_URL}/api/newsletter/subscribe`);
       const response = await fetch(`${API_BASE_URL}/api/newsletter/subscribe`, {
         method: "POST",
         headers: {
@@ -33,6 +45,7 @@ const Footer = () => {
       });
 
       const data = await response.json();
+      console.log('Response:', response.status, data);
 
       if (!response.ok) {
         toast({
@@ -49,6 +62,7 @@ const Footer = () => {
       });
       setEmail("");
     } catch (error) {
+      console.error('Newsletter subscription error:', error);
       toast({
         title: "Error",
         description: "Failed to subscribe. Please try again.",
