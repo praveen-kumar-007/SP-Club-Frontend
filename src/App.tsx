@@ -19,6 +19,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminRegistrationDetail from "./pages/AdminRegistrationDetail";
+import AdminInquiries from "./pages/AdminInquiries";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
+              <Route path="/admin/inquiries" element={<AdminInquiries />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
