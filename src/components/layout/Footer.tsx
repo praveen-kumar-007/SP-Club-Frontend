@@ -1,8 +1,64 @@
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import API_BASE_URL from "@/config/api";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleNewsletterSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/newsletter/subscribe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to subscribe",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Successfully subscribed to newsletter!",
+      });
+      setEmail("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-slate-900 text-white">
       <div className="container mx-auto px-6 py-12">
@@ -17,8 +73,15 @@ const Footer = () => {
               type="email"
               placeholder="Enter your email address"
               className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 flex-grow"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <Button variant="default" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold">
+            <Button 
+              variant="default" 
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold"
+              onClick={handleNewsletterSubmit}
+              disabled={isLoading}
+            >
               <Send size={20} />
             </Button>
           </div>
