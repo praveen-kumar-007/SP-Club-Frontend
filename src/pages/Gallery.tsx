@@ -153,11 +153,11 @@ const Lightbox = ({ item, onClose, onNext, onPrev }: { item: any, onClose: () =>
         </button>
 
         {/* Image and Content */}
-        <div className=\"relative max-w-5xl max-h-[90vh] flex flex-col items-center animate-scale-in\">
-          <OptimizedImage src={item.image} alt={item.title} className=\"max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl\" />
-          <div className=\"text-center text-white mt-4 p-4 bg-black/50 rounded-b-lg\">
-            <h3 className=\"text-2xl font-bold\">{item.title}</h3>
-            <p className=\"text-slate-300 mt-1 max-w-2xl\">{item.description}</p>
+        <div className="relative max-w-5xl max-h-[90vh] flex flex-col items-center animate-scale-in">
+          <OptimizedImage src={item.image} alt={item.title} className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
+          <div className="text-center text-white mt-4 p-4 bg-black/50 rounded-b-lg">
+            <h3 className="text-2xl font-bold">{item.title}</h3>
+            <p className="text-slate-300 mt-1 max-w-2xl">{item.description}</p>
           </div>
         </div>
       </div>
