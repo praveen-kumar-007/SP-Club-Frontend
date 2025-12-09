@@ -248,7 +248,7 @@ const AdminInquiries = () => {
         <Card>
           <CardContent>
             <Tabs value={currentTab} onValueChange={(value: string) => {
-              setCurrentTab(value);
+              setCurrentTab(value as 'contacts' | 'newsletters');
               setCurrentStatus('new');
             }}>
               <TabsList>
