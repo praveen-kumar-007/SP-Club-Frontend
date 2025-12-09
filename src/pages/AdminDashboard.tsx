@@ -245,7 +245,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<{className?: string; size?: number}>; title: string; value: number; color: string }) => (
+  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<any>; title: string; value: number; color: string }) => (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
