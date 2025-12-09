@@ -1,5 +1,6 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Default to production backend to avoid bundling a localhost URL in builds
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sp-club-backend.onrender.com';
 
 export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/api/register`,
