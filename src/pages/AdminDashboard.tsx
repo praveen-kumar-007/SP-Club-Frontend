@@ -76,13 +76,16 @@ const AdminDashboard = () => {
   }, [token, navigate]);
 
   // Fetch stats with React Query
-  const { data: statsData } = useQuery({
+  const { data: statsData, error: statsError } = useQuery({
     queryKey: ['admin-stats', token],
     queryFn: async () => {
       const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         headers: { "Authorization": `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error("Failed to fetch stats");
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(`Stats fetch failed: ${response.status} ${response.statusText} ${body.message || ''}`);
+      }
       return response.json();
     },
     staleTime: 30000, // Cache for 30 seconds
@@ -90,7 +93,7 @@ const AdminDashboard = () => {
   });
 
   // Fetch registrations with React Query
-  const { data: registrationsData, isLoading } = useQuery({
+  const { data: registrationsData, isLoading, error: registrationsError } = useQuery({
     queryKey: ['admin-registrations', currentStatus, page, debouncedSearch, token],
     queryFn: async () => {
       const query = new URLSearchParams({
@@ -105,7 +108,10 @@ const AdminDashboard = () => {
           headers: { "Authorization": `Bearer ${token}` },
         }
       );
-      if (!response.ok) throw new Error("Failed to fetch registrations");
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(`Registrations fetch failed: ${response.status} ${response.statusText} ${body.message || ''}`);
+      }
       return response.json();
     },
     staleTime: 20000, // Cache for 20 seconds
@@ -282,6 +288,13 @@ const AdminDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {(statsError || registrationsError) && (
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {statsError && <div>Stats error: {(statsError as Error).message}</div>}
+            {registrationsError && <div>Registrations error: {(registrationsError as Error).message}</div>}
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <StatCard
