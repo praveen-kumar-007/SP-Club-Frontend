@@ -51,7 +51,7 @@ const AdminDashboard = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [page, setPage] = useState(1);
-  const [adminUser, setAdminUser] = useState<any>(null);
+  const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
 
   const token = localStorage.getItem("adminToken");
 
@@ -245,7 +245,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const StatCard = ({ icon: Icon, title, value, color }: any) => (
+  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<{className?: string; size?: number}>; title: string; value: number; color: string }) => (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
@@ -331,8 +331,8 @@ const AdminDashboard = () => {
           </CardHeader>
 
           <CardContent>
-            <Tabs value={currentStatus} onValueChange={(value: any) => {
-              setCurrentStatus(value);
+            <Tabs value={currentStatus} onValueChange={(value: string) => {
+              setCurrentStatus(value as 'all' | 'pending' | 'approved' | 'rejected');
               setPage(1);
             }}>
               <TabsList>

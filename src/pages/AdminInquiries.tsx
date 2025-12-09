@@ -39,7 +39,7 @@ const AdminInquiries = () => {
   const [currentTab, setCurrentTab] = useState<'contacts' | 'newsletters'>('contacts');
   const [currentStatus, setCurrentStatus] = useState<'all' | 'new' | 'completed'>('new');
   const [isLoading, setIsLoading] = useState(true);
-  const [adminUser, setAdminUser] = useState<any>(null);
+  const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
 
   const token = localStorage.getItem("adminToken");
 
@@ -247,7 +247,7 @@ const AdminInquiries = () => {
         {/* Tabs */}
         <Card>
           <CardContent>
-            <Tabs value={currentTab} onValueChange={(value: any) => {
+            <Tabs value={currentTab} onValueChange={(value: string) => {
               setCurrentTab(value);
               setCurrentStatus('new');
             }}>

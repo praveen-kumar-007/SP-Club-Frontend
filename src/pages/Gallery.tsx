@@ -124,7 +124,7 @@ const categories = [
 const ITEMS_PER_PAGE = 9;
 
 // --- Lightbox Component ---
-const Lightbox = ({ item, onClose, onNext, onPrev }: { item: any, onClose: () => void, onNext: () => void, onPrev: () => void }) => {
+const Lightbox = ({ item, onClose, onNext, onPrev }: { item: {id: number; image: string; title: string; description: string}; onClose: () => void; onNext: () => void; onPrev: () => void }) => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
