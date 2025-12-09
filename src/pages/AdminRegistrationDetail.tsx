@@ -9,6 +9,13 @@ import { ArrowLeft, Download, Trash2 } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -55,6 +62,8 @@ const RegistrationDetail = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   const token = localStorage.getItem("adminToken");
 
@@ -66,18 +75,29 @@ const RegistrationDetail = () => {
     fetchRegistration();
 
     // Initialize session timeout manager
-    const cleanup = initializeSessionManager(() => {
-      clearSession();
-      toast({
-        title: "Session Expired",
-        description: "You have been logged out due to inactivity (15 minutes)",
-        variant: "destructive",
-      });
-      navigate("/admin/login");
-    });
+    const cleanup = initializeSessionManager(
+      () => {
+        clearSession();
+        navigate("/admin/login");
+      },
+      () => {
+        setShowTimeoutDialog(true);
+        setCountdown(5);
+      }
+    );
 
     return cleanup;
   }, [id, token]);
+
+  // Countdown timer for timeout dialog
+  useEffect(() => {
+    if (showTimeoutDialog && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showTimeoutDialog, countdown]);
 
   const fetchRegistration = async () => {
     setIsLoading(true);
@@ -234,6 +254,24 @@ const RegistrationDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Session Timeout Dialog */}
+      <AlertDialog open={showTimeoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-600">
+              ⏱️ Session Timeout
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base space-y-3">
+              <p>Your session has expired due to 15 minutes of inactivity.</p>
+              <p className="font-semibold text-gray-900">
+                You will be redirected to the login page in {countdown} second{countdown !== 1 ? 's' : ''}...
+              </p>
+              <p className="text-sm text-gray-600">Please log in again to continue.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">

@@ -2,10 +2,11 @@
 
 const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 const STORAGE_KEY = 'adminLastActivity';
+const REDIRECT_DELAY = 5000; // 5 seconds delay before redirect
 
 let timeoutId: NodeJS.Timeout | null = null;
 
-export const initializeSessionManager = (onTimeout: () => void) => {
+export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialog: () => void) => {
   // Update last activity timestamp
   const updateActivity = () => {
     localStorage.setItem(STORAGE_KEY, Date.now().toString());
@@ -21,7 +22,13 @@ export const initializeSessionManager = (onTimeout: () => void) => {
 
     const timeSinceActivity = Date.now() - parseInt(lastActivity);
     if (timeSinceActivity >= SESSION_TIMEOUT) {
-      onTimeout();
+      // Show timeout dialog first
+      showTimeoutDialog();
+      
+      // Clear session and redirect after 5 seconds
+      setTimeout(() => {
+        onTimeout();
+      }, REDIRECT_DELAY);
       return;
     }
 

@@ -10,6 +10,13 @@ import { CheckCircle, Trash2, LogOut, Search, Mail, Phone, ArrowLeft } from "luc
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -41,6 +48,8 @@ const AdminInquiries = () => {
   const [currentStatus, setCurrentStatus] = useState<'all' | 'new' | 'completed'>('new');
   const [isLoading, setIsLoading] = useState(true);
   const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
+  const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   const token = localStorage.getItem("adminToken");
 
@@ -94,18 +103,29 @@ const AdminInquiries = () => {
     fetchInquiries();
 
     // Initialize session timeout manager
-    const cleanup = initializeSessionManager(() => {
-      clearSession();
-      toast({
-        title: "Session Expired",
-        description: "You have been logged out due to inactivity (15 minutes)",
-        variant: "destructive",
-      });
-      navigate("/admin/login");
-    });
+    const cleanup = initializeSessionManager(
+      () => {
+        clearSession();
+        navigate("/admin/login");
+      },
+      () => {
+        setShowTimeoutDialog(true);
+        setCountdown(5);
+      }
+    );
 
     return cleanup;
   }, [token, navigate, fetchInquiries, toast]);
+
+  // Countdown timer for timeout dialog
+  useEffect(() => {
+    if (showTimeoutDialog && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showTimeoutDialog, countdown]);
 
   const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter') => {
     try {
@@ -218,6 +238,24 @@ const AdminInquiries = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Session Timeout Dialog */}
+      <AlertDialog open={showTimeoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-600">
+              ⏱️ Session Timeout
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base space-y-3">
+              <p>Your session has expired due to 15 minutes of inactivity.</p>
+              <p className="font-semibold text-gray-900">
+                You will be redirected to the login page in {countdown} second{countdown !== 1 ? 's' : ''}...
+              </p>
+              <p className="text-sm text-gray-600">Please log in again to continue.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
