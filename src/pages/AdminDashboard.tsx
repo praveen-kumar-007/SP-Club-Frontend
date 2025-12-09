@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, XCircle, Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import API_BASE_URL from "@/config/api";
+import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
   Table,
   TableBody,
@@ -73,7 +74,20 @@ const AdminDashboard = () => {
     if (admin) {
       setAdminUser(JSON.parse(admin));
     }
-  }, [token, navigate]);
+
+    // Initialize session timeout manager
+    const cleanup = initializeSessionManager(() => {
+      clearSession();
+      toast({
+        title: "Session Expired",
+        description: "You have been logged out due to inactivity (15 minutes)",
+        variant: "destructive",
+      });
+      navigate("/admin/login");
+    });
+
+    return cleanup;
+  }, [token, navigate, toast]);
 
   // Fetch stats with React Query
   const { data: statsData, error: statsError } = useQuery({
@@ -233,8 +247,7 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
+    clearSession();
     navigate("/admin/login");
   };
 

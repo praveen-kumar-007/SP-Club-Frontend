@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Download, Trash2 } from "lucide-react";
 import API_BASE_URL from "@/config/api";
+import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +64,19 @@ const RegistrationDetail = () => {
       return;
     }
     fetchRegistration();
+
+    // Initialize session timeout manager
+    const cleanup = initializeSessionManager(() => {
+      clearSession();
+      toast({
+        title: "Session Expired",
+        description: "You have been logged out due to inactivity (15 minutes)",
+        variant: "destructive",
+      });
+      navigate("/admin/login");
+    });
+
+    return cleanup;
   }, [id, token]);
 
   const fetchRegistration = async () => {

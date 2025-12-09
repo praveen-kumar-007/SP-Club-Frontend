@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, Trash2, LogOut, Search, Mail, Phone, ArrowLeft } from "lucide-react";
 import API_BASE_URL from "@/config/api";
+import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
   Table,
   TableBody,
@@ -91,7 +92,20 @@ const AdminInquiries = () => {
       setAdminUser(JSON.parse(admin));
     }
     fetchInquiries();
-  }, [token, navigate, fetchInquiries]);
+
+    // Initialize session timeout manager
+    const cleanup = initializeSessionManager(() => {
+      clearSession();
+      toast({
+        title: "Session Expired",
+        description: "You have been logged out due to inactivity (15 minutes)",
+        variant: "destructive",
+      });
+      navigate("/admin/login");
+    });
+
+    return cleanup;
+  }, [token, navigate, fetchInquiries, toast]);
 
   const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter') => {
     try {
@@ -170,8 +184,7 @@ const AdminInquiries = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
+    clearSession();
     navigate("/admin/login");
   };
 
