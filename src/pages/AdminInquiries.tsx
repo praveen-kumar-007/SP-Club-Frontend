@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -43,19 +43,7 @@ const AdminInquiries = () => {
 
   const token = localStorage.getItem("adminToken");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    const admin = localStorage.getItem("adminUser");
-    if (admin) {
-      setAdminUser(JSON.parse(admin));
-    }
-    fetchInquiries();
-  }, [token, navigate]);
-
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     setIsLoading(true);
     try {
       // Fetch contacts
@@ -91,7 +79,19 @@ const AdminInquiries = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, toast]);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/admin/login");
+      return;
+    }
+    const admin = localStorage.getItem("adminUser");
+    if (admin) {
+      setAdminUser(JSON.parse(admin));
+    }
+    fetchInquiries();
+  }, [token, navigate, fetchInquiries]);
 
   const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter') => {
     try {
