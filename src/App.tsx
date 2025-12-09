@@ -70,13 +70,5 @@ const App = () => (
 );
 
 export default App;
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
 export default App;
