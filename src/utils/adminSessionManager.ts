@@ -1,6 +1,7 @@
-// Admin Session Manager - Auto logout after 15 minutes of inactivity
+// Admin Session Manager - Auto logout after 5 minutes of inactivity
 
-const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+const SESSION_START_KEY = 'adminSessionStart';
 const STORAGE_KEY = 'adminLastActivity';
 const REDIRECT_DELAY = 5000; // 5 seconds delay before redirect
 
@@ -12,16 +13,16 @@ export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialo
     localStorage.setItem(STORAGE_KEY, Date.now().toString());
   };
 
-  // Check if session has expired
+  // Check if session has expired (based on session start time, not last activity)
   const checkSession = () => {
-    const lastActivity = localStorage.getItem(STORAGE_KEY);
-    if (!lastActivity) {
+    const sessionStart = localStorage.getItem(SESSION_START_KEY);
+    if (!sessionStart) {
       onTimeout();
       return;
     }
 
-    const timeSinceActivity = Date.now() - parseInt(lastActivity);
-    if (timeSinceActivity >= SESSION_TIMEOUT) {
+    const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
+    if (timeElapsedSinceStart >= SESSION_TIMEOUT) {
       // Show timeout dialog first
       showTimeoutDialog();
       
@@ -33,11 +34,16 @@ export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialo
     }
 
     // Schedule next check
-    const remainingTime = SESSION_TIMEOUT - timeSinceActivity;
+    const remainingTime = SESSION_TIMEOUT - timeElapsedSinceStart;
     timeoutId = setTimeout(checkSession, remainingTime);
   };
 
-  // Initialize activity timestamp
+  // Initialize session start time (only on first login, not on page refresh)
+  if (!localStorage.getItem(SESSION_START_KEY)) {
+    localStorage.setItem(SESSION_START_KEY, Date.now().toString());
+  }
+  
+  // Update last activity timestamp
   updateActivity();
 
   // Set up event listeners for user activity
@@ -64,6 +70,7 @@ export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialo
 
 export const clearSession = () => {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(SESSION_START_KEY);
   localStorage.removeItem('adminToken');
   localStorage.removeItem('adminUser');
 };

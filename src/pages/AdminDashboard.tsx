@@ -63,6 +63,7 @@ const AdminDashboard = () => {
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<number | null>(null);
+  const [sessionSecondsRemaining, setSessionSecondsRemaining] = useState<number | null>(null);
 
   const token = localStorage.getItem("adminToken");
 
@@ -112,18 +113,20 @@ const AdminDashboard = () => {
     }
   }, [showTimeoutDialog, countdown]);
 
-  // Session time remaining tracker
+  // Session time remaining tracker (based on session start time, not last activity)
   useEffect(() => {
     const updateSessionTime = () => {
-      const lastActivity = localStorage.getItem('adminLastActivity');
-      if (!lastActivity) return;
+      const sessionStart = localStorage.getItem('adminSessionStart');
+      if (!sessionStart) return;
 
-      const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
-      const timeSinceActivity = Date.now() - parseInt(lastActivity);
-      const remainingMs = SESSION_TIMEOUT - timeSinceActivity;
-      const remainingMinutes = Math.max(0, Math.ceil(remainingMs / 60000));
+      const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+      const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
+      const remainingMs = SESSION_TIMEOUT - timeElapsedSinceStart;
+      const remainingMinutes = Math.max(0, Math.floor(remainingMs / 60000));
+      const remainingSeconds = Math.max(0, Math.floor((remainingMs % 60000) / 1000));
       
       setSessionTimeRemaining(remainingMinutes);
+      setSessionSecondsRemaining(remainingSeconds);
     };
 
     updateSessionTime();
@@ -325,9 +328,9 @@ const AdminDashboard = () => {
       {/* Session Timer Banner */}
       {sessionTimeRemaining !== null && (
         <div className={`sticky top-0 z-50 px-4 py-3 ${
-          sessionTimeRemaining <= 2 
+          sessionTimeRemaining === 0 && sessionSecondsRemaining! <= 30 
             ? 'bg-red-500' 
-            : sessionTimeRemaining <= 5 
+            : sessionTimeRemaining <= 1 
             ? 'bg-yellow-500' 
             : 'bg-blue-500'
         }`}>
@@ -335,7 +338,7 @@ const AdminDashboard = () => {
             <div className="flex items-center gap-2">
               <AlertCircle className="text-white" size={20} />
               <span className="text-white font-semibold">
-                Session expires in {sessionTimeRemaining} minute{sessionTimeRemaining !== 1 ? 's' : ''}
+                Session expires in {sessionTimeRemaining}:{String(sessionSecondsRemaining).padStart(2, '0')} 
               </span>
             </div>
             <span className="text-white text-sm opacity-90">Stay active to keep your session alive</span>
