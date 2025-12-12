@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, User } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
+import { getOrCreateDeviceId, getDeviceName } from "@/utils/deviceManager";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -34,10 +35,17 @@ const AdminLogin = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
+      const deviceId = getOrCreateDeviceId();
+      const deviceName = getDeviceName();
+
       const response = await fetch(`${API_ENDPOINTS.REGISTER.split('/api/register')[0]}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          deviceId,
+          deviceName
+        }),
       });
 
       const result = await response.json();
@@ -51,13 +59,14 @@ const AdminLogin = () => {
         return;
       }
 
-      // Store token and admin info in localStorage
+      // Store token, admin info, and device info in localStorage
       localStorage.setItem("adminToken", result.token);
       localStorage.setItem("adminUser", JSON.stringify(result.admin));
+      localStorage.setItem("adminDeviceName", getDeviceName());
 
       toast({
         title: "Login Successful",
-        description: "Welcome to Admin Dashboard",
+        description: `Welcome to Admin Dashboard (Active sessions: ${result.activeSessions}/2)`,
       });
 
       // Redirect to dashboard
