@@ -54,7 +54,7 @@ const App = () => (
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/kabaddi-rules" element={<KabaddiRules />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin/signup" element={<AdminSignup />} />
+                <Route path="/sp-auth-x7k9-admin-init-portal-2025" element={<AdminSignup />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
                 <Route path="/admin/inquiries" element={<AdminInquiries />} />
