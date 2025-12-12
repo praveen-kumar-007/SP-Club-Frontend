@@ -51,11 +51,27 @@ const AdminLogin = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        toast({
-          title: "Login Failed",
-          description: result.message,
-          variant: "destructive",
-        });
+        // Handle device limit exceeded (429)
+        if (response.status === 429) {
+          let deviceList = '';
+          if (result.currentDevices && Array.isArray(result.currentDevices)) {
+            deviceList = result.currentDevices
+              .map((d: any) => `• ${d.deviceName} (${new Date(d.loginTime).toLocaleString()})`)
+              .join('\n');
+          }
+
+          toast({
+            title: "Device Limit Reached",
+            description: `${result.message}\n\nActive devices:\n${deviceList}`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description: result.message,
+            variant: "destructive",
+          });
+        }
         return;
       }
 
