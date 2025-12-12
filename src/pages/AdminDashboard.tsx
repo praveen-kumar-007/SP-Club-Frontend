@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, XCircle, Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -62,6 +62,7 @@ const AdminDashboard = () => {
   const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [sessionTimeRemaining, setSessionTimeRemaining] = useState<number | null>(null);
 
   const token = localStorage.getItem("adminToken");
 
@@ -110,6 +111,25 @@ const AdminDashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [showTimeoutDialog, countdown]);
+
+  // Session time remaining tracker
+  useEffect(() => {
+    const updateSessionTime = () => {
+      const lastActivity = localStorage.getItem('adminLastActivity');
+      if (!lastActivity) return;
+
+      const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+      const timeSinceActivity = Date.now() - parseInt(lastActivity);
+      const remainingMs = SESSION_TIMEOUT - timeSinceActivity;
+      const remainingMinutes = Math.max(0, Math.ceil(remainingMs / 60000));
+      
+      setSessionTimeRemaining(remainingMinutes);
+    };
+
+    updateSessionTime();
+    const interval = setInterval(updateSessionTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch stats with React Query
   const { data: statsData, error: statsError } = useQuery({
@@ -302,6 +322,27 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Session Timer Banner */}
+      {sessionTimeRemaining !== null && (
+        <div className={`sticky top-0 z-50 px-4 py-3 ${
+          sessionTimeRemaining <= 2 
+            ? 'bg-red-500' 
+            : sessionTimeRemaining <= 5 
+            ? 'bg-yellow-500' 
+            : 'bg-blue-500'
+        }`}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="text-white" size={20} />
+              <span className="text-white font-semibold">
+                Session expires in {sessionTimeRemaining} minute{sessionTimeRemaining !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <span className="text-white text-sm opacity-90">Stay active to keep your session alive</span>
+          </div>
+        </div>
+      )}
+
       {/* Session Timeout Dialog */}
       <AlertDialog open={showTimeoutDialog}>
         <AlertDialogContent>
