@@ -40,16 +40,22 @@ interface Registration {
   phone: string;
   parentsPhone: string;
   gender: string;
+  dob: string;
   bloodGroup: string;
+  address: string;
   role: string;
   ageGroup?: string;
   experience?: string;
+  kabaddiPositions?: string[];
+  clubDetails: string;
+  message?: string;
   aadharNumber: string;
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
   photo: string;
   aadharFront: string;
   aadharBack: string;
+  newsletter?: boolean;
 }
 
 interface Stats {
@@ -286,46 +292,118 @@ const AdminDashboard = () => {
     }
   };
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const headers = [
-      'Name', 'Father Name', 'Email', 'Phone', 'Blood Group', 
-      'Role', 'Age Group', 'Experience', 'Status', 'Registered Date'
-    ];
+  // Export to CSV - fetch ALL data with current filters
+  const exportToCSV = async () => {
+    try {
+      toast({
+        title: "Exporting...",
+        description: "Fetching all data for export",
+      });
 
-    const rows = filteredRegistrations.map((reg: Registration) => [
-      reg.name,
-      reg.fathersName,
-      reg.email,
-      reg.phone,
-      reg.bloodGroup,
-      reg.role,
-      reg.ageGroup || 'N/A',
-      reg.experience || 'N/A',
-      reg.status,
-      new Date(reg.registeredAt).toLocaleDateString()
-    ]);
+      // Build query params with all current filters
+      const params = new URLSearchParams({
+        status: currentStatus,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(ageGroupFilter !== 'all' && { ageGroup: ageGroupFilter }),
+        ...(roleFilter !== 'all' && { role: roleFilter }),
+        ...(experienceFilter !== 'all' && { experience: experienceFilter }),
+      });
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/export?${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `registrations_${currentStatus}_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (!response.ok) throw new Error('Export failed');
+      
+      const data = await response.json();
+      const allRegistrations = data.registrations || [];
 
-    toast({
-      title: "Export Successful",
-      description: `Exported ${filteredRegistrations.length} registrations`,
-    });
+      // All CSV headers
+      const headers = [
+        'Registration ID',
+        'Name',
+        'Father\'s Name',
+        'Email',
+        'Phone',
+        'Parent Phone',
+        'Gender',
+        'Date of Birth',
+        'Age Group',
+        'Blood Group',
+        'Address',
+        'Aadhar Number',
+        'Role',
+        'Experience Level',
+        'Kabaddi Positions',
+        'Club Details',
+        'Message',
+        'Newsletter Subscribed',
+        'Status',
+        'Registered Date',
+        'Photo URL',
+        'Aadhar Front URL',
+        'Aadhar Back URL'
+      ];
+
+      const rows = allRegistrations.map((reg: Registration) => [
+        reg._id,
+        reg.name,
+        reg.fathersName,
+        reg.email,
+        reg.phone || 'N/A',
+        reg.parentsPhone || 'N/A',
+        reg.gender,
+        reg.dob ? new Date(reg.dob).toLocaleDateString() : 'N/A',
+        reg.ageGroup || 'N/A',
+        reg.bloodGroup,
+        reg.address || 'N/A',
+        reg.aadharNumber,
+        reg.role,
+        reg.experience || 'N/A',
+        reg.kabaddiPositions ? reg.kabaddiPositions.join('; ') : 'N/A',
+        reg.clubDetails || 'N/A',
+        reg.message || 'N/A',
+        reg.newsletter ? 'Yes' : 'No',
+        reg.status,
+        new Date(reg.registeredAt).toLocaleString(),
+        reg.photo,
+        reg.aadharFront,
+        reg.aadharBack
+      ]);
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `SP_Kabaddi_Registrations_${currentStatus}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Successful",
+        description: `Exported ${allRegistrations.length} registrations with all fields`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: error instanceof Error ? error.message : "Failed to export data",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -698,11 +776,16 @@ const AdminDashboard = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                 <Input
-                  placeholder="Search by name, email, or Aadhar..."
+                  placeholder="Search by name, email, phone, or Aadhar number..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-10"
                 />
+                {debouncedSearch && (
+                  <div className="absolute right-3 top-3 text-xs text-gray-500">
+                    Searching...
+                  </div>
+                )}
               </div>
 
               <Tabs value={currentStatus} onValueChange={(value: any) => {
