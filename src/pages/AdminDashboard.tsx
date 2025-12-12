@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,13 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight, 
-  AlertCircle, CheckCircle, XCircle, Download, BarChart3, Filter 
-} from "lucide-react";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -42,8 +36,6 @@ interface Registration {
   gender: string;
   bloodGroup: string;
   role: string;
-  ageGroup?: string;
-  experience?: string;
   aadharNumber: string;
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
@@ -53,33 +45,16 @@ interface Registration {
 }
 
 interface Stats {
-  summary: {
-    total: number;
-    pending: number;
-    approved: number;
-    rejected: number;
-    approvalRate: number;
-  };
-  monthlyRegistrations: Array<{
-    _id: { year: number; month: number };
-    count: number;
-    approved: number;
-    rejected: number;
-    pending: number;
-  }>;
-  popularPositions: Array<{ position: string; count: number }>;
-  ageGroups: Array<{ ageGroup: string; count: number }>;
-  roles: Array<{ role: string; count: number }>;
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
 }
-
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 const AdminDashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
-  // State
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
@@ -89,29 +64,18 @@ const AdminDashboard = () => {
   const [countdown, setCountdown] = useState(5);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<number | null>(null);
   const [sessionSecondsRemaining, setSessionSecondsRemaining] = useState<number | null>(null);
-  
-  // Bulk operations state
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [selectAll, setSelectAll] = useState(false);
-  
-  // Advanced filters state
-  const [ageGroupFilter, setAgeGroupFilter] = useState<string>("all");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [experienceFilter, setExperienceFilter] = useState<string>("all");
-  const [showStats, setShowStats] = useState(false);
 
   const token = localStorage.getItem("adminToken");
 
-  // Debounce search
+  // Debounce search input (wait 500ms after user stops typing)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
-    }, 300);
+    }, 500);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Session management
   useEffect(() => {
     if (!token) {
       navigate("/admin/login");
@@ -122,9 +86,11 @@ const AdminDashboard = () => {
       setAdminUser(JSON.parse(admin));
     }
 
+    // Initialize session timeout manager
     const cleanup = initializeSessionManager(
       () => {
         clearSession();
+        // Invalidate all queries to prevent 401 errors
         queryClient.clear();
         navigate("/admin/login");
       },
@@ -135,9 +101,9 @@ const AdminDashboard = () => {
     );
 
     return cleanup;
-  }, [token, navigate, queryClient]);
+  }, [token, navigate, toast, queryClient]);
 
-  // Timeout countdown
+  // Countdown timer for timeout dialog
   useEffect(() => {
     if (showTimeoutDialog && countdown > 0) {
       const timer = setTimeout(() => {
@@ -147,13 +113,13 @@ const AdminDashboard = () => {
     }
   }, [showTimeoutDialog, countdown]);
 
-  // Session time remaining tracker
+  // Session time remaining tracker (based on session start time, not last activity)
   useEffect(() => {
     const updateSessionTime = () => {
       const sessionStart = localStorage.getItem('adminSessionStart');
       if (!sessionStart) return;
 
-      const SESSION_TIMEOUT = 5 * 60 * 1000;
+      const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
       const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
       const remainingMs = SESSION_TIMEOUT - timeElapsedSinceStart;
       const remainingMinutes = Math.max(0, Math.floor(remainingMs / 60000));
@@ -168,168 +134,129 @@ const AdminDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch registrations
-  const { data: registrationsData, refetch: refetchRegistrations } = useQuery({
-    queryKey: ['registrations', currentStatus, page, debouncedSearch],
+  // Fetch stats with React Query
+  const { data: statsData, error: statsError } = useQuery({
+    queryKey: ['admin-stats', token],
     queryFn: async () => {
-      const params = new URLSearchParams({
-        status: currentStatus,
-        page: page.toString(),
-        limit: '10',
-        ...(debouncedSearch && { search: debouncedSearch })
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+        headers: { "Authorization": `Bearer ${token}` },
       });
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/registrations?${params}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(`Stats fetch failed: ${response.status} ${response.statusText} ${body.message || ''}`);
+      }
       return response.json();
     },
+    staleTime: 30000, // Cache for 30 seconds
     enabled: !!token,
   });
 
-  // Fetch statistics
-  const { data: statsData } = useQuery<Stats>({
-    queryKey: ['statistics'],
+  // Fetch registrations with React Query
+  const { data: registrationsData, isLoading, error: registrationsError } = useQuery({
+    queryKey: ['admin-registrations', currentStatus, page, debouncedSearch, token],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/admin/statistics`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const query = new URLSearchParams({
+        status: currentStatus,
+        page: page.toString(),
+        limit: "10",
+        search: debouncedSearch,
       });
-      if (!response.ok) throw new Error('Failed to fetch statistics');
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations?${query}`,
+        {
+          headers: { "Authorization": `Bearer ${token}` },
+        }
+      );
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(`Registrations fetch failed: ${response.status} ${response.statusText} ${body.message || ''}`);
+      }
       return response.json();
     },
-    enabled: !!token && showStats,
+    staleTime: 20000, // Cache for 20 seconds
+    enabled: !!token,
   });
 
-  const registrations = registrationsData?.registrations || [];
-  const pagination = registrationsData?.pagination || { total: 0, pages: 1, currentPage: 1 };
+  const stats = statsData?.stats ?? { total: 0, pending: 0, approved: 0, rejected: 0 };
+  const registrations = registrationsData?.registrations ?? [];
+  const pagination = registrationsData?.pagination ?? { total: 0, pages: 1 };
 
-  // Filter registrations by advanced filters
-  const filteredRegistrations = registrations.filter((reg: Registration) => {
-    if (ageGroupFilter !== "all" && reg.ageGroup !== ageGroupFilter) return false;
-    if (roleFilter !== "all" && reg.role !== roleFilter) return false;
-    if (experienceFilter !== "all" && reg.experience !== experienceFilter) return false;
-    return true;
-  });
+  // Memoize refetch functions to avoid unnecessary re-renders
+  const refetchData = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['admin-registrations'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+  }, [queryClient]);
 
-  // Bulk selection handlers
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filteredRegistrations.map(r => r._id)));
-    }
-    setSelectAll(!selectAll);
-  };
+  const handleApprove = async (id: string) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}/approve`,
+        {
+          method: "PUT",
+          headers: { "Authorization": `Bearer ${token}` },
+        }
+      );
 
-  const handleSelectOne = (id: string) => {
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedIds(newSelected);
-    setSelectAll(newSelected.size === filteredRegistrations.length);
-  };
-
-  // Bulk approve/reject
-  const handleBulkAction = async (action: 'approve' | 'reject') => {
-    if (selectedIds.size === 0) {
+      if (!response.ok) throw new Error("Failed to approve");
       toast({
-        title: "No Selection",
-        description: "Please select registrations first",
+        title: "Success",
+        description: "Registration approved successfully",
+      });
+      refetchData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to approve",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async (id: string, reason: string) => {
+    if (!reason.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a rejection reason",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/registrations/bulk-update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ids: Array.from(selectedIds),
-          action,
-        }),
-      });
-
-      const result = await response.json();
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}/reject`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reason }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(result.message || 'Bulk action failed');
+        const data = await response.json().catch(() => ({ message: 'Failed to reject' }));
+        throw new Error(data.message || "Failed to reject");
       }
-
+      
       toast({
         title: "Success",
-        description: result.message,
+        description: "Registration rejected successfully",
       });
-
-      setSelectedIds(new Set());
-      setSelectAll(false);
-      refetchRegistrations();
+      refetchData();
     } catch (error) {
+      console.error('Reject error:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Bulk action failed",
+        description: error instanceof Error ? error.message : "Failed to reject",
         variant: "destructive",
       });
     }
   };
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const headers = [
-      'Name', 'Father Name', 'Email', 'Phone', 'Blood Group', 
-      'Role', 'Age Group', 'Experience', 'Status', 'Registered Date'
-    ];
-
-    const rows = filteredRegistrations.map((reg: Registration) => [
-      reg.name,
-      reg.fathersName,
-      reg.email,
-      reg.phone,
-      reg.bloodGroup,
-      reg.role,
-      reg.ageGroup || 'N/A',
-      reg.experience || 'N/A',
-      reg.status,
-      new Date(reg.registeredAt).toLocaleDateString()
-    ]);
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `registrations_${currentStatus}_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast({
-      title: "Export Successful",
-      description: `Exported ${filteredRegistrations.length} registrations`,
-    });
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this registration permanently?')) {
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to permanently delete ${name}'s registration? This cannot be undone.`)) {
       return;
     }
 
@@ -337,9 +264,9 @@ const AdminDashboard = () => {
       const response = await fetch(
         `${API_BASE_URL}/api/admin/registrations/${id}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
           },
         }
       );
@@ -353,7 +280,7 @@ const AdminDashboard = () => {
         title: "Success",
         description: "Registration deleted permanently",
       });
-      refetchRegistrations();
+      refetchData();
     } catch (error) {
       console.error('Delete error:', error);
       toast({
@@ -382,14 +309,19 @@ const AdminDashboard = () => {
     }
   };
 
-  // Monthly data formatting
-  const monthlyChartData = statsData?.monthlyRegistrations.map(m => ({
-    name: `${m._id.month}/${m._id.year}`,
-    Total: m.count,
-    Approved: m.approved,
-    Pending: m.pending,
-    Rejected: m.rejected,
-  })) || [];
+  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<any>; title: string; value: number; color: string }) => (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-bold">{value}</div>
+          <Icon className={`${color}`} size={32} />
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -440,12 +372,9 @@ const AdminDashboard = () => {
             <p className="text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
           </div>
           <div className="flex gap-3">
-            <Button 
-              variant={showStats ? "default" : "outline"} 
-              onClick={() => setShowStats(!showStats)}
-            >
-              <BarChart3 size={18} className="mr-2" />
-              {showStats ? 'Hide' : 'Show'} Statistics
+            <Button variant="outline" onClick={() => navigate("/admin/inquiries")}>
+              <Mail size={18} className="mr-2" />
+              View Inquiries
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
               <LogOut size={18} className="mr-2" />
@@ -455,404 +384,202 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Statistics Dashboard */}
-        {showStats && statsData && (
-          <div className="space-y-6">
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Total</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{statsData.summary.total}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-yellow-600">Pending</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{statsData.summary.pending}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-green-600">Approved</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{statsData.summary.approved}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-red-600">Rejected</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{statsData.summary.rejected}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-blue-600">Approval Rate</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{statsData.summary.approvalRate}%</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Monthly Registrations Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Monthly Registrations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={monthlyChartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="Total" stroke="#3b82f6" strokeWidth={2} />
-                      <Line type="monotone" dataKey="Approved" stroke="#10b981" />
-                      <Line type="monotone" dataKey="Pending" stroke="#f59e0b" />
-                      <Line type="monotone" dataKey="Rejected" stroke="#ef4444" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Popular Positions Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Popular Kabaddi Positions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={statsData.popularPositions.slice(0, 5)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="position" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="#3b82f6" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Age Group Distribution */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Age Group Distribution</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={statsData.ageGroups}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ ageGroup, count }) => `${ageGroup}: ${count}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="count"
-                      >
-                        {statsData.ageGroups.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Role Distribution */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Role Distribution</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={statsData.roles}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ role, count }) => `${role}: ${count}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="count"
-                      >
-                        {statsData.roles.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {(statsError || registrationsError) && (
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {statsError && <div>Stats error: {(statsError as Error).message}</div>}
+            {registrationsError && <div>Registrations error: {(registrationsError as Error).message}</div>}
           </div>
         )}
 
-        {/* Advanced Filters */}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <StatCard
+            icon={Clock}
+            title="Pending"
+            value={stats.pending}
+            color="text-yellow-500"
+          />
+          <StatCard
+            icon={CheckCircle}
+            title="Approved"
+            value={stats.approved}
+            color="text-green-500"
+          />
+          <StatCard
+            icon={XCircle}
+            title="Rejected"
+            value={stats.rejected}
+            color="text-red-500"
+          />
+          <StatCard
+            icon={Eye}
+            title="Total"
+            value={stats.total}
+            color="text-blue-500"
+          />
+        </div>
+
+        {/* Registrations Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter size={20} />
-              Advanced Filters
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Age Group</label>
-                <Select value={ageGroupFilter} onValueChange={setAgeGroupFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All age groups" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Age Groups</SelectItem>
-                    <SelectItem value="Under 14">Under 14</SelectItem>
-                    <SelectItem value="Under 17">Under 17</SelectItem>
-                    <SelectItem value="Under 21">Under 21</SelectItem>
-                    <SelectItem value="Senior">Senior</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Role</label>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All roles" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="player">Player</SelectItem>
-                    <SelectItem value="coach">Coach</SelectItem>
-                    <SelectItem value="referee">Referee</SelectItem>
-                    <SelectItem value="supporter">Supporter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Experience</label>
-                <Select value={experienceFilter} onValueChange={setExperienceFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Experience</SelectItem>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                    <SelectItem value="professional">Professional</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-end">
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => {
-                    setAgeGroupFilter("all");
-                    setRoleFilter("all");
-                    setExperienceFilter("all");
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Registrations List */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-4">
               <CardTitle>Registrations</CardTitle>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={exportToCSV}>
-                  <Download size={16} className="mr-2" />
-                  Export CSV
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {/* Search & Tabs */}
-            <div className="space-y-4 mb-4">
               <div className="relative">
-                <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+                <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                 <Input
-                  placeholder="Search by name, email, or Aadhar..."
+                  placeholder="Search by name, email, or Aadhar"
+                  className="pl-10 w-64"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
                 />
               </div>
+            </div>
+          </CardHeader>
 
-              <Tabs value={currentStatus} onValueChange={(value: any) => {
-                setCurrentStatus(value);
-                setPage(1);
-                setSelectedIds(new Set());
-                setSelectAll(false);
-              }}>
-                <TabsList>
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="pending">Pending</TabsTrigger>
-                  <TabsTrigger value="approved">Approved</TabsTrigger>
-                  <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                </TabsList>
-              </Tabs>
+          <CardContent>
+            <Tabs value={currentStatus} onValueChange={(value: string) => {
+              setCurrentStatus(value as 'all' | 'pending' | 'approved' | 'rejected');
+              setPage(1);
+            }}>
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="approved">Approved</TabsTrigger>
+                <TabsTrigger value="rejected">Rejected</TabsTrigger>
+              </TabsList>
 
-              {/* Bulk Actions */}
-              {selectedIds.size > 0 && (
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <span className="text-sm font-medium">{selectedIds.size} selected</span>
-                  <div className="flex gap-2 ml-auto">
-                    <Button 
-                      size="sm" 
-                      variant="default"
-                      onClick={() => handleBulkAction('approve')}
-                    >
-                      <CheckCircle size={16} className="mr-2" />
-                      Approve Selected
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => handleBulkAction('reject')}
-                    >
-                      <XCircle size={16} className="mr-2" />
-                      Reject Selected
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedIds(new Set());
-                        setSelectAll(false);
-                      }}
-                    >
-                      Clear
-                    </Button>
+              <TabsContent value={currentStatus} className="mt-4">
+                {isLoading ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="inline-block">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                    </div>
+                    <p className="mt-2">Loading registrations...</p>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Table */}
-            <div className="border rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox 
-                        checked={selectAll}
-                        onCheckedChange={handleSelectAll}
-                      />
-                    </TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Blood Group</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRegistrations.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                        No registrations found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredRegistrations.map((registration: Registration) => (
-                      <TableRow key={registration._id}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={selectedIds.has(registration._id)}
-                            onCheckedChange={() => handleSelectOne(registration._id)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">{registration.name}</TableCell>
-                        <TableCell>{registration.email}</TableCell>
-                        <TableCell>{registration.phone}</TableCell>
-                        <TableCell className="capitalize">{registration.role}</TableCell>
-                        <TableCell>{registration.bloodGroup}</TableCell>
-                        <TableCell>{getStatusBadge(registration.status)}</TableCell>
-                        <TableCell>{new Date(registration.registeredAt).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => navigate(`/admin/registration/${registration._id}`)}
-                            >
-                              <Eye size={16} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDelete(registration._id)}
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Pagination */}
-            {pagination.pages > 1 && (
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-gray-600">
-                  Showing {((pagination.currentPage - 1) * 10) + 1} to {Math.min(pagination.currentPage * 10, pagination.total)} of {pagination.total} results
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(Math.max(1, page - 1))}
-                    disabled={page === 1}
-                  >
-                    <ChevronLeft size={16} />
-                  </Button>
-                  <span className="px-3 py-2 text-sm">
-                    Page {pagination.currentPage} of {pagination.pages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(Math.min(pagination.pages, page + 1))}
-                    disabled={page === pagination.pages}
-                  >
-                    <ChevronRight size={16} />
-                  </Button>
-                </div>
-              </div>
-            )}
+                ) : registrations.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No registrations found
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Photo</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {registrations.map((reg) => (
+                            <TableRow key={reg._id} className="hover:bg-gray-50">
+                              <TableCell>
+                                {reg.photo ? (
+                                  <img 
+                                    src={reg.photo} 
+                                    alt={reg.name}
+                                    className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs">No Photo</span>
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <p className="font-medium">{reg.name}</p>
+                              </TableCell>
+                              <TableCell>
+                                <p className="text-sm">{reg.email}</p>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm space-y-0.5">
+                                  <p>{reg.phone || 'N/A'}</p>
+                                  {reg.parentsPhone && <p className="text-gray-500">{reg.parentsPhone}</p>}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{reg.role}</Badge>
+                              </TableCell>
+                              <TableCell>
+                                {getStatusBadge(reg.status)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex gap-2 justify-end">
+                                  <Button
+                                    size="sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    onClick={() => navigate(`/admin/registration/${reg._id}`)}
+                                  >
+                                    View Details
+                                  </Button>
+                                  {reg.status === 'pending' && (
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white"
+                                      onClick={() => handleApprove(reg._id)}
+                                    >
+                                      Approve
+                                    </Button>
+                                  )}
+                                  {(reg.status === 'approved' || reg.status === 'rejected') && (
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => handleDelete(reg._id, reg.name)}
+                                    >
+                                      <Trash2 size={16} />
+                                    </Button>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    {/* Pagination Controls */}
+                    {pagination.pages > 1 && (
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                        <div className="text-sm text-gray-600">
+                          Page {pagination.currentPage} of {pagination.pages} ({pagination.total} total)
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={pagination.currentPage === 1}
+                            onClick={() => setPage(Math.max(1, page - 1))}
+                          >
+                            <ChevronLeft size={16} className="mr-1" />
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={pagination.currentPage === pagination.pages}
+                            onClick={() => setPage(Math.min(pagination.pages, page + 1))}
+                          >
+                            Next
+                            <ChevronRight size={16} className="ml-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
