@@ -1,4 +1,5 @@
 // Admin Session Manager - Auto logout after 5 minutes of inactivity
+import API_BASE_URL from "@/config/api";
 
 const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 const SESSION_START_KEY = 'adminSessionStart';
@@ -75,8 +76,7 @@ export const clearSession = () => {
   
   if (deviceId && token) {
     try {
-      const API_BASE = localStorage.getItem('apiBase') || 'https://sp-club-backend.onrender.com';
-      fetch(`${API_BASE}/api/admin/logout`, {
+      fetch(`${API_BASE_URL}/api/admin/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
