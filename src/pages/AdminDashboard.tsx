@@ -88,6 +88,8 @@ const AdminDashboard = () => {
     const cleanup = initializeSessionManager(
       () => {
         clearSession();
+        // Invalidate all queries to prevent 401 errors
+        queryClient.clear();
         navigate("/admin/login");
       },
       () => {
@@ -97,7 +99,7 @@ const AdminDashboard = () => {
     );
 
     return cleanup;
-  }, [token, navigate, toast]);
+  }, [token, navigate, toast, queryClient]);
 
   // Countdown timer for timeout dialog
   useEffect(() => {

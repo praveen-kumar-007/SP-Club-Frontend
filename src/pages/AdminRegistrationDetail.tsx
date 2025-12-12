@@ -78,6 +78,8 @@ const RegistrationDetail = () => {
     const cleanup = initializeSessionManager(
       () => {
         clearSession();
+        // Clear registration data to prevent stale API calls
+        setRegistration(null);
         navigate("/admin/login");
       },
       () => {

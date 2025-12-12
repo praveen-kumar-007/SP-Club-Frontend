@@ -106,6 +106,9 @@ const AdminInquiries = () => {
     const cleanup = initializeSessionManager(
       () => {
         clearSession();
+        // Clear all data to prevent stale API calls
+        setContacts([]);
+        setNewsletters([]);
         navigate("/admin/login");
       },
       () => {
