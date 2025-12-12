@@ -69,6 +69,29 @@ export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialo
 };
 
 export const clearSession = () => {
+  // Notify backend of logout
+  const deviceId = localStorage.getItem('adminDeviceId');
+  const token = localStorage.getItem('adminToken');
+  
+  if (deviceId && token) {
+    try {
+      const API_BASE = localStorage.getItem('apiBase') || 'https://sp-club-backend.onrender.com';
+      fetch(`${API_BASE}/api/admin/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ deviceId })
+      }).catch(() => {
+        // Fail silently if backend is unreachable
+      });
+    } catch (error) {
+      // Fail silently
+    }
+  }
+
+  // Clear local storage
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(SESSION_START_KEY);
   localStorage.removeItem('adminToken');

@@ -354,7 +354,7 @@ const AdminDashboard = () => {
               ⏱️ Session Timeout
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base space-y-3">
-              <p>Your session has expired due to 15 minutes of inactivity.</p>
+              <p>Your session has expired due to inactivity.</p>
               <p className="font-semibold text-gray-900">
                 You will be redirected to the login page in {countdown} second{countdown !== 1 ? 's' : ''}...
               </p>
