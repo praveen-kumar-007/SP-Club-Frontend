@@ -78,12 +78,6 @@ interface Stats {
   roles: Array<{ role: string; count: number }>;
 }
 
-  interface FilterOptions {
-    roles: Array<{ value: string; label: string }>;
-    ageGroups: Array<{ value: string; label: string }>;
-    experiences: Array<{ value: string; label: string }>;
-  }
-
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 const AdminDashboard = () => {
@@ -111,13 +105,6 @@ const AdminDashboard = () => {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [experienceFilter, setExperienceFilter] = useState<string>("all");
   const [showStats, setShowStats] = useState(false);
-
-    // Filter options from backend
-    const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-      roles: [],
-      ageGroups: [],
-      experiences: []
-    });
 
   const token = localStorage.getItem("adminToken");
 
@@ -186,26 +173,6 @@ const AdminDashboard = () => {
     const interval = setInterval(updateSessionTime, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  // Fetch filter options dynamically
-  const { data: filterOptionsData } = useQuery<FilterOptions>({
-    queryKey: ['filterOptions'],
-    queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/admin/filter-options`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error('Failed to fetch filter options');
-      return response.json();
-    },
-    enabled: !!token,
-  });
-
-  // Update filter options when data is fetched
-  useEffect(() => {
-    if (filterOptionsData) {
-      setFilterOptions(filterOptionsData);
-    }
-  }, [filterOptionsData]);
 
   // Fetch registrations
   const { data: registrationsData, refetch: refetchRegistrations } = useQuery({
@@ -733,11 +700,10 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Age Groups</SelectItem>
-                      {filterOptions.ageGroups.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
+                    <SelectItem value="Under 14">Under 14</SelectItem>
+                    <SelectItem value="Under 17">Under 17</SelectItem>
+                    <SelectItem value="Under 21">Under 21</SelectItem>
+                    <SelectItem value="Senior">Senior</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -750,11 +716,10 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
-                      {filterOptions.roles.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
+                    <SelectItem value="player">Player</SelectItem>
+                    <SelectItem value="coach">Coach</SelectItem>
+                    <SelectItem value="referee">Referee</SelectItem>
+                    <SelectItem value="supporter">Supporter</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -767,11 +732,10 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Experience</SelectItem>
-                      {filterOptions.experiences.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="professional">Professional</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
