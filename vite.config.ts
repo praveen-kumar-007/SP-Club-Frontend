@@ -25,13 +25,7 @@ export default defineConfig(({ mode }) => ({
     },
     // Optimize chunks
     target: 'esnext',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild',
     // CSS optimization
     cssCodeSplit: true,
   },
