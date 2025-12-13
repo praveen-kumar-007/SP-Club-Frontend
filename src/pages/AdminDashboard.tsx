@@ -48,6 +48,7 @@ interface Registration {
   gender: string;
   bloodGroup: string;
   role: string;
+  dob: string;
   aadharNumber: string;
   status: 'pending' | 'approved' | 'rejected';
   registeredAt: string;
@@ -70,6 +71,7 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [currentAgeGroup, setCurrentAgeGroup] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
@@ -165,10 +167,11 @@ const AdminDashboard = () => {
 
   // Fetch registrations with React Query
   const { data: registrationsData, isLoading, error: registrationsError } = useQuery({
-    queryKey: ['admin-registrations', currentStatus, page, debouncedSearch, token],
+    queryKey: ['admin-registrations', currentStatus, currentAgeGroup, page, debouncedSearch, token],
     queryFn: async () => {
       const query = new URLSearchParams({
         status: currentStatus,
+        ageGroup: currentAgeGroup,
         page: page.toString(),
         limit: "10",
         search: debouncedSearch,
@@ -465,6 +468,80 @@ const AdminDashboard = () => {
               </TabsList>
 
               <TabsContent value={currentStatus} className="mt-4">
+                {/* Age Group Filter */}
+                <div className="mb-4 flex gap-2 flex-wrap">
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === 'all' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('all');
+                      setPage(1);
+                    }}
+                  >
+                    All Ages
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === 'Under 10' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('Under 10');
+                      setPage(1);
+                    }}
+                  >
+                    Under 10
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === '10-14' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('10-14');
+                      setPage(1);
+                    }}
+                  >
+                    10-14
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === '14-16' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('14-16');
+                      setPage(1);
+                    }}
+                  >
+                    14-16
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === '16-19' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('16-19');
+                      setPage(1);
+                    }}
+                  >
+                    16-19
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === '19-25' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('19-25');
+                      setPage(1);
+                    }}
+                  >
+                    19-25
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentAgeGroup === 'Over 25' ? 'default' : 'outline'}
+                    onClick={() => {
+                      setCurrentAgeGroup('Over 25');
+                      setPage(1);
+                    }}
+                  >
+                    Over 25
+                  </Button>
+                </div>
+
                 {isLoading ? (
                   <div className="text-center py-8 text-gray-500">
                     <div className="inline-block">
@@ -486,6 +563,7 @@ const AdminDashboard = () => {
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Phone</TableHead>
+                            <TableHead>Age Group</TableHead>
                             <TableHead>Role</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -519,6 +597,22 @@ const AdminDashboard = () => {
                                   <p>{reg.phone || 'N/A'}</p>
                                   {reg.parentsPhone && <p className="text-gray-500">{reg.parentsPhone}</p>}
                                 </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary">{(() => {
+                                  const dob = reg.dob ? new Date(reg.dob) : null;
+                                  if (!dob || isNaN(dob.getTime())) return 'N/A';
+                                  const today = new Date();
+                                  let age = today.getFullYear() - dob.getFullYear();
+                                  const m = today.getMonth() - dob.getMonth();
+                                  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+                                  if (age < 10) return 'Under 10';
+                                  if (age < 14) return '10-14';
+                                  if (age < 16) return '14-16';
+                                  if (age < 19) return '16-19';
+                                  if (age < 25) return '19-25';
+                                  return 'Over 25';
+                                })()}</Badge>
                               </TableCell>
                               <TableCell>
                                 <Badge variant="outline">{reg.role}</Badge>
