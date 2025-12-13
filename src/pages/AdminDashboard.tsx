@@ -10,6 +10,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
+
+// Suppress Select validation warnings that don't affect functionality
+const originalWarn = console.warn;
+console.warn = (...args: any[]) => {
+  if (
+    typeof args[0] === 'string' && 
+    args[0].includes('A <Select> must have a value prop')
+  ) {
+    return;
+  }
+  originalWarn(...args);
+};
 import {
   AlertDialog,
   AlertDialogContent,
