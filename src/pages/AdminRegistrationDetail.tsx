@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,26 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+// Function to calculate age group from DOB
+const calculateAgeGroup = (dob: string): string => {
+  if (!dob) return 'N/A';
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  if (age < 10) return 'Under 10';
+  if (age < 14) return '10-14';
+  if (age < 16) return '14-16';
+  if (age < 19) return '16-19';
+  if (age < 25) return '19-25';
+  return 'Over 25';
+};
 
 interface Registration {
   _id: string;
@@ -447,7 +467,7 @@ const RegistrationDetail = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Age Group</p>
-                    <p className="font-medium">{registration.ageGroup || 'N/A'}</p>
+                    <p className="font-medium">{calculateAgeGroup(registration.dob)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Aadhar Number</p>
