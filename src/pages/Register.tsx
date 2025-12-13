@@ -30,7 +30,6 @@ const formSchema = z.object({
   dob: z.date({ required_error: "Please select your date of birth" }),
   aadharNumber: z.string().min(12, "Aadhar number must be 12 digits").max(12, "Aadhar number must be 12 digits").regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
   role: z.string().min(1, "Please select your role"),
-  ageGroup: z.string().min(1, "Please select your age group"),
   experience: z.string().min(1, "Please select your experience"),
   address: z.string().min(5, "Please enter your address"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
@@ -71,7 +70,6 @@ const Register = () => {
       gender: "",
       bloodGroup: "",
       role: "",
-      ageGroup: "",
       experience: "",
       address: "",
       dob: undefined,
@@ -129,7 +127,6 @@ const Register = () => {
       formData.append('gender', data.gender);
       formData.append('bloodGroup', data.bloodGroup);
       formData.append('role', data.role);
-      formData.append('ageGroup', data.ageGroup || '');
       formData.append('experience', data.experience || '');
       formData.append('address', data.address || '');
       formData.append('dob', data.dob.toISOString());
@@ -266,14 +263,6 @@ const Register = () => {
     { value: "coach", label: "Coach" },
     { value: "official", label: "Match Official" },
     { value: "other", label: "Other" }
-  ];
-
-  const ageGroups = [
-    { value: "under18", label: "Under 18" },
-    { value: "18-25", label: "18-25" },
-    { value: "26-35", label: "26-35" },
-    { value: "36-45", label: "36-45" },
-    { value: "above45", label: "Above 45" }
   ];
 
   const experienceLevels = [
@@ -668,28 +657,6 @@ const Register = () => {
 
                         <FormField
                           control={form.control}
-                          name="ageGroup"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Age Group <span className="text-red-500">*</span></FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                    <SelectValue placeholder="Select your age group" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  {ageGroups.map((age) => (
-                                    <SelectItem key={age.value} value={age.value}>{age.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
                       {/* Experience */}
                       <FormField
                         control={form.control}
