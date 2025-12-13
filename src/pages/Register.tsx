@@ -655,31 +655,30 @@ const Register = () => {
                           )}
                         />
 
+                        {/* Experience */}
                         <FormField
                           control={form.control}
-                      {/* Experience */}
-                      <FormField
-                        control={form.control}
-                        name="experience"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-300">Sports Experience <span className="text-red-500">*</span></FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                  <SelectValue placeholder="Select your experience level" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                {experienceLevels.map((level) => (
-                                  <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          name="experience"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Sports Experience <span className="text-red-500">*</span></FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select your experience level" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  {experienceLevels.map((level) => (
+                                    <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       {/* Address */}
                       <FormField
