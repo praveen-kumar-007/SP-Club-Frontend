@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, Globe2, ChevronLeft } from "lucide-react";
+import { Calendar, Globe2, ChevronLeft, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Seo from "@/components/Seo";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_ENDPOINTS } from "@/config/api";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewsArticle {
   _id: string;
@@ -21,6 +22,7 @@ interface NewsArticle {
 }
 
 const News = () => {
+  const { toast } = useToast();
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +59,32 @@ const News = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleShare = (article: NewsArticle, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const url = `${window.location.origin}/news/${article._id}`;
+    const text = article.title;
+    
+    // Check if Web Share API is available (mobile devices)
+    if (navigator.share) {
+      navigator.share({
+        title: text,
+        url: url,
+      }).catch((error) => {
+        // User cancelled or error occurred
+        console.log('Error sharing:', error);
+      });
+    } else {
+      // Fallback: copy link to clipboard
+      navigator.clipboard.writeText(url);
+      toast({
+        title: "Link Copied!",
+        description: "Article link copied to clipboard",
+      });
+    }
   };
 
   return (
@@ -188,12 +216,23 @@ const News = () => {
                       </span>
                     </div>
 
-                    <Link to={`/news/${article._id}`} className="block">
-                      <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 shadow-lg hover:shadow-red-500/50 transition-all duration-300 group-hover:scale-105 text-sm md:text-base py-2 md:py-3">
-                        <span className="mr-2">Read Full Article</span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                    <div className="flex gap-2">
+                      <Link to={`/news/${article._id}`} className="flex-1">
+                        <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 shadow-lg hover:shadow-red-500/50 transition-all duration-300 group-hover:scale-105 text-sm md:text-base py-2 md:py-3">
+                          <span className="mr-2">Read Full Article</span>
+                          <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-gray-700 hover:bg-gray-600 border-gray-600 text-white flex-shrink-0"
+                        onClick={(e) => handleShare(article, e)}
+                        title="Share article"
+                      >
+                        <Share2 className="h-4 w-4" />
                       </Button>
-                    </Link>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

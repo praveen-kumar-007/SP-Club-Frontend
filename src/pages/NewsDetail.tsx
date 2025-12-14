@@ -166,6 +166,8 @@ const NewsDetail = () => {
         title={`${article.title} - SP Kabaddi Club`}
         description={article.content.substring(0, 160)}
         keywords={`SP Kabaddi, news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
+        image={article.images[0]}
+        url={window.location.href}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
