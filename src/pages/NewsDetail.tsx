@@ -162,23 +162,13 @@ const NewsDetail = () => {
 
   if (!article) return null;
 
-  // Use article image if available, otherwise fallback to logo
-  const shareImage = article.images && article.images.length > 0
-    ? (article.images[0].startsWith('http') 
-        ? article.images[0] 
-        : `https://spkabaddi.me${article.images[0]}`)
-    : 'https://spkabaddi.me/Logo.png';
-  
-  const shareUrl = `https://spkabaddi.me/news/${article._id}`;
-
   return (
     <>
       <Seo
         title={`${article.title} - SP Kabaddi Club`}
         description={article.content.substring(0, 160)}
         keywords={`SP Kabaddi, news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
-        image={shareImage}
-        url={shareUrl}
+        url={`https://spkabaddi.me/news/${article._id}`}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
