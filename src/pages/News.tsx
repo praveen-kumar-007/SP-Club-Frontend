@@ -180,11 +180,11 @@ const News = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
                   
                   {/* Image Carousel */}
-                  <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
+                  <div className="relative h-64 sm:h-72 md:h-80 overflow-hidden">
                     <img
                       src={article.images && article.images.length > 0 ? article.images[0] : '/Logo.png'}
                       alt={article.title}
-                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 md:group-hover:scale-125 group-hover:rotate-1 md:group-hover:rotate-2"
+                      className="w-full h-full object-cover object-top transition-all duration-700 group-hover:scale-110 md:group-hover:scale-125 group-hover:rotate-1 md:group-hover:rotate-2"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                     
