@@ -369,12 +369,20 @@ const AdminDashboard = () => {
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          {/* Top row: Title and Logout */}
+          <div className="flex justify-between items-center mb-3 md:mb-0">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold">Admin Dashboard</h1>
+              <p className="text-xs md:text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
+            </div>
+            <Button variant="destructive" onClick={handleLogout} size="sm" className="md:hidden">
+              <LogOut size={16} />
+            </Button>
           </div>
-          <div className="flex gap-3">
+          
+          {/* Bottom row: Action buttons - hidden on mobile, full on desktop */}
+          <div className="hidden md:flex justify-end gap-3 mt-3">
             <Button variant="outline" onClick={() => navigate("/admin/inquiries")}>
               <Mail size={18} className="mr-2" />
               View Inquiries
@@ -386,6 +394,17 @@ const AdminDashboard = () => {
             <Button variant="destructive" onClick={handleLogout}>
               <LogOut size={18} className="mr-2" />
               Logout
+            </Button>
+          </div>
+          
+          {/* Mobile buttons row */}
+          <div className="flex md:hidden gap-2 mt-3">
+            <Button variant="outline" onClick={() => navigate("/admin/inquiries")} size="sm" className="flex-1">
+              <Mail size={16} className="mr-1" />
+              <span className="text-xs">Inquiries</span>
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/admin/news")} size="sm" className="flex-1 bg-red-50 hover:bg-red-100 border-red-200">
+              <span className="text-xs">📰 News</span>
             </Button>
           </div>
         </div>
