@@ -1,17 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 export const config = {
-  matcher: '/news/:path*',
+  runtime: 'edge',
 };
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+export default async function middleware(request: Request) {
+  const url = new URL(request.url);
+  const { pathname } = url;
   
   // Extract article ID from /news/:id
   const match = pathname.match(/^\/news\/([a-f0-9]+)$/i);
   
   if (!match) {
-    return NextResponse.next();
+    return fetch(request);
   }
   
   const articleId = match[1];
@@ -21,7 +20,7 @@ export async function middleware(req: NextRequest) {
     const articleResponse = await fetch(`https://spkabaddi.me/api/news/${articleId}`);
     
     if (!articleResponse.ok) {
-      return NextResponse.next();
+      return fetch(request);
     }
     
     const article = await articleResponse.json();
@@ -33,8 +32,8 @@ export async function middleware(req: NextRequest) {
           : `https://spkabaddi.me${article.images[0]}`)
       : 'https://spkabaddi.me/Logo.png';
     
-    // Fetch the base HTML from your Vercel deployment
-    const htmlResponse = await fetch(req.nextUrl.origin);
+    // Fetch the base HTML
+    const htmlResponse = await fetch(`${url.origin}/index.html`);
     const html = await htmlResponse.text();
     
     // Escape special characters for HTML attributes
@@ -64,7 +63,7 @@ export async function middleware(req: NextRequest) {
     // Replace existing meta tags or add after <head>
     const modifiedHtml = html.replace(/<head>/, `<head>${metaTags}`);
     
-    return new NextResponse(modifiedHtml, {
+    return new Response(modifiedHtml, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
@@ -72,6 +71,6 @@ export async function middleware(req: NextRequest) {
     });
   } catch (error) {
     console.error('Middleware error:', error);
-    return NextResponse.next();
+    return fetch(request);
   }
 }
