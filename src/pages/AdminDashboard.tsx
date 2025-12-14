@@ -368,30 +368,43 @@ const AdminDashboard = () => {
       </AlertDialog>
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {/* Top row: Title and Logout */}
           <div className="flex justify-between items-center mb-3 md:mb-0">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold">Admin Dashboard</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800">Admin Dashboard</h1>
               <p className="text-xs md:text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
             </div>
-            <Button variant="destructive" onClick={handleLogout} size="sm" className="md:hidden">
-              <LogOut size={16} />
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout} 
+              className="md:hidden font-semibold px-4 py-2 h-10"
+            >
+              <LogOut size={18} className="mr-1" />
+              <span>Logout</span>
             </Button>
           </div>
           
           {/* Bottom row: Action buttons - hidden on mobile, full on desktop */}
           <div className="hidden md:flex justify-end gap-3 mt-3">
-            <Button variant="outline" onClick={() => navigate("/admin/inquiries")}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/admin/inquiries")}
+              className="bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700 font-semibold"
+            >
               <Mail size={18} className="mr-2" />
               View Inquiries
             </Button>
-            <Button variant="outline" onClick={() => navigate("/admin/news")} className="bg-red-50 hover:bg-red-100 border-red-200">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/admin/news")} 
+              className="bg-orange-50 hover:bg-orange-100 border-orange-300 text-orange-700 font-semibold"
+            >
               📰
               <span className="ml-2">Manage News</span>
             </Button>
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button variant="destructive" onClick={handleLogout} className="font-semibold">
               <LogOut size={18} className="mr-2" />
               Logout
             </Button>
@@ -399,12 +412,18 @@ const AdminDashboard = () => {
           
           {/* Mobile buttons row */}
           <div className="flex md:hidden gap-2 mt-3">
-            <Button variant="outline" onClick={() => navigate("/admin/inquiries")} size="sm" className="flex-1">
-              <Mail size={16} className="mr-1" />
-              <span className="text-xs">Inquiries</span>
+            <Button 
+              onClick={() => navigate("/admin/inquiries")} 
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 h-auto"
+            >
+              <Mail size={18} className="mr-2" />
+              <span>Inquiries</span>
             </Button>
-            <Button variant="outline" onClick={() => navigate("/admin/news")} size="sm" className="flex-1 bg-red-50 hover:bg-red-100 border-red-200">
-              <span className="text-xs">📰 News</span>
+            <Button 
+              onClick={() => navigate("/admin/news")} 
+              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 h-auto"
+            >
+              <span>📰 News</span>
             </Button>
           </div>
         </div>
