@@ -496,7 +496,7 @@ const AdminNews = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article) => (
               <Card key={article._id} className="bg-gray-800 border-gray-700 hover:border-red-600 transition-all">
-                <div className="relative h-48 overflow-hidden rounded-t-lg">
+                <div className="relative h-64 md:h-72 overflow-hidden rounded-t-lg">
                   <img
                     src={article.images[0]}
                     alt={article.title}
