@@ -290,7 +290,6 @@ const Register = () => {
         title="Register"
         description="Register with SP Club (SP Kabaddi Group Dhanbad) to join training, events, and community programs."
         url="https://spkabaddi.me/register"
-        image="https://spkabaddi.me/Logo.png"
         keywords="register SP Club, join SP Kabaddi Group Dhanbad, spkg register"
       />
       {/* Hero Section with Background Container */}

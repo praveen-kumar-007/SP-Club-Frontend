@@ -9,7 +9,6 @@ const TermsConditions = () => {
         title="Terms & Conditions"
         description="SP Club (SP Kabaddi Group Dhanbad) Terms and Conditions - Membership rules, AKFI regulations, and club policies."
         url="https://spkabaddi.me/terms-conditions"
-        image="https://spkabaddi.me/Logo.png"
         keywords="SP Club terms, kabaddi club rules, AKFI regulations, sports club membership"
       />
 

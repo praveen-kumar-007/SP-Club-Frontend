@@ -84,7 +84,6 @@ const Contact = () => {
         title="Contact"
         description="Contact SP Club (SP Kabaddi Group Dhanbad) — get in touch to join, enquire about coaching, events, or membership."
         url="https://spkabaddi.me/contact"
-        image="https://spkabaddi.me/Logo.png"
         keywords="contact SP Club, SP Kabaddi Group Dhanbad contact, spkg contact"
       />
       {/* Hero Section */}

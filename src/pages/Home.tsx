@@ -66,7 +66,6 @@ const Home = () => {
         title="Home"
         description="SP Club (SP Kabaddi Group Dhanbad) — training champions since 2010. Join our programs, events, and community."
         url="https://spkabaddi.me/"
-        image="https://spkabaddi.me/Logo.png"
         keywords="SP Club, SP Kabaddi Group Dhanbad, kabaddi Dhanbad, sports club Dhanbad, spkg"
       />
       {/* Hero Section */}

@@ -136,7 +136,6 @@ const About = () => {
         title="About"
         description="Learn about SP Club (SP Kabaddi Group Dhanbad) — our mission, history, and core team dedicated to building champions."
         url="https://spkabaddi.me/about"
-        image="https://spkabaddi.me/Logo.png"
         keywords="about SP Club, SP Kabaddi Group Dhanbad, sports history Dhanbad, spkg"
       />
       
