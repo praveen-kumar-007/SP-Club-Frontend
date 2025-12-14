@@ -5,6 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sp-club-backend.on
 export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/api/register`,
   CONTACT: `${API_BASE_URL}/api/contact`,
+  NEWS: `${API_BASE_URL}/api/news`,
 };
 
 export default API_BASE_URL;

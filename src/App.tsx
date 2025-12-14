@@ -15,6 +15,8 @@ const About = lazy(() => import("./pages/About"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const Register = lazy(() => import("./pages/Register"));
 const Contact = lazy(() => import("./pages/Contact"));
+const News = lazy(() => import("./pages/News"));
+const NewsDetail = lazy(() => import("./pages/NewsDetail"));
 const TermsConditions = lazy(() => import("./pages/TermsConditions"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const KabaddiRules = lazy(() => import("./pages/KabaddiRules"));
@@ -23,6 +25,7 @@ const AdminSignup = lazy(() => import("./pages/AdminSignup"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminRegistrationDetail = lazy(() => import("./pages/AdminRegistrationDetail"));
 const AdminInquiries = lazy(() => import("./pages/AdminInquiries"));
+const AdminNews = lazy(() => import("./pages/AdminNews"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -50,6 +53,8 @@ const App = () => (
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:id" element={<NewsDetail />} />
                 <Route path="/terms-conditions" element={<TermsConditions />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/kabaddi-rules" element={<KabaddiRules />} />
@@ -58,6 +63,7 @@ const App = () => (
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
                 <Route path="/admin/inquiries" element={<AdminInquiries />} />
+                <Route path="/admin/news" element={<AdminNews />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

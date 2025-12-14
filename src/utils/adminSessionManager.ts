@@ -1,7 +1,7 @@
-// Admin Session Manager - Auto logout after 5 minutes of inactivity
+// Admin Session Manager - Auto logout after 15 minutes of inactivity
 import API_BASE_URL from "@/config/api";
 
-const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 const SESSION_START_KEY = 'adminSessionStart';
 const STORAGE_KEY = 'adminLastActivity';
 const REDIRECT_DELAY = 5000; // 5 seconds delay before redirect

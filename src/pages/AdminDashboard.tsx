@@ -121,7 +121,7 @@ const AdminDashboard = () => {
       const sessionStart = localStorage.getItem('adminSessionStart');
       if (!sessionStart) return;
 
-      const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+      const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
       const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
       const remainingMs = SESSION_TIMEOUT - timeElapsedSinceStart;
       const remainingMinutes = Math.max(0, Math.floor(remainingMs / 60000));
@@ -378,6 +378,10 @@ const AdminDashboard = () => {
             <Button variant="outline" onClick={() => navigate("/admin/inquiries")}>
               <Mail size={18} className="mr-2" />
               View Inquiries
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/admin/news")} className="bg-red-50 hover:bg-red-100 border-red-200">
+              📰
+              <span className="ml-2">Manage News</span>
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
               <LogOut size={18} className="mr-2" />
