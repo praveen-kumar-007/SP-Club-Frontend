@@ -182,13 +182,13 @@ const News = () => {
                   {/* Image Carousel */}
                   <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
                     <img
-                      src={article.images[0]}
+                      src={article.images && article.images.length > 0 ? article.images[0] : '/Logo.png'}
                       alt={article.title}
                       className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 md:group-hover:scale-125 group-hover:rotate-1 md:group-hover:rotate-2"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                     
-                    {article.images.length > 1 && (
+                    {article.images && article.images.length > 1 && (
                       <Badge className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/80 backdrop-blur-sm text-white border-0 shadow-lg text-xs md:text-sm">
                         📷 +{article.images.length - 1}
                       </Badge>

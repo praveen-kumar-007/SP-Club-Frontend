@@ -162,9 +162,12 @@ const NewsDetail = () => {
 
   if (!article) return null;
 
-  const shareImage = article.images[0]?.startsWith('http') 
-    ? article.images[0] 
-    : `https://spkabaddi.me${article.images[0]}`;
+  // Use article image if available, otherwise fallback to logo
+  const shareImage = article.images && article.images.length > 0
+    ? (article.images[0].startsWith('http') 
+        ? article.images[0] 
+        : `https://spkabaddi.me${article.images[0]}`)
+    : 'https://spkabaddi.me/Logo.png';
   
   const shareUrl = `https://spkabaddi.me/news/${article._id}`;
 
@@ -235,68 +238,70 @@ const NewsDetail = () => {
             {/* Content Layout - Centered single column */}
             <div className="max-w-5xl mx-auto space-y-6">
               {/* Image Gallery Card */}
-              <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 overflow-hidden">
-                <CardContent className="p-4 md:p-6">
-                  <div className="relative rounded-xl overflow-hidden shadow-2xl mb-4">
-                    <img
-                      src={article.images[currentImageIndex]}
-                      alt={`${article.title} - Image ${currentImageIndex + 1}`}
-                      className="w-full h-auto object-cover"
-                      style={{ maxHeight: '600px' }}
-                    />
-                    
-                    {article.images.length > 1 && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
-                          onClick={prevImage}
-                        >
-                          <ChevronLeft className="h-5 w-5 text-white" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
-                          onClick={nextImage}
-                        >
-                          <ChevronRight className="h-5 w-5 text-white" />
-                        </Button>
+              {article.images && article.images.length > 0 && (
+                <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 overflow-hidden">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="relative rounded-xl overflow-hidden shadow-2xl mb-4">
+                      <img
+                        src={article.images[currentImageIndex]}
+                        alt={`${article.title} - Image ${currentImageIndex + 1}`}
+                        className="w-full h-auto object-cover"
+                        style={{ maxHeight: '600px' }}
+                      />
+                      
+                      {article.images.length > 1 && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
+                            onClick={prevImage}
+                          >
+                            <ChevronLeft className="h-5 w-5 text-white" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
+                            onClick={nextImage}
+                          >
+                            <ChevronRight className="h-5 w-5 text-white" />
+                          </Button>
 
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 px-3 py-1.5 rounded-full">
-                          <span className="text-white text-sm font-medium">
-                            {currentImageIndex + 1} / {article.images.length}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Thumbnails */}
-                  {article.images.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-2">
-                      {article.images.map((img, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
-                          className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                            idx === currentImageIndex
-                              ? 'border-red-500 scale-105'
-                              : 'border-gray-600 hover:border-gray-400'
-                          }`}
-                        >
-                          <img
-                            src={img}
-                            alt={`Thumbnail ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 px-3 py-1.5 rounded-full">
+                            <span className="text-white text-sm font-medium">
+                              {currentImageIndex + 1} / {article.images.length}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    {/* Thumbnails */}
+                    {article.images.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {article.images.map((img, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                              idx === currentImageIndex
+                                ? 'border-red-500 scale-105'
+                                : 'border-gray-600 hover:border-gray-400'
+                            }`}
+                          >
+                            <img
+                              src={img}
+                              alt={`Thumbnail ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Article Content Card */}
               <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700">
