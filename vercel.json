@@ -3,5 +3,8 @@
   "env": {
     "NODE_OPTIONS": "--max-old-space-size=4096"
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/news/:id", "destination": "/api/news" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
