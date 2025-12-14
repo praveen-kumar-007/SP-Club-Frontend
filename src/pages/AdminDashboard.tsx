@@ -503,6 +503,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === 'all' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== 'all' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('all');
                       setPage(1);
@@ -513,6 +514,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === 'Under 10' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== 'Under 10' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('Under 10');
                       setPage(1);
@@ -523,6 +525,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === '10-14' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== '10-14' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('10-14');
                       setPage(1);
@@ -533,6 +536,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === '14-16' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== '14-16' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('14-16');
                       setPage(1);
@@ -543,6 +547,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === '16-19' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== '16-19' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('16-19');
                       setPage(1);
@@ -553,6 +558,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === '19-25' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== '19-25' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('19-25');
                       setPage(1);
@@ -563,6 +569,7 @@ const AdminDashboard = () => {
                   <Button
                     size="sm"
                     variant={currentAgeGroup === 'Over 25' ? 'default' : 'outline'}
+                    className={currentAgeGroup !== 'Over 25' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
                     onClick={() => {
                       setCurrentAgeGroup('Over 25');
                       setPage(1);
@@ -696,6 +703,7 @@ const AdminDashboard = () => {
                             size="sm"
                             disabled={pagination.currentPage === 1}
                             onClick={() => setPage(Math.max(1, page - 1))}
+                            className="bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold disabled:opacity-50"
                           >
                             <ChevronLeft size={16} className="mr-1" />
                             Previous
@@ -705,6 +713,7 @@ const AdminDashboard = () => {
                             size="sm"
                             disabled={pagination.currentPage === pagination.pages}
                             onClick={() => setPage(Math.min(pagination.pages, page + 1))}
+                            className="bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold disabled:opacity-50"
                           >
                             Next
                             <ChevronRight size={16} className="ml-1" />
