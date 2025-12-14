@@ -500,7 +500,7 @@ const AdminNews = () => {
                   <img
                     src={article.images[0]}
                     alt={article.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
                   {article.images.length > 1 && (
                     <Badge className="absolute top-2 right-2 bg-black/60 border-0">
@@ -661,7 +661,7 @@ const AdminNews = () => {
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
+                        className="w-full h-32 object-cover object-top rounded-lg"
                       />
                       {!editingArticle && (
                         <button
@@ -721,7 +721,7 @@ const AdminNews = () => {
                 <img
                   src={viewingArticle.images[currentImageIndex]}
                   alt={`Image ${currentImageIndex + 1}`}
-                  className="w-full h-96 object-cover rounded-lg"
+                  className="w-full h-96 object-cover object-top rounded-lg"
                 />
                 {viewingArticle.images.length > 1 && (
                   <>
