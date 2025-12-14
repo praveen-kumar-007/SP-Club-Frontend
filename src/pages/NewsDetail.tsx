@@ -30,6 +30,7 @@ const NewsDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -231,11 +232,11 @@ const NewsDetail = () => {
               {article.images && article.images.length > 0 && (
                 <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 overflow-hidden">
                   <CardContent className="p-4 md:p-6">
-                    <div className="relative rounded-xl overflow-hidden shadow-2xl mb-4">
+                    <div className="relative rounded-xl overflow-hidden shadow-2xl mb-4 cursor-pointer" onClick={() => setIsFullScreenOpen(true)}>
                       <img
                         src={article.images[currentImageIndex]}
                         alt={`${article.title} - Image ${currentImageIndex + 1}`}
-                        className="w-full h-auto object-cover"
+                        className="w-full h-auto object-cover object-top"
                         style={{ maxHeight: '600px' }}
                       />
                       
@@ -245,7 +246,10 @@ const NewsDetail = () => {
                             size="sm"
                             variant="secondary"
                             className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
-                            onClick={prevImage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              prevImage();
+                            }}
                           >
                             <ChevronLeft className="h-5 w-5 text-white" />
                           </Button>
@@ -253,7 +257,10 @@ const NewsDetail = () => {
                             size="sm"
                             variant="secondary"
                             className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-2"
-                            onClick={nextImage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              nextImage();
+                            }}
                           >
                             <ChevronRight className="h-5 w-5 text-white" />
                           </Button>
@@ -313,7 +320,7 @@ const NewsDetail = () => {
 
                   {/* Share Section */}
                   <div className="mt-8 pt-6 border-t border-gray-700/50">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex flex-col gap-4">
                       <div className="flex items-center gap-2">
                         <Share2 className="h-5 w-5 text-gray-400" />
                         <span className="text-gray-400 font-medium">Share this article:</span>
@@ -415,6 +422,56 @@ const NewsDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Full Screen Image Modal */}
+        {isFullScreenOpen && (
+          <div 
+            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+            onClick={() => setIsFullScreenOpen(false)}
+          >
+            <button
+              className="absolute top-4 right-4 text-white bg-red-600 hover:bg-red-700 rounded-full p-3 z-10"
+              onClick={() => setIsFullScreenOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="relative max-w-7xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={article.images[currentImageIndex]}
+                alt={`${article.title} - Image ${currentImageIndex + 1}`}
+                className="w-full h-full object-contain"
+              />
+
+              {article.images.length > 1 && (
+                <>
+                  <Button
+                    size="lg"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-4"
+                    onClick={prevImage}
+                  >
+                    <ChevronLeft className="h-8 w-8 text-white" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-600 border-0 p-4"
+                    onClick={nextImage}
+                  >
+                    <ChevronRight className="h-8 w-8 text-white" />
+                  </Button>
+
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 px-4 py-2 rounded-full">
+                    <span className="text-white text-lg font-medium">
+                      {currentImageIndex + 1} / {article.images.length}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
