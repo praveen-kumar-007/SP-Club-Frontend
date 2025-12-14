@@ -142,7 +142,6 @@ const Footer = () => {
               <li><a href="/news" className="hover:text-amber-400 transition-colors duration-300">News & Updates</a></li>
               <li><a href="/register" className="hover:text-amber-400 transition-colors duration-300">Membership</a></li>
               <li><a href="/contact" className="hover:text-amber-400 transition-colors duration-300">Contact Us</a></li>
-              <li><a href="/admin/news" className="hover:text-amber-400 transition-colors duration-300 text-sm opacity-70">Admin: Manage News</a></li>
             </ul>
           </div>
 
@@ -172,7 +171,6 @@ const Footer = () => {
               <li><a href="/terms-conditions" className="hover:text-amber-400 transition-colors duration-300">Terms & Conditions</a></li>
               <li><a href="/privacy-policy" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
               <li><a href="/kabaddi-rules" className="hover:text-amber-400 transition-colors duration-300">Kabaddi Rules</a></li>
-              <li><a href="https://spkabaddi.me/sitemap.xml" className="hover:text-amber-400 transition-colors duration-300">Sitemap</a></li>
             </ul>
           </div>
         </div>
