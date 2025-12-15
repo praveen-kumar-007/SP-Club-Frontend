@@ -78,7 +78,6 @@ const Home = () => {
           loop
           muted
           playsInline
-          loading="lazy"
           preload="metadata"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
@@ -119,19 +118,16 @@ const Home = () => {
             </div>
 
             {/* embed responsive YouTube iframe instead of <video> */}
-            <div className="relative rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500 group">
+            <div className="relative rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
               <div className="w-full h-0 pb-[56.25%] relative"> {/* 16:9 box */}
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={embedStoryUrl}
                   title="SP Club Story"
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <Play size={64} className="text-white bg-amber-500/80 p-4 rounded-full" />
               </div>
             </div>
           </div>
