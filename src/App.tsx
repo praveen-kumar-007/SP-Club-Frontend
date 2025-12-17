@@ -26,6 +26,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminRegistrationDetail = lazy(() => import("./pages/AdminRegistrationDetail"));
 const AdminInquiries = lazy(() => import("./pages/AdminInquiries"));
 const AdminNews = lazy(() => import("./pages/AdminNews"));
+const IDCardGenerator = lazy(() => import("./pages/IDCard/IDCardGenerator"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
                 <Route path="/admin/inquiries" element={<AdminInquiries />} />
                 <Route path="/admin/news" element={<AdminNews />} />
+                <Route path="/id-card/:id" element={<IDCardGenerator />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

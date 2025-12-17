@@ -38,7 +38,7 @@ const AdminLogin = () => {
       const deviceId = getOrCreateDeviceId();
       const deviceName = getDeviceName();
 
-      const response = await fetch(`${API_ENDPOINTS.REGISTER.split('/api/register')[0]}/api/admin/login`, {
+      const response = await fetch(API_ENDPOINTS.ADMIN_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

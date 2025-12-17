@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Download, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -71,6 +72,8 @@ interface Registration {
   rejectionReason?: string;
   newsletter: boolean;
   terms: boolean;
+  idCardNumber?: string;
+  idCardGeneratedAt?: string;
 }
 
 const RegistrationDetail = () => {
@@ -84,6 +87,23 @@ const RegistrationDetail = () => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [isGeneratingId, setIsGeneratingId] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState(false);
+  const [customIdNumber, setCustomIdNumber] = useState("");
+  const [showIdDialog, setShowIdDialog] = useState(false);
+  // Role selection for ID card
+  const [idCardRole, setIdCardRole] = useState("");
+  const [customRole, setCustomRole] = useState("");
+  // Default role options (can be extended)
+  const defaultRoles = [
+    "Player",
+    "Coach",
+    "Fan",
+    "Manager",
+    "Referee",
+    "Captain",
+    "Member"
+  ];
 
   const token = localStorage.getItem("adminToken");
 
@@ -250,6 +270,104 @@ const RegistrationDetail = () => {
         description: error instanceof Error ? error.message : "Failed to delete",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleGenerateId = async () => {
+    setIsGeneratingId(true);
+    try {
+      // Determine final role to send
+      let finalRole = idCardRole === 'custom' ? customRole.trim() : idCardRole;
+      if (!finalRole) finalRole = registration?.role || "Member";
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}/generate-id`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customIdNumber: customIdNumber.trim() || null,
+            idCardRole: finalRole
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({ message: 'Failed to generate ID' }));
+        throw new Error(data.message || "Failed to generate ID");
+      }
+
+      const data = await response.json();
+      toast({
+        title: "Success",
+        description: `ID Card generated successfully: ${data.idCardNumber} (${data.type === 'custom' ? 'Custom' : 'Random'})`,
+      });
+      setShowIdDialog(false);
+      setCustomIdNumber("");
+      setIdCardRole("");
+      setCustomRole("");
+      // Refresh registration data
+      fetchRegistration();
+    } catch (error) {
+      console.error('Generate ID error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate ID",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingId(false);
+    }
+  };
+
+  const handleDeleteId = async () => {
+    if (!confirm('Delete ID card for this member? This will remove the ID number permanently.')) {
+      return;
+    }
+
+    setIsDeletingId(true);
+    try {
+      console.log('Deleting ID for registration:', id);
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}/delete-id`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log('Delete ID response status:', response.status);
+      
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({ message: 'Failed to delete ID' }));
+        console.error('Delete ID error response:', data);
+        throw new Error(data.message || "Failed to delete ID");
+      }
+
+      const data = await response.json();
+      console.log('Delete ID success:', data);
+      
+      toast({
+        title: "Success",
+        description: `ID Card deleted successfully: ${data.deletedIdCardNumber}`,
+      });
+      
+      // Refresh registration data
+      fetchRegistration();
+    } catch (error) {
+      console.error('Delete ID error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete ID",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingId(false);
     }
   };
 
@@ -638,50 +756,172 @@ const RegistrationDetail = () => {
 
             {/* Actions for Approved Registrations */}
             {registration.status === 'approved' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Reconsider Approval</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
-                    <p className="text-sm text-green-800">
-                      <strong>Approved on:</strong> {registration.approvedAt ? new Date(registration.approvedAt).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                  <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-                    <DialogTrigger asChild>
-                      <Button variant="destructive" className="w-full">
-                        Reject This Approval
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Reject Approved Registration</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <Textarea
-                          placeholder="Enter reason for rejection..."
-                          value={rejectionReason}
-                          onChange={(e) => setRejectionReason(e.target.value)}
-                          className="min-h-24"
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
-                          Cancel
-                        </Button>
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">ID Card Management</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {registration.idCardNumber ? (
+                      <>
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-green-800">ID Card Generated</p>
+                            <Badge className="bg-green-600">Active</Badge>
+                          </div>
+                          <p className="text-lg font-bold text-green-900">{registration.idCardNumber}</p>
+                          <p className="text-xs text-green-700">
+                            Generated: {registration.idCardGeneratedAt ? new Date(registration.idCardGeneratedAt).toLocaleDateString() : 'N/A'}
+                          </p>
+                        </div>
+                        <Link to={`/id-card/${registration._id}`} target="_blank">
+                          <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                            <ExternalLink size={18} className="mr-2" />
+                            View ID Card
+                          </Button>
+                        </Link>
                         <Button
                           variant="destructive"
-                          onClick={handleReject}
-                          disabled={isRejecting}
+                          className="w-full mt-2"
+                          onClick={handleDeleteId}
+                          disabled={isDeletingId}
                         >
-                          {isRejecting ? "Rejecting..." : "Reject"}
+                          <Trash2 size={18} className="mr-2" />
+                          {isDeletingId ? "Deleting..." : "Delete ID Card"}
                         </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+                          <p className="text-sm text-amber-800">
+                            <strong>Note:</strong> Generate a unique ID card number for this approved member. 
+                            You can provide a custom ID or leave it blank for a random 4-digit ID (e.g., SPKG-1234).
+                          </p>
+                        </div>
+                        <Dialog open={showIdDialog} onOpenChange={setShowIdDialog}>
+                          <DialogTrigger asChild>
+                            <Button className="w-full bg-amber-600 hover:bg-amber-700">
+                              <CreditCard size={18} className="mr-2" />
+                              Generate ID Card
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Generate ID Card</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="text-sm font-medium mb-2 block">
+                                  Custom ID Number (Optional)
+                                </label>
+                                <Input
+                                  placeholder="e.g., SPKG-0001 or leave blank for random"
+                                  value={customIdNumber}
+                                  onChange={(e) => setCustomIdNumber(e.target.value)}
+                                  className="w-full"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Leave blank to generate a random 4-digit ID like SPKG-4567
+                                </p>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium mb-2 block">
+                                  Role on ID Card
+                                </label>
+                                <select
+                                  className="w-full border rounded px-2 py-1 text-sm"
+                                  value={idCardRole || registration?.role || ""}
+                                  onChange={e => setIdCardRole(e.target.value)}
+                                >
+                                  <option value="">(Use registration role: {registration?.role || 'Member'})</option>
+                                  {defaultRoles.map(role => (
+                                    <option key={role} value={role}>{role}</option>
+                                  ))}
+                                  <option value="custom">Other (Custom)</option>
+                                </select>
+                                {idCardRole === 'custom' && (
+                                  <Input
+                                    className="mt-2"
+                                    placeholder="Enter custom role (e.g., Organizer)"
+                                    value={customRole}
+                                    onChange={e => setCustomRole(e.target.value)}
+                                  />
+                                )}
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Select a role for this member's ID card. You can add a custom role if needed.
+                                </p>
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button 
+                                variant="outline" 
+                                onClick={() => {
+                                  setShowIdDialog(false);
+                                  setCustomIdNumber("");
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                onClick={handleGenerateId}
+                                disabled={isGeneratingId}
+                                className="bg-amber-600 hover:bg-amber-700"
+                              >
+                                {isGeneratingId ? "Generating..." : "Generate"}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Reconsider Approval</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                      <p className="text-sm text-green-800">
+                        <strong>Approved on:</strong> {registration.approvedAt ? new Date(registration.approvedAt).toLocaleDateString() : 'N/A'}
+                      </p>
+                    </div>
+                    <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                      <DialogTrigger asChild>
+                        <Button variant="destructive" className="w-full">
+                          Reject This Approval
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reject Approved Registration</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <Textarea
+                            placeholder="Enter reason for rejection..."
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
+                            className="min-h-24"
+                          />
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={handleReject}
+                            disabled={isRejecting}
+                          >
+                            {isRejecting ? "Rejecting..." : "Reject"}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </CardContent>
+                </Card>
+              </>
             )}
 
             {/* Delete Action - Available for all statuses */}
