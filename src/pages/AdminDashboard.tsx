@@ -58,7 +58,7 @@ const AdminDashboard = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('approved');
   const [currentAgeGroup, setCurrentAgeGroup] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
