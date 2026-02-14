@@ -29,7 +29,10 @@ export default defineConfig(({ mode }) => ({
     // CSS optimization
     cssCodeSplit: true,
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger()
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
