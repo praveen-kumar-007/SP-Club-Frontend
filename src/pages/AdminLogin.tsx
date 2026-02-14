@@ -109,7 +109,7 @@ const AdminLogin = () => {
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Access the SP Club management panel
+            Access the SP Kabaddi Group Dhanbad management panel
           </CardDescription>
         </CardHeader>
         <CardContent>

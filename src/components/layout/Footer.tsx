@@ -112,7 +112,7 @@ const Footer = () => {
         <div className="bg-slate-800 rounded-lg p-8 md:p-12 mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h3 className="text-3xl font-bold mb-2">Stay Ahead of the Game</h3>
-            <p className="text-slate-400">Subscribe to our newsletter for the latest updates, news, and offers from SP Club.</p>
+            <p className="text-slate-400">Subscribe to our newsletter for the latest updates, news, and offers from SP Kabaddi Group Dhanbad.</p>
           </div>
           <div className="flex w-full max-w-md space-x-2">
             <Input
@@ -140,18 +140,18 @@ const Footer = () => {
               <div
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-1 cursor-pointer"
                 role="button"
-                aria-label="SP Club logo (click 7 times for admin)"
-                title="SP Club"
+                aria-label="SP Kabaddi Group Dhanbad logo (click 7 times for admin)"
+                title="SP Kabaddi Group Dhanbad"
                 onClick={handleLogoClick}
               >
                 <img
                   src="/Logo.png"
-                  alt="SP Club Logo"
+                  alt="SP Kabaddi Group Dhanbad Logo"
                   className="w-full h-full rounded-full object-cover select-none"
                   draggable={false}
                 />
               </div>
-              <h3 className="text-2xl font-bold text-amber-400">SP Club</h3>
+              <h3 className="text-2xl font-bold text-amber-400">SP Kabaddi Group Dhanbad</h3>
             </div>
             <p className="text-slate-400">
               Building champions, fostering community, and celebrating the spirit of sports in India.
@@ -216,7 +216,7 @@ const Footer = () => {
 
         <div className="border-t border-slate-700 mt-10 pt-8 text-center">
           <p className="text-slate-500">
-            © {new Date().getFullYear()} SP Club. All rights reserved. Built with passion for sports.
+            © {new Date().getFullYear()} SP Kabaddi Group Dhanbad. All rights reserved. Built with passion for sports.
           </p>
         </div>
       </div>

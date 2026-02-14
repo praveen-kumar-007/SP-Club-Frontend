@@ -67,7 +67,7 @@ const About = () => {
     {
       name: "Pappu Kumar Yadav",
       role: "Founder & Head Coach",
-      bio: "With over 15 years of experience, Pappu founded SP Club to create a new generation of champions.",
+      bio: "With over 15 years of experience, Pappu founded SP Kabaddi Group Dhanbad to create a new generation of champions.",
       image: "/pappu_yadav.png",
       social: {
         linkedin: "#",
@@ -77,7 +77,7 @@ const About = () => {
     {
       name: "Sunny Ray",
       role: "Treasurer & Operations Manager",
-      bio: "Sunny ensures the smooth operation of SP Club, managing finances and logistics with precision.",
+      bio: "Sunny ensures the smooth operation of SP Kabaddi Group Dhanbad, managing finances and logistics with precision.",
       image: "/about_assets/sunny.jpg.jpg",
       social: {
         linkedin: "#",
@@ -111,7 +111,7 @@ const About = () => {
     {
       year: "2010",
       title: "The Foundation",
-      description: "SP Club was founded with a vision to create a premier sports facility in Dhanbad, starting with just 50 members and 3 sports."
+      description: "SP Kabaddi Group Dhanbad was founded with a vision to create a premier sports facility in Dhanbad, starting with just 50 members and 3 sports."
     },
     {
       year: "2015",
@@ -134,9 +134,9 @@ const About = () => {
     <div className="bg-gradient-to-b from-slate-900 via-[#0f172a] to-slate-900 text-white">
       <Seo
         title="About"
-        description="Learn about SP Club (SP Kabaddi Group Dhanbad) — our mission, history, and core team dedicated to building champions."
+        description="Learn about SP Kabaddi Group Dhanbad — our mission, history, and core team dedicated to building champions."
         url="https://spkabaddi.me/about"
-        keywords="about SP Club, SP Kabaddi Group Dhanbad, sports history Dhanbad, spkg"
+        keywords="about SP Kabaddi Group Dhanbad, sports history Dhanbad, spkg"
       />
       
       {/* Hero Section */}
@@ -152,7 +152,7 @@ const About = () => {
             </span>
           </div>
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-6 tracking-tight">
-            About <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">SP Club</span>
+            About <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">SP Kabaddi Group Dhanbad</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed">
             Building champions, forging character, and creating a community where excellence meets passion
@@ -217,7 +217,7 @@ const About = () => {
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Milestones Through Time
             </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">Follow the key moments that shaped SP Club into the powerhouse it is today</p>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">Follow the key moments that shaped SP Kabaddi Group Dhanbad into the powerhouse it is today</p>
           </div>
           <div className="relative max-w-3xl mx-auto">
             <div className="absolute left-1/2 top-0 h-full w-1 bg-gradient-to-b from-amber-500 to-orange-500 -translate-x-1/2"></div>
@@ -246,7 +246,7 @@ const About = () => {
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Meet The Visionaries
             </h2>
-            <p className="text-lg text-slate-400 max-w-3xl mx-auto">The dedicated leaders who drive SP Club's mission and inspire excellence every single day</p>
+            <p className="text-lg text-slate-400 max-w-3xl mx-auto">The dedicated leaders who drive SP Kabaddi Group Dhanbad's mission and inspire excellence every single day</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {teamMembers.map((member, index) => (
@@ -330,7 +330,7 @@ const About = () => {
             Become part of a community that transforms talent into champions. Let's write your success story together.
           </p>
           <a href="/register" className="inline-block px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105">
-            Join SP Club Today
+            Join SP Kabaddi Group Dhanbad Today
           </a>
         </div>
       </section>

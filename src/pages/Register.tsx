@@ -162,7 +162,7 @@ const Register = () => {
       if (response.ok) {
         toast({
           title: "Registration Successful! 🎉",
-          description: result.message || "Welcome to SP Club! We'll contact you within 24 hours.",
+          description: result.message || "Welcome to SP Kabaddi Group Dhanbad! We'll contact you within 24 hours.",
           variant: "default",
         });
         form.reset();
@@ -288,9 +288,9 @@ const Register = () => {
     <div className="min-h-screen bg-[#0a192f]">
       <Seo
         title="Register"
-        description="Register with SP Club (SP Kabaddi Group Dhanbad) to join training, events, and community programs."
+        description="Register with SP Kabaddi Group Dhanbad to join training, events, and community programs."
         url="https://spkabaddi.me/register"
-        keywords="register SP Club, join SP Kabaddi Group Dhanbad, spkg register"
+        keywords="register SP Kabaddi Group Dhanbad, spkg register"
       />
       {/* Hero Section with Background Container */}
       <div className="relative">
@@ -325,7 +325,7 @@ const Register = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Join <span className="text-[#facc15]">SP Club</span>
+                Join <span className="text-[#facc15]">SP Kabaddi Group Dhanbad</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
                 Register as a player or fan and be part of our growing community
@@ -340,7 +340,7 @@ const Register = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Registration Form</h2>
             <p className="text-lg text-gray-400">
-              Fill out the form below to register with SP Club. Fields marked with <span className="text-red-500">*</span> are required.
+              Fill out the form below to register with SP Kabaddi Group Dhanbad. Fields marked with <span className="text-red-500">*</span> are required.
             </p>
           </div>
 
@@ -387,7 +387,7 @@ const Register = () => {
                 <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "SP Club has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
+                      "SP Kabaddi Group Dhanbad has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
                     </p>
                     <div className="text-xs">
                       <p className="font-semibold text-white">Vikram Singh</p>
@@ -399,7 +399,7 @@ const Register = () => {
                 <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Club's championship run in 2024 was the highlight of my sports career."
+                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Kabaddi Group Dhanbad's championship run in 2024 was the highlight of my sports career."
                     </p>
                     <div className="text-xs">
                       <p className="font-semibold text-white">Aditya Kumar</p>
@@ -428,7 +428,7 @@ const Register = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl text-white flex items-center">
                     <UserPlus className="w-8 h-8 mr-3 text-[#facc15]" />
-                    Join SP Club
+                    Join SP Kabaddi Group Dhanbad
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -700,7 +700,7 @@ const Register = () => {
                         name="clubDetails"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Why do you want to join SP Club? <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel className="text-gray-300">Why do you want to join SP Kabaddi Group Dhanbad? <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Share your motivation, goals, or what you hope to achieve by joining our club..."

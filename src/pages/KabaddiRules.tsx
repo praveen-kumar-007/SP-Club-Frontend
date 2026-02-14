@@ -12,7 +12,7 @@ const KabaddiRules = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
-              SP Club Kabaddi Rules
+              SP Kabaddi Group Dhanbad Kabaddi Rules
             </span>
           </h1>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
@@ -555,24 +555,24 @@ const KabaddiRules = () => {
           </div>
         </div>
 
-        {/* SP Club Compliance */}
+        {/* SP Kabaddi Group Dhanbad Compliance */}
         <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 border border-amber-500/30 rounded-xl p-8">
           <div className="flex items-start gap-4">
             <Trophy className="w-8 h-8 text-amber-400 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-2xl font-bold text-white mb-3">SP Club Commitment</h3>
+              <h3 className="text-2xl font-bold text-white mb-3">SP Kabaddi Group Dhanbad Commitment</h3>
               <p className="text-slate-300 leading-relaxed mb-4">
-                SP Kabaddi Club strictly adheres to all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). We ensure that all our members, coaches, and officials are well-versed in these rules to maintain the highest standards of fair play and sportsmanship.
+                SP Kabaddi Group Dhanbad strictly adheres to all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). We ensure that all our members, coaches, and officials are well-versed in these rules to maintain the highest standards of fair play and sportsmanship.
               </p>
               <p className="text-slate-300 leading-relaxed mb-4">
-                All training sessions, practice matches, and tournaments organized by SP Club follow AKFI guidelines. We believe in developing players who not only excel in skills but also understand and respect the spirit of the game.
+                All training sessions, practice matches, and tournaments organized by SP Kabaddi Group Dhanbad follow AKFI guidelines. We believe in developing players who not only excel in skills but also understand and respect the spirit of the game.
               </p>
               <div className="flex flex-wrap gap-4 mt-6">
                 <Link 
                   to="/register" 
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
                 >
-                  Join SP Club
+                  Join SP Kabaddi Group Dhanbad
                 </Link>
                 <Link 
                   to="/terms-conditions" 

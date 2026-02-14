@@ -7,9 +7,9 @@ const TermsConditions = () => {
     <div className="bg-gradient-to-b from-slate-900 via-[#0f172a] to-slate-900 text-white min-h-screen">
       <Seo
         title="Terms & Conditions"
-        description="SP Club (SP Kabaddi Group Dhanbad) Terms and Conditions - Membership rules, AKFI regulations, and club policies."
+        description="SP Kabaddi Group Dhanbad Terms and Conditions - Membership rules, AKFI regulations, and club policies."
         url="https://spkabaddi.me/terms-conditions"
-        keywords="SP Club terms, kabaddi club rules, AKFI regulations, sports club membership"
+        keywords="SP Kabaddi Group Dhanbad terms, kabaddi club rules, AKFI regulations, sports club membership"
       />
 
       {/* Hero Section */}
@@ -26,7 +26,7 @@ const TermsConditions = () => {
               Terms & Conditions
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Please read these terms and conditions carefully before joining SP Club (SP Kabaddi Group Dhanbad)
+              Please read these terms and conditions carefully before joining SP Kabaddi Group Dhanbad
             </p>
             <p className="text-sm text-slate-500 mt-4">
               Last Updated: December 8, 2025
@@ -46,7 +46,7 @@ const TermsConditions = () => {
               <div>
                 <h2 className="text-xl font-bold text-amber-400 mb-2">Important Notice</h2>
                 <p className="text-slate-300 leading-relaxed">
-                  By registering with SP Club (SP Kabaddi Group Dhanbad), you agree to comply with all terms, conditions, rules, and regulations set forth by the club and the Amateur Kabaddi Federation of India (AKFI). Violation of these terms may result in disciplinary action, including suspension or termination of membership.
+                  By registering with SP Kabaddi Group Dhanbad, you agree to comply with all terms, conditions, rules, and regulations set forth by the club and the Amateur Kabaddi Federation of India (AKFI). Violation of these terms may result in disciplinary action, including suspension or termination of membership.
                 </p>
               </div>
             </div>
@@ -86,7 +86,7 @@ const TermsConditions = () => {
                 <div className="space-y-3">
                   <p className="font-semibold text-white flex items-start gap-2">
                     <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    Members must provide a minimum of 14 (fourteen) days written notice before leaving or terminating their membership with SP Club.
+                    Members must provide a minimum of 14 (fourteen) days written notice before leaving or terminating their membership with SP Kabaddi Group Dhanbad.
                   </p>
                   <ul className="space-y-2 list-disc list-inside ml-7">
                     <li>Written notice must be submitted to the club management committee via email or physical application.</li>
@@ -118,7 +118,7 @@ const TermsConditions = () => {
             <div className="space-y-6 text-slate-300">
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
                 <p className="text-slate-300 leading-relaxed">
-                  <strong className="text-white">Important:</strong> SP Club follows all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). While we do not directly register players with AKFI, all our training, tournaments, and activities comply with AKFI standards. Members are expected to adhere to these regulations.
+                  <strong className="text-white">Important:</strong> SP Kabaddi Group Dhanbad follows all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). While we do not directly register players with AKFI, all our training, tournaments, and activities comply with AKFI standards. Members are expected to adhere to these regulations.
                 </p>
               </div>
 
@@ -129,7 +129,7 @@ const TermsConditions = () => {
                   <li>Age verification documents must be submitted as per AKFI standards</li>
                   <li>Players must maintain amateur status as defined by AKFI regulations</li>
                   <li>Medical fitness certificates may be required for tournament participation</li>
-                  <li>Players can view detailed <Link to="/kabaddi-rules" className="text-blue-400 hover:text-blue-300 underline">SP Club Kabaddi Rules</Link> (based on AKFI)</li>
+                  <li>Players can view detailed <Link to="/kabaddi-rules" className="text-blue-400 hover:text-blue-300 underline">SP Kabaddi Group Dhanbad Kabaddi Rules</Link> (based on AKFI)</li>
                 </ul>
               </div>
 
@@ -148,24 +148,24 @@ const TermsConditions = () => {
                 <div className="space-y-3">
                   <p className="font-semibold text-white flex items-start gap-2">
                     <FileText className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                    Any SP Club member wishing to play for another club or team must obtain a No Objection Certificate (NOC) from SP Club management.
+                    Any SP Kabaddi Group Dhanbad member wishing to play for another club or team must obtain a No Objection Certificate (NOC) from SP Kabaddi Group Dhanbad management.
                   </p>
                   <ul className="space-y-2 list-disc list-inside ml-7">
                     <li>NOC applications must be submitted in writing to the club management committee at least 21 days before the intended participation date.</li>
                     <li>The committee will review and respond to NOC requests within 7 working days.</li>
                     <li>Playing for another club/team without obtaining a proper NOC is considered a serious breach and will result in:
                       <ul className="ml-6 mt-2 space-y-1 list-circle list-inside">
-                        <li>Immediate suspension from SP Club</li>
+                        <li>Immediate suspension from SP Kabaddi Group Dhanbad</li>
                         <li>Reporting to AKFI and state kabaddi associations</li>
-                        <li>Disqualification from future SP Club tournaments and events</li>
+                        <li>Disqualification from future SP Kabaddi Group Dhanbad tournaments and events</li>
                         <li>Legal action if necessary</li>
                       </ul>
                     </li>
                     <li>NOC may be granted subject to conditions including but not limited to:
                       <ul className="ml-6 mt-2 space-y-1 list-circle list-inside">
-                        <li>No pending commitments with SP Club</li>
+                        <li>No pending commitments with SP Kabaddi Group Dhanbad</li>
                         <li>Clearance of all dues and fees</li>
-                        <li>No conflict with SP Club's tournament schedule</li>
+                        <li>No conflict with SP Kabaddi Group Dhanbad's tournament schedule</li>
                         <li>Good standing membership record</li>
                       </ul>
                     </li>
@@ -180,7 +180,7 @@ const TermsConditions = () => {
                   <li>All matches and tournaments will be conducted as per AKFI rules and regulations.</li>
                   <li>Players must wear approved uniforms and protective gear during matches.</li>
                   <li>Team selection and composition will follow AKFI guidelines.</li>
-                  <li>Disciplinary actions imposed by AKFI will be binding on all SP Club members.</li>
+                  <li>Disciplinary actions imposed by AKFI will be binding on all SP Kabaddi Group Dhanbad members.</li>
                 </ul>
               </div>
             </div>
@@ -342,7 +342,7 @@ const TermsConditions = () => {
               <div className="pl-6 border-l-2 border-amber-500/50">
                 <h3 className="text-xl font-semibold text-white mb-3">6.1 Amendments</h3>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li>SP Club reserves the right to amend these terms and conditions at any time.</li>
+                  <li>SP Kabaddi Group Dhanbad reserves the right to amend these terms and conditions at any time.</li>
                   <li>Members will be notified of significant changes via email or club notice board.</li>
                   <li>Continued membership after amendments constitutes acceptance of new terms.</li>
                 </ul>
@@ -370,7 +370,7 @@ const TermsConditions = () => {
                 <h3 className="text-xl font-semibold text-white mb-3">6.4 Contact Information</h3>
                 <p>For questions or concerns regarding these terms and conditions, please contact:</p>
                 <ul className="space-y-2 mt-3">
-                  <li><strong>SP Club (SP Kabaddi Group Dhanbad)</strong></li>
+                  <li><strong>SP Kabaddi Group Dhanbad</strong></li>
                   <li>Email: spkabaddigroupdhanbad@gmail.com</li>
                   <li>Website: https://spkabaddi.me</li>
                 </ul>
@@ -383,7 +383,7 @@ const TermsConditions = () => {
             <Shield className="w-12 h-12 text-amber-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-4">Acceptance of Terms</h3>
             <p className="text-slate-300 leading-relaxed max-w-3xl mx-auto">
-              By completing the registration process and becoming a member of SP Club (SP Kabaddi Group Dhanbad), you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, as well as all AKFI regulations and guidelines. You further acknowledge that violation of these terms may result in disciplinary action as outlined above.
+              By completing the registration process and becoming a member of SP Kabaddi Group Dhanbad, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, as well as all AKFI regulations and guidelines. You further acknowledge that violation of these terms may result in disciplinary action as outlined above.
             </p>
             <div className="mt-6">
               <a 

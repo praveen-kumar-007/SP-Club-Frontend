@@ -102,7 +102,7 @@ const Header = () => {
               <div className="relative">
                 <img
                   src="/Logo.png"
-                  alt="SP Club Logo"
+                  alt="SP Kabaddi Group Dhanbad Logo"
                   className="w-12 h-12 rounded-full object-cover border-2 border-slate-500 transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 rounded-full transition-all duration-500 opacity-0 group-hover:opacity-100 
@@ -110,7 +110,7 @@ const Header = () => {
                 </div>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-amber-400 transition-colors duration-300 group-hover:text-amber-300">SP Club</h1>
+                <h1 className="text-xl font-bold text-amber-400 transition-colors duration-300 group-hover:text-amber-300">SP Kabaddi Group Dhanbad</h1>
                 <p className="text-xs text-slate-400">Sports Excellence</p>
               </div>
             </Link>

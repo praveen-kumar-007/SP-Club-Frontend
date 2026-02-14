@@ -76,15 +76,15 @@ const Contact = () => {
   };
 
   const googleMapsLink = "https://www.google.com/maps/search/?api=1&query=QCJF%2BF93+SP+Kabaddi+Group+Dhanbad%2C+Shakti+Mandir+Path%2C+Dhanbad%2C+Jharkhand+826007";
-  const mapAddress = "SP Club, Shakti Mandir Path, Dhanbad, Jharkhand 826007";
+  const mapAddress = "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007";
 
   return (
     <div className="min-h-screen bg-[#0a192f] text-white">
       <Seo
         title="Contact"
-        description="Contact SP Club (SP Kabaddi Group Dhanbad) — get in touch to join, enquire about coaching, events, or membership."
+        description="Contact SP Kabaddi Group Dhanbad — get in touch to join, enquire about coaching, events, or membership."
         url="https://spkabaddi.me/contact"
-        keywords="contact SP Club, SP Kabaddi Group Dhanbad contact, spkg contact"
+        keywords="contact SP Kabaddi Group Dhanbad, spkg contact"
       />
       {/* Hero Section */}
       <div className="relative">
@@ -104,7 +104,7 @@ const Contact = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Contact <span className="text-[#facc15]">SP Club</span>
+                Contact <span className="text-[#facc15]">SP Kabaddi Group Dhanbad</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
                 Get in touch with us - we're here to help you succeed
@@ -311,7 +311,7 @@ const Contact = () => {
                   <div className="aspect-video bg-[#0a192f] rounded-lg flex items-center justify-center p-4">
                     <div className="text-center">
                       <MapPin className="w-16 h-16 text-[#facc15] mx-auto mb-4" />
-                      <h3 className="text-xl font-bold mb-2">SP Club Sports Complex</h3>
+                      <h3 className="text-xl font-bold mb-2">SP Kabaddi Group Dhanbad Sports Complex</h3>
                       <p className="text-gray-300 mb-4">
                         {mapAddress.split(', ').map((line, index) => (
                           <span key={index}>{line}<br /></span>
@@ -337,7 +337,7 @@ const Contact = () => {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
             <p className="text-xl text-gray-400">
-              Quick answers to common questions about SP Club
+              Quick answers to common questions about SP Kabaddi Group Dhanbad
             </p>
           </div>
 

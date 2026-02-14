@@ -91,9 +91,9 @@ const IDCardGenerator = () => {
     <div style={{ fontFamily: "'Poppins', sans-serif", backgroundColor: "#e0e0e0", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "20px 10px" }}>
       <Seo
         title="ID Card Generator"
-        description="SP Club Member ID Card"
+        description="SP Kabaddi Group Dhanbad Member ID Card"
         url="https://spkabaddi.me/id-card"
-        keywords="SP Club ID card, member card"
+        keywords="SP Kabaddi Group Dhanbad ID card, member card"
       />
       
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>

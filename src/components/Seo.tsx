@@ -10,11 +10,11 @@ type SeoProps = {
   canonical?: string;
 };
 
-const SITE_NAME = "SP Club";
+const SITE_NAME = "SP Kabaddi Group Dhanbad";
 const SITE_URL = "https://spkabaddi.me";
 const DEFAULT_IMAGE = `${SITE_URL}/Logo.png`;
 const DEFAULT_DESCRIPTION =
-  "SP Club (SP Kabaddi Group Dhanbad) — premier sports club in Dhanbad offering coaching, events, and championship training.";
+  "SP Kabaddi Group Dhanbad — premier sports club in Dhanbad offering coaching, events, and championship training.";
 
 const Seo: React.FC<SeoProps> = ({
   title,

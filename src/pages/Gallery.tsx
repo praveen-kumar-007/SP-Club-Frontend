@@ -29,7 +29,7 @@ const galleryItems = [
   },
   {
     id: 3,
-    title: "Winning 1st SP Club Kabaddi Team ",
+    title: "Winning 1st SP Kabaddi Group Dhanbad Kabaddi Team ",
     category: "championships",
     description: "Victory pose! Our Kabaddi team after clinching the championship title.",
     image: "/home_assets/win_holi.jpg",
@@ -212,9 +212,9 @@ const Gallery = () => {
     <div className="bg-slate-900 min-h-screen text-white">
       <Seo
         title="Gallery"
-        description="Gallery — Photos from SP Club (SP Kabaddi Group Dhanbad) showcasing training, matches, championships, and events."
+        description="Gallery — Photos from SP Kabaddi Group Dhanbad showcasing training, matches, championships, and events."
         url="https://spkabaddi.me/gallery"
-        keywords="SP Club gallery, SP Kabaddi Group Dhanbad photos, spkg gallery"
+        keywords="SP Kabaddi Group Dhanbad gallery, spkg gallery"
       />
       {/* Hero Section */}
       <section className="relative py-32 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://images.pexels.com/photos/220201/pexels-photo-220201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')" }}>
