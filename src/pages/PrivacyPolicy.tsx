@@ -235,30 +235,24 @@ const PrivacyPolicy = () => {
           </div>
         </div>
 
-        {/* Section 6: Cookies and Website Analytics */}
+        {/* Section 6: Cookies */}
         <div className="mb-12 bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-xl p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-500/40 to-purple-500/40 rounded-lg flex items-center justify-center">
               <Database className="w-5 h-5 text-indigo-400" />
             </div>
-            <h2 className="text-3xl font-bold text-white">6. Cookies and Website Analytics</h2>
+            <h2 className="text-3xl font-bold text-white">6. Cookies</h2>
           </div>
 
           <div className="space-y-6 text-slate-300">
             <div className="pl-6 border-l-2 border-indigo-500/50">
               <h3 className="text-xl font-semibold text-white mb-3">6.1 Cookie Usage</h3>
-              <p className="mb-3">Our website uses cookies to enhance user experience:</p>
+              <p className="mb-3">Our website uses minimal cookies to enhance user experience:</p>
               <ul className="space-y-2 list-disc list-inside">
                 <li><strong>Essential Cookies:</strong> Required for website functionality and security</li>
-                <li><strong>Performance Cookies:</strong> Help us understand how visitors use our website</li>
                 <li><strong>Functional Cookies:</strong> Remember your preferences and settings</li>
               </ul>
-              <p className="mt-3 text-sm">You can disable cookies through your browser settings, but some website features may not function properly.</p>
-            </div>
-
-            <div className="pl-6 border-l-2 border-indigo-500/50">
-              <h3 className="text-xl font-semibold text-white mb-3">6.2 Third-Party Analytics</h3>
-              <p>We may use third-party analytics tools to improve our website and services. These tools collect aggregated, anonymized data about website usage.</p>
+              <p className="mt-3 text-sm">We do not use tracking cookies, analytics cookies, or third-party cookies. You can disable cookies through your browser settings, but some website features may not function properly.</p>
             </div>
           </div>
         </div>
