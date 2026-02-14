@@ -153,6 +153,14 @@ const Header = () => {
                   />
                 )}
               </div>
+
+              {/* Admin Login button (desktop) */}
+              <Link to="/admin/login" className="hidden md:inline-block">
+                <Button variant="outline" className="mr-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-semibold">
+                  Admin Login
+                </Button>
+              </Link>
+
               <Button className="font-bold text-slate-900 bg-amber-500 transition-all duration-300
                hover:bg-amber-400 hover:scale-105 hover:shadow-[0_0_15px_rgba(251,191,36,0.6)]">
                 Join Now
@@ -193,16 +201,25 @@ const Header = () => {
               {link.name}
             </Link>
           ))}
+
+          {/* Mobile Admin Login + Join Now buttons */}
           <div
             style={{
               opacity: isMenuOpen ? 1 : 0,
               transform: isMenuOpen ? 'translateY(0)' : 'translateY(25px)',
               transitionDelay: `${navLinks.length * 120 + 200}ms`,
             }}
+            className="flex flex-col items-center gap-4 mt-6"
           >
+            <Link to="/admin/login" onClick={() => setIsMenuOpen(false)} className="w-full">
+              <Button size="lg" variant="outline" className="w-full border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-semibold">
+                Admin Login
+              </Button>
+            </Link>
+
             <Button
               size="lg"
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xl px-10 py-5 mt-10"
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xl px-10 py-5 mt-2 w-full"
               onClick={() => setIsMenuOpen(false)}
             >
               Join Now
