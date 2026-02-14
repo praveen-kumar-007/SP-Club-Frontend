@@ -1,7 +1,8 @@
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import API_BASE_URL from "@/config/api";
 
@@ -9,6 +10,37 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Secret footer logo clicks -> open admin login after 7 clicks
+  const navigate = useNavigate();
+  const clickRef = useRef(0);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
+
+  const handleLogoClick = () => {
+    clickRef.current += 1;
+    const c = clickRef.current;
+
+    // show short feedback
+    toast({ title: `${c}/7 — admin unlock` });
+
+    // reset counter after 2s of inactivity
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = window.setTimeout(() => {
+      clickRef.current = 0;
+    }, 2000);
+
+    if (c >= 7) {
+      clickRef.current = 0;
+      toast({ title: "Opening admin login", description: "Redirecting..." });
+      navigate('/admin/login');
+    }
+  };
 
   const handleNewsletterSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -105,11 +137,18 @@ const Footer = () => {
           {/* Club Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-1">
+              <div
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-1 cursor-pointer"
+                role="button"
+                aria-label="SP Club logo (click 7 times for admin)"
+                title="SP Club"
+                onClick={handleLogoClick}
+              >
                 <img
                   src="/Logo.png"
                   alt="SP Club Logo"
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full rounded-full object-cover select-none"
+                  draggable={false}
                 />
               </div>
               <h3 className="text-2xl font-bold text-amber-400">SP Club</h3>
