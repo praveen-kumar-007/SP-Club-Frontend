@@ -48,7 +48,18 @@ const AdminLogin = () => {
         }),
       });
 
-      const result = await response.json();
+      const responseText = await response.text();
+      const result = responseText ? (() => {
+        try {
+          return JSON.parse(responseText);
+        } catch {
+          return null;
+        }
+      })() : null;
+
+      if (!result) {
+        throw new Error(`Invalid API response from ${API_ENDPOINTS.ADMIN_LOGIN}. Check VITE_API_URL and backend deployment.`);
+      }
 
       if (!response.ok) {
         // Handle device limit exceeded (429)
@@ -68,7 +79,7 @@ const AdminLogin = () => {
         } else {
           toast({
             title: "Login Failed",
-            description: result.message,
+            description: result.message || "Invalid username or password",
             variant: "destructive",
           });
         }
