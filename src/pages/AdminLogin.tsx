@@ -114,8 +114,12 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white p-3 rounded-lg">
-              <Lock size={32} />
+            <div className="h-16 w-16 rounded-xl overflow-hidden border border-blue-200 bg-white shadow-sm">
+              <img
+                src="/Logo.png"
+                alt="SP Kabaddi Group Dhanbad"
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>

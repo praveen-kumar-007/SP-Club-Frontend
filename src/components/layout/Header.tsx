@@ -156,14 +156,8 @@ const Header = () => {
 
               {/* Admin Login button (desktop) */}
               <Link to="/player/login" className="hidden md:inline-block">
-                <Button variant="outline" className="mr-2 border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-slate-900 font-semibold">
+                <Button variant="outline" className="mr-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white font-semibold">
                   Player Login
-                </Button>
-              </Link>
-
-              <Link to="/admin/login" className="hidden md:inline-block">
-                <Button variant="outline" className="mr-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-semibold">
-                  Admin Login
                 </Button>
               </Link>
 
@@ -208,7 +202,7 @@ const Header = () => {
             </Link>
           ))}
 
-          {/* Mobile Admin Login + Join Now buttons */}
+          {/* Mobile Player Login + Join Now buttons */}
           <div
             style={{
               opacity: isMenuOpen ? 1 : 0,
@@ -218,14 +212,8 @@ const Header = () => {
             className="flex flex-col items-center gap-4 mt-6"
           >
             <Link to="/player/login" onClick={() => setIsMenuOpen(false)} className="w-full">
-              <Button size="lg" variant="outline" className="w-full border-emerald-400 text-emerald-400 hover:bg-emerald-400 hover:text-slate-900 font-semibold">
+              <Button size="lg" variant="outline" className="w-full border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white font-semibold">
                 Player Login
-              </Button>
-            </Link>
-
-            <Link to="/admin/login" onClick={() => setIsMenuOpen(false)} className="w-full">
-              <Button size="lg" variant="outline" className="w-full border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-semibold">
-                Admin Login
               </Button>
             </Link>
 

@@ -1,57 +1,71 @@
 // Device Manager - Generates unique device ID and detects device info
 
-const DEVICE_ID_KEY = 'adminDeviceId';
+const ADMIN_DEVICE_ID_KEY = "adminDeviceId";
+const PLAYER_DEVICE_ID_KEY = "playerDeviceId";
 
-export const getOrCreateDeviceId = (): string => {
-  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
-  
+const generateDeviceId = () =>
+  `device_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+const getOrCreateDeviceIdByKey = (storageKey: string): string => {
+  let deviceId = localStorage.getItem(storageKey);
+
   if (!deviceId) {
-    // Generate unique device ID based on browser/device fingerprint
-    deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    // Persist a stable browser-level ID for this app on this device.
+    deviceId = generateDeviceId();
+    localStorage.setItem(storageKey, deviceId);
   }
-  
+
   return deviceId;
 };
+
+export const getOrCreateDeviceId = (): string =>
+  getOrCreateDeviceIdByKey(ADMIN_DEVICE_ID_KEY);
+
+export const getOrCreatePlayerDeviceId = (): string =>
+  getOrCreateDeviceIdByKey(PLAYER_DEVICE_ID_KEY);
 
 export const getDeviceName = (): string => {
   // Detect device/browser info
   const userAgent = navigator.userAgent;
-  let deviceName = 'Unknown Device';
+  let deviceName = "Unknown Device";
 
   if (/windows/i.test(userAgent)) {
     if (/chrome/i.test(userAgent)) {
-      deviceName = 'Windows - Chrome';
+      deviceName = "Windows - Chrome";
     } else if (/firefox/i.test(userAgent)) {
-      deviceName = 'Windows - Firefox';
+      deviceName = "Windows - Firefox";
     } else if (/edg/i.test(userAgent)) {
-      deviceName = 'Windows - Edge';
+      deviceName = "Windows - Edge";
     } else if (/safari/i.test(userAgent)) {
-      deviceName = 'Windows - Safari';
+      deviceName = "Windows - Safari";
     } else {
-      deviceName = 'Windows Device';
+      deviceName = "Windows Device";
     }
   } else if (/macintosh/i.test(userAgent)) {
     if (/chrome/i.test(userAgent)) {
-      deviceName = 'Mac - Chrome';
+      deviceName = "Mac - Chrome";
     } else if (/firefox/i.test(userAgent)) {
-      deviceName = 'Mac - Firefox';
+      deviceName = "Mac - Firefox";
     } else if (/safari/i.test(userAgent)) {
-      deviceName = 'Mac - Safari';
+      deviceName = "Mac - Safari";
     } else {
-      deviceName = 'Mac Device';
+      deviceName = "Mac Device";
     }
   } else if (/iphone|ipad|ipod/i.test(userAgent)) {
-    deviceName = 'iOS Device';
+    deviceName = "iOS Device";
   } else if (/android/i.test(userAgent)) {
-    deviceName = 'Android Device';
+    deviceName = "Android Device";
   } else if (/linux/i.test(userAgent)) {
-    deviceName = 'Linux Device';
+    deviceName = "Linux Device";
   }
 
   return deviceName;
 };
 
 export const clearDeviceId = (): void => {
-  localStorage.removeItem(DEVICE_ID_KEY);
+  localStorage.removeItem(ADMIN_DEVICE_ID_KEY);
+};
+
+export const clearPlayerDeviceId = (): void => {
+  localStorage.removeItem(PLAYER_DEVICE_ID_KEY);
 };

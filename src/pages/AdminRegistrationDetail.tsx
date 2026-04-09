@@ -32,7 +32,7 @@ const calculateAgeGroup = (dob: string): string => {
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
     age--;
   }
@@ -218,7 +218,7 @@ const RegistrationDetail = () => {
         const data = await response.json().catch(() => ({ message: 'Failed to reject' }));
         throw new Error(data.message || "Failed to reject");
       }
-      
+
       toast({
         title: "Success",
         description: "Registration rejected and stored in database",
@@ -257,7 +257,7 @@ const RegistrationDetail = () => {
         const data = await response.json().catch(() => ({ message: 'Failed to delete' }));
         throw new Error(data.message || "Failed to delete");
       }
-      
+
       toast({
         title: "Success",
         description: "Registration deleted permanently",
@@ -342,7 +342,7 @@ const RegistrationDetail = () => {
       );
 
       console.log('Delete ID response status:', response.status);
-      
+
       if (!response.ok) {
         const data = await response.json().catch(() => ({ message: 'Failed to delete ID' }));
         console.error('Delete ID error response:', data);
@@ -351,12 +351,12 @@ const RegistrationDetail = () => {
 
       const data = await response.json();
       console.log('Delete ID success:', data);
-      
+
       toast({
         title: "Success",
         description: `ID Card deleted successfully: ${data.deletedIdCardNumber}`,
       });
-      
+
       // Refresh registration data
       fetchRegistration();
     } catch (error) {
@@ -414,17 +414,17 @@ const RegistrationDetail = () => {
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4">
             <Button variant="ghost" onClick={() => navigate("/admin/dashboard")}>
               <ArrowLeft size={20} />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">{registration.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold break-words">{registration.name}</h1>
               <p className="text-gray-600">{registration.email}</p>
             </div>
           </div>
-          <div>{getStatusBadge(registration.status)}</div>
+          <div className="self-start sm:self-auto">{getStatusBadge(registration.status)}</div>
         </div>
       </div>
 
@@ -439,12 +439,12 @@ const RegistrationDetail = () => {
                   <CardTitle className="text-lg font-semibold">Passport Size Photo</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-start gap-6">
-                    <div className="relative">
+                  <div className="flex flex-col sm:flex-row items-start gap-6">
+                    <div className="relative mx-auto sm:mx-0">
                       <img
                         src={registration.photo}
                         alt="Passport"
-                        className="w-48 h-56 object-cover rounded-lg border-2 border-gray-300 shadow-md"
+                        className="w-40 h-48 sm:w-48 sm:h-56 object-cover rounded-lg border-2 border-gray-300 shadow-md"
                       />
                       <div className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow">
                         Verified
@@ -794,7 +794,7 @@ const RegistrationDetail = () => {
                       <>
                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
                           <p className="text-sm text-amber-800">
-                            <strong>Note:</strong> Generate a unique ID card number for this approved member. 
+                            <strong>Note:</strong> Generate a unique ID card number for this approved member.
                             You can provide a custom ID or leave it blank for a random 4-digit ID (e.g., SPKG-1234).
                           </p>
                         </div>
@@ -853,8 +853,8 @@ const RegistrationDetail = () => {
                               </div>
                             </div>
                             <DialogFooter>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 onClick={() => {
                                   setShowIdDialog(false);
                                   setCustomIdNumber("");
@@ -935,7 +935,7 @@ const RegistrationDetail = () => {
                 {registration.status === 'rejected' && (
                   <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                     <p className="text-sm text-yellow-800">
-                      <strong>Rejected Registration:</strong> This registration is stored in rejected status. 
+                      <strong>Rejected Registration:</strong> This registration is stored in rejected status.
                       You can permanently delete it from the database if needed.
                     </p>
                     {registration.rejectionReason && (
@@ -954,8 +954,8 @@ const RegistrationDetail = () => {
                   {registration.status === 'rejected' ? 'Delete from Database Permanently' : 'Delete Permanently'}
                 </Button>
                 <p className="text-xs text-gray-500 mt-2">
-                  {registration.status === 'rejected' 
-                    ? 'This will permanently remove the rejected registration from the database.' 
+                  {registration.status === 'rejected'
+                    ? 'This will permanently remove the rejected registration from the database.'
                     : 'This action cannot be undone.'}
                 </p>
               </CardContent>

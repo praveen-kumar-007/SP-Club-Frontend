@@ -61,7 +61,7 @@ const AdminDashboard = () => {
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('approved');
   const [currentAgeGroup, setCurrentAgeGroup] = useState<string>('all');
   const [page, setPage] = useState(1);
-  const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
+  const [adminUser, setAdminUser] = useState<{ username: string; role: string } | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<number | null>(null);
@@ -126,7 +126,7 @@ const AdminDashboard = () => {
       const remainingMs = SESSION_TIMEOUT - timeElapsedSinceStart;
       const remainingMinutes = Math.max(0, Math.floor(remainingMs / 60000));
       const remainingSeconds = Math.max(0, Math.floor((remainingMs % 60000) / 1000));
-      
+
       setSessionTimeRemaining(remainingMinutes);
       setSessionSecondsRemaining(remainingSeconds);
     };
@@ -242,7 +242,7 @@ const AdminDashboard = () => {
         const data = await response.json().catch(() => ({ message: 'Failed to reject' }));
         throw new Error(data.message || "Failed to reject");
       }
-      
+
       toast({
         title: "Success",
         description: "Registration rejected successfully",
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
         const data = await response.json().catch(() => ({ message: 'Failed to delete' }));
         throw new Error(data.message || "Failed to delete");
       }
-      
+
       toast({
         title: "Success",
         description: "Registration deleted permanently",
@@ -330,21 +330,20 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Session Timer Banner */}
       {sessionTimeRemaining !== null && (
-        <div className={`sticky top-0 z-50 px-4 py-3 ${
-          sessionTimeRemaining === 0 && sessionSecondsRemaining! <= 30 
-            ? 'bg-red-500' 
-            : sessionTimeRemaining <= 1 
-            ? 'bg-yellow-500' 
-            : 'bg-blue-500'
-        }`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className={`sticky top-0 z-50 px-4 py-3 ${sessionTimeRemaining === 0 && sessionSecondsRemaining! <= 30
+            ? 'bg-red-500'
+            : sessionTimeRemaining <= 1
+              ? 'bg-yellow-500'
+              : 'bg-blue-500'
+          }`}>
+          <div className="max-w-7xl mx-auto flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <AlertCircle className="text-white" size={20} />
               <span className="text-white font-semibold">
-                Session expires in {sessionTimeRemaining}:{String(sessionSecondsRemaining).padStart(2, '0')} 
+                Session expires in {sessionTimeRemaining}:{String(sessionSecondsRemaining).padStart(2, '0')}
               </span>
             </div>
-            <span className="text-white text-sm opacity-90">Stay active to keep your session alive</span>
+            <span className="text-white text-xs sm:text-sm opacity-90">Stay active to keep your session alive</span>
           </div>
         </div>
       )}
@@ -371,21 +370,21 @@ const AdminDashboard = () => {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {/* Top row: Title and Logout */}
-          <div className="flex justify-between items-center mb-3 md:mb-0">
+          <div className="flex items-start justify-between gap-3 mb-3 md:mb-0">
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-gray-800">Admin Dashboard</h1>
               <p className="text-xs md:text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
             </div>
-            <Button 
-              variant="destructive" 
-              onClick={handleLogout} 
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
               className="md:hidden font-semibold px-4 py-2 h-10"
             >
               <LogOut size={18} className="mr-1" />
               <span>Logout</span>
             </Button>
           </div>
-          
+
           {/* Bottom row: Action buttons - hidden on mobile, full on desktop */}
           <div className="hidden md:flex justify-end gap-3 mt-3">
             <Button
@@ -396,8 +395,8 @@ const AdminDashboard = () => {
               <UserRoundCheck size={18} className="mr-2" />
               Player Attendance
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => navigate("/admin/inquiries")}
               className="bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700 font-semibold"
             >
@@ -420,9 +419,9 @@ const AdminDashboard = () => {
               <Send size={18} className="mr-2" />
               Mail Center
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/admin/news")} 
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/news")}
               className="bg-orange-50 hover:bg-orange-100 border-orange-300 text-orange-700 font-semibold"
             >
               📰
@@ -433,39 +432,39 @@ const AdminDashboard = () => {
               Logout
             </Button>
           </div>
-          
+
           {/* Mobile buttons row */}
-          <div className="flex md:hidden gap-2 mt-3">
+          <div className="grid grid-cols-2 md:hidden gap-2 mt-3">
             <Button
               onClick={() => navigate("/admin/player-attendance")}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
             >
               <span>Players</span>
             </Button>
-            <Button 
-              onClick={() => navigate("/admin/inquiries")} 
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 h-auto"
+            <Button
+              onClick={() => navigate("/admin/inquiries")}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 h-auto"
             >
               <Mail size={18} className="mr-2" />
               <span>Inquiries</span>
             </Button>
             <Button
               onClick={() => navigate("/admin/messages")}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 h-auto"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 h-auto"
             >
               <MessageSquare size={18} className="mr-2" />
               <span>Messages</span>
             </Button>
             <Button
               onClick={() => navigate("/admin/mail")}
-              className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 h-auto"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 h-auto"
             >
               <Send size={18} className="mr-2" />
               <span>Mail</span>
             </Button>
-            <Button 
-              onClick={() => navigate("/admin/news")} 
-              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 h-auto"
+            <Button
+              onClick={() => navigate("/admin/news")}
+              className="col-span-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 h-auto"
             >
               <span>📰 News</span>
             </Button>
@@ -512,13 +511,13 @@ const AdminDashboard = () => {
         {/* Registrations Table */}
         <Card>
           <CardHeader>
-            <div className="flex justify-between items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>Registrations</CardTitle>
-              <div className="relative">
+              <div className="relative w-full sm:w-auto">
                 <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                 <Input
                   placeholder="Search by name, email, or Aadhar"
-                  className="pl-10 w-64"
+                  className="pl-10 w-full sm:w-64"
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -534,7 +533,7 @@ const AdminDashboard = () => {
               setCurrentStatus(value as 'all' | 'pending' | 'approved' | 'rejected');
               setPage(1);
             }}>
-              <TabsList>
+              <TabsList className="h-auto flex-wrap justify-start gap-2">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="pending">Pending</TabsTrigger>
                 <TabsTrigger value="approved">Approved</TabsTrigger>
@@ -655,8 +654,8 @@ const AdminDashboard = () => {
                             <TableRow key={reg._id} className="hover:bg-gray-50">
                               <TableCell>
                                 {reg.photo ? (
-                                  <img 
-                                    src={reg.photo} 
+                                  <img
+                                    src={reg.photo}
                                     alt={reg.name}
                                     className="w-12 h-12 rounded-lg object-cover border border-gray-200"
                                     loading="lazy"
@@ -737,11 +736,11 @@ const AdminDashboard = () => {
                     </div>
                     {/* Pagination Controls */}
                     {pagination.pages > 1 && (
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t">
                         <div className="text-sm text-gray-600">
                           Page {pagination.currentPage} of {pagination.pages} ({pagination.total} total)
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             variant="outline"
                             size="sm"

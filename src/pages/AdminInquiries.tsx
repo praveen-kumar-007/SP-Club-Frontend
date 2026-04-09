@@ -49,7 +49,7 @@ const AdminInquiries = () => {
   const [currentTab, setCurrentTab] = useState<'contacts' | 'newsletters' | 'playerMessages'>('contacts');
   const [currentStatus, setCurrentStatus] = useState<'all' | 'new' | 'completed'>('new');
   const [isLoading, setIsLoading] = useState(true);
-  const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
+  const [adminUser, setAdminUser] = useState<{ username: string; role: string } | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
 
@@ -165,17 +165,17 @@ const AdminInquiries = () => {
           ? '/api/newsletter/admin'
           : '/api/admin/player-messages';
       console.log('Marking as complete:', `${API_BASE_URL}${endpoint}/${id}`);
-      
+
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
         method: "PATCH",
-        headers: { 
+        headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
       });
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Failed to mark as completed' }));
         console.error('Error response:', errorData);
@@ -209,10 +209,10 @@ const AdminInquiries = () => {
           ? '/api/newsletter/admin'
           : '/api/admin/player-messages';
       console.log('Deleting:', `${API_BASE_URL}${endpoint}/${id}`);
-      
+
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
         method: "DELETE",
-        headers: { 
+        headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
@@ -247,7 +247,7 @@ const AdminInquiries = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    return status === 'completed' 
+    return status === 'completed'
       ? <Badge className="bg-green-500">Completed</Badge>
       : <Badge className="bg-yellow-500">New</Badge>;
   };
@@ -312,17 +312,17 @@ const AdminInquiries = () => {
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1 className="text-2xl font-bold">Inquiries & Submissions</h1>
             <p className="text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => navigate("/admin/dashboard")}>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
+            <Button className="w-full sm:w-auto" variant="outline" onClick={() => navigate("/admin/dashboard")}>
               <ArrowLeft size={18} className="mr-2" />
               Back to Dashboard
             </Button>
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button className="w-full sm:w-auto" variant="destructive" onClick={handleLogout}>
               <LogOut size={18} className="mr-2" />
               Logout
             </Button>
@@ -334,13 +334,13 @@ const AdminInquiries = () => {
         {/* Search */}
         <Card className="mb-8">
           <CardHeader>
-            <div className="flex justify-between items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>Filter & Search</CardTitle>
-              <div className="relative">
+              <div className="relative w-full sm:w-auto">
                 <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                 <Input
                   placeholder="Search by name, email, or phone"
-                  className="pl-10 w-64"
+                  className="pl-10 w-full sm:w-64"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -356,7 +356,7 @@ const AdminInquiries = () => {
               setCurrentTab(value as 'contacts' | 'newsletters' | 'playerMessages');
               setCurrentStatus('new');
             }}>
-              <TabsList>
+              <TabsList className="h-auto w-full flex-wrap justify-start gap-2">
                 <TabsTrigger value="contacts">Contact Forms</TabsTrigger>
                 <TabsTrigger value="newsletters">Newsletter Subscriptions</TabsTrigger>
                 <TabsTrigger value="playerMessages">Player Messages</TabsTrigger>
@@ -365,20 +365,20 @@ const AdminInquiries = () => {
               {/* Contact Forms Tab */}
               <TabsContent value="contacts" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex gap-2">
-                    <Button 
+                  <div className="flex flex-wrap gap-2">
+                    <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
                     >
                       All
                     </Button>
-                    <Button 
+                    <Button
                       variant={currentStatus === 'new' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('new')}
                     >
                       New
                     </Button>
-                    <Button 
+                    <Button
                       variant={currentStatus === 'completed' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('completed')}
                     >
@@ -461,20 +461,20 @@ const AdminInquiries = () => {
               {/* Newsletter Tab */}
               <TabsContent value="newsletters" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex gap-2">
-                    <Button 
+                  <div className="flex flex-wrap gap-2">
+                    <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
                     >
                       All
                     </Button>
-                    <Button 
+                    <Button
                       variant={currentStatus === 'new' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('new')}
                     >
                       New
                     </Button>
-                    <Button 
+                    <Button
                       variant={currentStatus === 'completed' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('completed')}
                     >
@@ -548,7 +548,7 @@ const AdminInquiries = () => {
               {/* Player Messages Tab */}
               <TabsContent value="playerMessages" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
