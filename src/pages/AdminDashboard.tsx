@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Trash2, Mail, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -388,6 +388,14 @@ const AdminDashboard = () => {
           
           {/* Bottom row: Action buttons - hidden on mobile, full on desktop */}
           <div className="hidden md:flex justify-end gap-3 mt-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/player-attendance")}
+              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-700 font-semibold"
+            >
+              <UserRoundCheck size={18} className="mr-2" />
+              Player Attendance
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/admin/inquiries")}
@@ -395,6 +403,22 @@ const AdminDashboard = () => {
             >
               <Mail size={18} className="mr-2" />
               View Inquiries
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/messages")}
+              className="bg-indigo-50 hover:bg-indigo-100 border-indigo-300 text-indigo-700 font-semibold"
+            >
+              <MessageSquare size={18} className="mr-2" />
+              Player Messages
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/mail")}
+              className="bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-700 font-semibold"
+            >
+              <Send size={18} className="mr-2" />
+              Mail Center
             </Button>
             <Button 
               variant="outline" 
@@ -412,12 +436,32 @@ const AdminDashboard = () => {
           
           {/* Mobile buttons row */}
           <div className="flex md:hidden gap-2 mt-3">
+            <Button
+              onClick={() => navigate("/admin/player-attendance")}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
+            >
+              <span>Players</span>
+            </Button>
             <Button 
               onClick={() => navigate("/admin/inquiries")} 
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 h-auto"
             >
               <Mail size={18} className="mr-2" />
               <span>Inquiries</span>
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/messages")}
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 h-auto"
+            >
+              <MessageSquare size={18} className="mr-2" />
+              <span>Messages</span>
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/mail")}
+              className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 h-auto"
+            >
+              <Send size={18} className="mr-2" />
+              <span>Mail</span>
             </Button>
             <Button 
               onClick={() => navigate("/admin/news")} 

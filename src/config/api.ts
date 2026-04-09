@@ -38,6 +38,23 @@ export const API_ENDPOINTS = {
   NEWS: `${API_BASE_URL}/api/news`,
   ADMIN_LOGIN: `${API_BASE_URL}/api/admin/login`,
   ADMIN_REGISTER: `${API_BASE_URL}/api/admin/register`,
+  ADMIN_PLAYERS: `${API_BASE_URL}/api/admin/players`,
+  ADMIN_ATTENDANCE: `${API_BASE_URL}/api/admin/attendance`,
+  ADMIN_PLAYER_MESSAGES: `${API_BASE_URL}/api/admin/player-messages`,
+  ADMIN_FORGOT_PASSWORD_REQUEST: `${API_BASE_URL}/api/admin/password/forgot/request`,
+  ADMIN_FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/admin/password/forgot/reset`,
+  ADMIN_MAIL_SETTINGS: `${API_BASE_URL}/api/admin/mail/settings`,
+  ADMIN_MAIL_SEND: `${API_BASE_URL}/api/admin/mail/send`,
+  PLAYER_LOGIN: `${API_BASE_URL}/api/player/login`,
+  PLAYER_ME: `${API_BASE_URL}/api/player/me`,
+  PLAYER_ME_PHOTO: `${API_BASE_URL}/api/player/me/photo`,
+  PLAYER_ATTENDANCE: `${API_BASE_URL}/api/player/attendance`,
+  PLAYER_MESSAGES: `${API_BASE_URL}/api/player/messages`,
+  PLAYER_MESSAGES_UNREAD_COUNT: `${API_BASE_URL}/api/player/messages/unread-count`,
+  PLAYER_MESSAGES_READ_ALL: `${API_BASE_URL}/api/player/messages/read-all`,
+  PLAYER_FORGOT_PASSWORD_REQUEST: `${API_BASE_URL}/api/player/password/forgot/request`,
+  PLAYER_FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/player/password/forgot/reset`,
+  PLAYER_CHANGE_PASSWORD: `${API_BASE_URL}/api/player/password/change`,
 };
 
 export const getNewsShareUrl = (newsId: string): string =>

@@ -33,9 +33,10 @@ interface Inquiry {
   subject: string;
   message: string;
   status: 'new' | 'completed';
-  type: 'contact' | 'newsletter';
+  type: 'contact' | 'newsletter' | 'player-message';
   createdAt?: string;
   subscribedAt?: string;
+  idCardNumber?: string;
 }
 
 const AdminInquiries = () => {
@@ -43,8 +44,9 @@ const AdminInquiries = () => {
   const navigate = useNavigate();
   const [contacts, setContacts] = useState<Inquiry[]>([]);
   const [newsletters, setNewsletters] = useState<Inquiry[]>([]);
+  const [playerMessages, setPlayerMessages] = useState<Inquiry[]>([]);
   const [search, setSearch] = useState("");
-  const [currentTab, setCurrentTab] = useState<'contacts' | 'newsletters'>('contacts');
+  const [currentTab, setCurrentTab] = useState<'contacts' | 'newsletters' | 'playerMessages'>('contacts');
   const [currentStatus, setCurrentStatus] = useState<'all' | 'new' | 'completed'>('new');
   const [isLoading, setIsLoading] = useState(true);
   const [adminUser, setAdminUser] = useState<{username: string; role: string} | null>(null);
@@ -78,6 +80,31 @@ const AdminInquiries = () => {
       if (newslettersResponse.ok) {
         const newslettersData = await newslettersResponse.json();
         setNewsletters(newslettersData.newsletters || []);
+      }
+
+      // Fetch player messages
+      const playerMessagesResponse = await fetch(
+        `${API_BASE_URL}/api/admin/player-messages`,
+        {
+          headers: { "Authorization": `Bearer ${token}` },
+        }
+      );
+      if (playerMessagesResponse.ok) {
+        const playerMessagesData = await playerMessagesResponse.json();
+        setPlayerMessages(
+          (playerMessagesData.items || []).map((item: any) => ({
+            _id: item._id,
+            name: item.playerName,
+            email: item.playerEmail,
+            phone: item.playerPhone || '',
+            idCardNumber: item.idCardNumber || '',
+            subject: item.subject,
+            message: item.message,
+            status: item.status,
+            type: 'player-message',
+            createdAt: item.createdAt,
+          }))
+        );
       }
     } catch (error) {
       console.error('Error fetching inquiries:', error);
@@ -130,9 +157,13 @@ const AdminInquiries = () => {
     }
   }, [showTimeoutDialog, countdown]);
 
-  const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter') => {
+  const handleMarkComplete = async (id: string, type: 'contact' | 'newsletter' | 'player-message') => {
     try {
-      const endpoint = type === 'contact' ? '/api/contact/admin' : '/api/newsletter/admin';
+      const endpoint = type === 'contact'
+        ? '/api/contact/admin'
+        : type === 'newsletter'
+          ? '/api/newsletter/admin'
+          : '/api/admin/player-messages';
       console.log('Marking as complete:', `${API_BASE_URL}${endpoint}/${id}`);
       
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
@@ -166,13 +197,17 @@ const AdminInquiries = () => {
     }
   };
 
-  const handleDelete = async (id: string, type: 'contact' | 'newsletter', name?: string) => {
+  const handleDelete = async (id: string, type: 'contact' | 'newsletter' | 'player-message', name?: string) => {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) {
       return;
     }
 
     try {
-      const endpoint = type === 'contact' ? '/api/contact/admin' : '/api/newsletter/admin';
+      const endpoint = type === 'contact'
+        ? '/api/contact/admin'
+        : type === 'newsletter'
+          ? '/api/newsletter/admin'
+          : '/api/admin/player-messages';
       console.log('Deleting:', `${API_BASE_URL}${endpoint}/${id}`);
       
       const response = await fetch(`${API_BASE_URL}${endpoint}/${id}`, {
@@ -239,6 +274,22 @@ const AdminInquiries = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const filteredPlayerMessages = playerMessages.filter((item) => {
+    const term = (search || '').toLowerCase().trim();
+    const name = item?.name?.toLowerCase?.() || '';
+    const email = item?.email?.toLowerCase?.() || '';
+    const subject = item?.subject?.toLowerCase?.() || '';
+    const idCardNumber = item?.idCardNumber?.toLowerCase?.() || '';
+
+    const matchesSearch = term === '' ||
+      name.includes(term) ||
+      email.includes(term) ||
+      subject.includes(term) ||
+      idCardNumber.includes(term);
+    const matchesStatus = currentStatus === 'all' || item.status === currentStatus;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Session Timeout Dialog */}
@@ -302,12 +353,13 @@ const AdminInquiries = () => {
         <Card>
           <CardContent>
             <Tabs value={currentTab} onValueChange={(value: string) => {
-              setCurrentTab(value as 'contacts' | 'newsletters');
+              setCurrentTab(value as 'contacts' | 'newsletters' | 'playerMessages');
               setCurrentStatus('new');
             }}>
               <TabsList>
                 <TabsTrigger value="contacts">Contact Forms</TabsTrigger>
                 <TabsTrigger value="newsletters">Newsletter Subscriptions</TabsTrigger>
+                <TabsTrigger value="playerMessages">Player Messages</TabsTrigger>
               </TabsList>
 
               {/* Contact Forms Tab */}
@@ -480,6 +532,98 @@ const AdminInquiries = () => {
                                   variant="destructive"
                                   size="sm"
                                   onClick={() => handleDelete(newsletter._id, 'newsletter')}
+                                >
+                                  <Trash2 size={16} />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Player Messages Tab */}
+              <TabsContent value="playerMessages" className="mt-4">
+                <div className="space-y-4 mb-4">
+                  <div className="flex gap-2">
+                    <Button
+                      variant={currentStatus === 'all' ? 'default' : 'outline'}
+                      onClick={() => setCurrentStatus('all')}
+                    >
+                      All
+                    </Button>
+                    <Button
+                      variant={currentStatus === 'new' ? 'default' : 'outline'}
+                      onClick={() => setCurrentStatus('new')}
+                    >
+                      New
+                    </Button>
+                    <Button
+                      variant={currentStatus === 'completed' ? 'default' : 'outline'}
+                      onClick={() => setCurrentStatus('completed')}
+                    >
+                      Completed
+                    </Button>
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <div className="text-center py-8">Loading...</div>
+                ) : filteredPlayerMessages.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No player messages found
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Player</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>ID Card</TableHead>
+                          <TableHead>Subject</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredPlayerMessages.map((item) => (
+                          <TableRow key={item._id} className="hover:bg-gray-50">
+                            <TableCell>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.message}</p>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Mail size={16} className="text-gray-400" />
+                                <p className="text-sm">{item.email}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <p className="text-sm">{item.idCardNumber || 'N/A'}</p>
+                            </TableCell>
+                            <TableCell>
+                              <p className="text-sm">{item.subject}</p>
+                            </TableCell>
+                            <TableCell>{getStatusBadge(item.status)}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex gap-2 justify-end">
+                                {item.status === 'new' && (
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    onClick={() => handleMarkComplete(item._id, 'player-message')}
+                                  >
+                                    <CheckCircle size={16} />
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDelete(item._id, 'player-message', item.name)}
                                 >
                                   <Trash2 size={16} />
                                 </Button>

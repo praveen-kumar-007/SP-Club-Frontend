@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -170,6 +170,12 @@ const AdminLogin = () => {
                   </FormItem>
                 )}
               />
+
+              <div className="text-right">
+                <Link to="/admin/forgot-password" className="text-sm text-blue-700 hover:text-blue-800 font-medium">
+                  Forgot Password?
+                </Link>
+              </div>
 
               <Button
                 type="submit"
