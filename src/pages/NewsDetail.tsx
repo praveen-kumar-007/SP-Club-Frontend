@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { API_ENDPOINTS } from "@/config/api";
+import { API_ENDPOINTS, getNewsShareUrl } from "@/config/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface NewsArticle {
@@ -86,7 +86,8 @@ const NewsDetail = () => {
   };
 
   const handleCopyLink = () => {
-    const url = window.location.href;
+    if (!article) return;
+    const url = getNewsShareUrl(article._id);
     navigator.clipboard.writeText(url);
     setCopied(true);
     toast({
@@ -99,7 +100,7 @@ const NewsDetail = () => {
   const handleShare = (platform: string) => {
     if (!article) return;
     
-    const url = window.location.href;
+    const url = getNewsShareUrl(article._id);
     const text = article.title;
     
     const shareUrls: { [key: string]: string } = {
@@ -170,6 +171,7 @@ const NewsDetail = () => {
         description={article.content.substring(0, 160)}
         keywords={`SP Kabaddi, news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
         url={`https://spkabaddi.me/news/${article._id}`}
+        image={article.images && article.images.length > 0 ? article.images[0] : undefined}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">

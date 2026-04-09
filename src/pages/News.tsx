@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { API_ENDPOINTS } from "@/config/api";
+import { API_ENDPOINTS, getNewsShareUrl } from "@/config/api";
 import { useToast } from "@/hooks/use-toast";
 
 interface NewsArticle {
@@ -65,7 +65,7 @@ const News = () => {
     e.preventDefault();
     e.stopPropagation();
     
-    const url = `${window.location.origin}/news/${article._id}`;
+    const url = getNewsShareUrl(article._id);
     const text = article.title;
     
     // Check if Web Share API is available (mobile devices)

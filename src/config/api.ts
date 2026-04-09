@@ -40,4 +40,7 @@ export const API_ENDPOINTS = {
   ADMIN_REGISTER: `${API_BASE_URL}/api/admin/register`,
 };
 
+export const getNewsShareUrl = (newsId: string): string =>
+  `${API_ENDPOINTS.NEWS}/share/${encodeURIComponent(newsId)}`;
+
 export default API_BASE_URL;
