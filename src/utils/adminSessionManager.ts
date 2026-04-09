@@ -1,48 +1,17 @@
-// Admin Session Manager - Auto logout after 15 minutes of inactivity
+// Admin Session Manager - activity tracking without forced timeout
 import API_BASE_URL from "@/config/api";
 
-const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
 const SESSION_START_KEY = 'adminSessionStart';
 const STORAGE_KEY = 'adminLastActivity';
-const REDIRECT_DELAY = 5000; // 5 seconds delay before redirect
 
-let timeoutId: NodeJS.Timeout | null = null;
-
-export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialog: () => void) => {
+export const initializeSessionManager = (_onTimeout: () => void, _showTimeoutDialog: () => void) => {
   // Update last activity timestamp
   const updateActivity = () => {
     localStorage.setItem(STORAGE_KEY, Date.now().toString());
   };
 
-  // Check if session has expired (based on session start time, not last activity)
-  const checkSession = () => {
-    const sessionStart = localStorage.getItem(SESSION_START_KEY);
-    if (!sessionStart) {
-      onTimeout();
-      return;
-    }
-
-    const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
-    if (timeElapsedSinceStart >= SESSION_TIMEOUT) {
-      // Show timeout dialog first
-      showTimeoutDialog();
-      
-      // Clear session and redirect after 5 seconds
-      setTimeout(() => {
-        onTimeout();
-      }, REDIRECT_DELAY);
-      return;
-    }
-
-    // Schedule next check
-    const remainingTime = SESSION_TIMEOUT - timeElapsedSinceStart;
-    timeoutId = setTimeout(checkSession, remainingTime);
-  };
-
-  // Initialize session start time (only on first login, not on page refresh)
-  if (!localStorage.getItem(SESSION_START_KEY)) {
-    localStorage.setItem(SESSION_START_KEY, Date.now().toString());
-  }
+  // Remove old timeout-session metadata so timeout banners no longer show.
+  localStorage.removeItem(SESSION_START_KEY);
   
   // Update last activity timestamp
   updateActivity();
@@ -54,14 +23,8 @@ export const initializeSessionManager = (onTimeout: () => void, showTimeoutDialo
     window.addEventListener(event, updateActivity, { passive: true });
   });
 
-  // Start checking session
-  checkSession();
-
   // Return cleanup function
   return () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
     activityEvents.forEach(event => {
       window.removeEventListener(event, updateActivity);
     });
