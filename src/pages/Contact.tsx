@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import Seo from "@/components/Seo";
 import { API_ENDPOINTS } from "@/config/api";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -75,8 +75,7 @@ const Contact = () => {
     }
   };
 
-  const googleMapsLink = "https://www.google.com/maps/search/?api=1&query=QCJF%2BF93+SP+Kabaddi+Group+Dhanbad%2C+Shakti+Mandir+Path%2C+Dhanbad%2C+Jharkhand+826007";
-  const mapAddress = "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007";
+  const mapAddress = SP_KABADDI_LOCATION.address;
 
   return (
     <div className="min-h-screen bg-[#0a192f] text-white">
@@ -308,21 +307,27 @@ const Contact = () => {
                   <CardTitle className="text-2xl text-white">Find Us on Map</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video bg-[#0a192f] rounded-lg flex items-center justify-center p-4">
-                    <div className="text-center">
-                      <MapPin className="w-16 h-16 text-[#facc15] mx-auto mb-4" />
-                      <h3 className="text-xl font-bold mb-2">SP Kabaddi Group Dhanbad Sports Complex</h3>
-                      <p className="text-gray-300 mb-4">
-                        {mapAddress.split(', ').map((line, index) => (
-                          <span key={index}>{line}<br /></span>
-                        ))}
-                      </p>
-                      <Button asChild className="bg-transparent border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0a192f]">
-                        <a href={googleMapsLink} target="_blank" rel="noopener noreferrer">
-                          Open in Google Maps
-                        </a>
-                      </Button>
+                  <div className="overflow-hidden rounded-lg border border-gray-600 bg-[#0a192f]">
+                    <div className="aspect-video">
+                      <iframe
+                        title="SP Kabaddi Group Dhanbad Map"
+                        src={GOOGLE_MAPS_EMBED_URL}
+                        className="h-full w-full"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        allowFullScreen
+                      />
                     </div>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-gray-300">
+                      {mapAddress}
+                    </p>
+                    <Button asChild className="bg-transparent border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0a192f]">
+                      <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer">
+                        Open in Google Maps
+                      </a>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

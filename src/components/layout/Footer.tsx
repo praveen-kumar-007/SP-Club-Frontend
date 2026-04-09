@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import API_BASE_URL from "@/config/api";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -133,7 +134,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Club Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
@@ -211,6 +212,34 @@ const Footer = () => {
               <li><a href="/privacy-policy" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
               <li><a href="/kabaddi-rules" className="hover:text-amber-400 transition-colors duration-300">Kabaddi Rules</a></li>
             </ul>
+          </div>
+
+          {/* Map Card */}
+          <div className="md:col-span-2 lg:col-span-1">
+            <h4 className="font-semibold text-xl mb-4 text-amber-400">Find Us</h4>
+            <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
+              <div className="aspect-video">
+                <iframe
+                  title="SP Kabaddi Group Dhanbad Location"
+                  src={GOOGLE_MAPS_EMBED_URL}
+                  className="w-full h-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+              <div className="p-4 space-y-3">
+                <p className="text-sm text-slate-300">{SP_KABADDI_LOCATION.address}</p>
+                <a
+                  href={GOOGLE_MAPS_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  Open full map
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
