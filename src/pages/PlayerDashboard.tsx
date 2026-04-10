@@ -21,6 +21,9 @@ interface PlayerProfile {
     gender: string;
     address: string;
     clubDetails: string;
+    kitSize?: string;
+    jerseyNumber?: number;
+    status?: string;
     photo: string;
     certificates: Array<{
         title: string;
@@ -37,6 +40,10 @@ const PlayerDashboard = () => {
     const [player, setPlayer] = useState<PlayerProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
+    const [savingKitDetails, setSavingKitDetails] = useState(false);
+    const [editingKitDetails, setEditingKitDetails] = useState(false);
+    const [kitSize, setKitSize] = useState("");
+    const [jerseyNumber, setJerseyNumber] = useState("");
     const [markingTodayAttendance, setMarkingTodayAttendance] = useState(false);
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const photoInputRef = useRef<HTMLInputElement | null>(null);
@@ -66,6 +73,8 @@ const PlayerDashboard = () => {
         }
 
         setPlayer(profileData.player);
+        setKitSize(profileData.player?.kitSize || "");
+        setJerseyNumber(profileData.player?.jerseyNumber ? String(profileData.player.jerseyNumber) : "");
     };
 
     const fetchUnreadMessageCount = async (activePlayerToken: string) => {
@@ -109,6 +118,19 @@ const PlayerDashboard = () => {
 
         initialize();
     }, [navigate, playerId, playerToken, toast]);
+
+    useEffect(() => {
+        if (!isLoading && player && player.status !== "approved") {
+            localStorage.removeItem("playerToken");
+            localStorage.removeItem("playerUser");
+            toast({
+                title: "Access Denied",
+                description: "Your registration is not yet approved. Please wait for approval before using the dashboard.",
+                variant: "destructive",
+            });
+            navigate("/player/login");
+        }
+    }, [isLoading, navigate, player, toast]);
 
     const handlePhotoSelected = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -226,6 +248,55 @@ const PlayerDashboard = () => {
             });
         } finally {
             setMarkingTodayAttendance(false);
+        }
+    };
+
+    const handleSaveKitDetails = async () => {
+        if (!playerToken) {
+            navigate("/player/login");
+            return;
+        }
+
+        setSavingKitDetails(true);
+        try {
+if (player?.status !== "approved" && jerseyNumber) {
+            throw new Error(
+                "Jersey numbers can only be selected after approval."
+            );
+        }
+
+        const response = await fetch(API_ENDPOINTS.PLAYER_ME_UPDATE, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${playerToken}`,
+            },
+            body: JSON.stringify({
+                kitSize: kitSize || null,
+                jerseyNumber: player?.status === "approved" ? jerseyNumber || null : null,
+                }),
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update kit details");
+            }
+
+            await fetchPlayerProfile(playerToken);
+            setEditingKitDetails(false);
+
+            toast({
+                title: "Profile Updated",
+                description: "Your kit size and jersey number are now saved.",
+            });
+        } catch (error) {
+            toast({
+                title: "Update Failed",
+                description: error instanceof Error ? error.message : "Unable to save kit details",
+                variant: "destructive",
+            });
+        } finally {
+            setSavingKitDetails(false);
         }
     };
 
@@ -388,6 +459,99 @@ const PlayerDashboard = () => {
                                 <p className="text-xs text-slate-500">Club Details</p>
                                 <p className="font-medium text-slate-800">{player?.clubDetails || "N/A"}</p>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 flex items-center gap-2">
+                            <CreditCard className="h-5 w-5 text-blue-800" />
+                            Kit & Jersey
+                        </CardTitle>
+                        <CardDescription>
+                        Update your kit size anytime. Jersey number selection is only enabled once your registration is approved.
+                    </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4 sm:grid-cols-2 items-end">
+                            <div>
+                                <p className="text-xs text-slate-500">Kit Size</p>
+                                <p className="font-medium text-slate-800">{player?.kitSize || "Not selected"}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-slate-500">Jersey Number</p>
+                                <p className="font-medium text-slate-800">{player?.jerseyNumber ?? "Not assigned"}</p>
+                            </div>
+                            <div className="sm:col-span-2">
+                                {editingKitDetails ? (
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div>
+                                            <p className="text-xs text-slate-500">Kit Size</p>
+                                            <select
+                                                className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900"
+                                                value={kitSize}
+                                                onChange={(e) => setKitSize(e.target.value)}
+                                            >
+                                                <option value="">Not selected</option>
+                                                <option value="XS">XS</option>
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="XXL">XXL</option>
+                                                <option value="XXXL">XXXL</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-slate-500">Jersey Number</p>
+                                            {player?.status === "approved" ? (
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={99}
+                                                    className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900"
+                                                    placeholder="1-99"
+                                                    value={jerseyNumber}
+                                                    onChange={(e) => setJerseyNumber(e.target.value)}
+                                                />
+                                            ) : (
+                                                <div className="mt-2 rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                                                    Jersey number assignment becomes available once your registration is approved.
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+                            {editingKitDetails ? (
+                                <>
+                                    <Button
+                                        className="bg-blue-800 hover:bg-blue-900"
+                                        disabled={savingKitDetails}
+                                        onClick={handleSaveKitDetails}
+                                    >
+                                        {savingKitDetails ? "Saving..." : "Save Kit Details"}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setEditingKitDetails(false);
+                                            setKitSize(player?.kitSize || "");
+                                            setJerseyNumber(player?.jerseyNumber ? String(player.jerseyNumber) : "");
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button className="bg-blue-800 hover:bg-blue-900" onClick={() => setEditingKitDetails(true)}>
+                                    Edit Kit & Jersey
+                                </Button>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

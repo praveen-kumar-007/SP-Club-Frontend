@@ -560,6 +560,14 @@ const AdminDashboard = () => {
             </Button>
             <Button
               variant="outline"
+              onClick={() => navigate("/admin/players")}
+              className="bg-slate-50 hover:bg-slate-100 border-slate-300 text-slate-700 font-semibold"
+            >
+              <Search size={18} className="mr-2" />
+              <span>Player Directory</span>
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => navigate("/admin/mail")}
               className="bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-700 font-semibold"
             >

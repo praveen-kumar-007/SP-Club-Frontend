@@ -48,6 +48,7 @@ export const API_ENDPOINTS = {
   ADMIN_LOGIN_HISTORY: `${API_BASE_URL}/api/admin/login-history`,
   PLAYER_LOGIN: `${API_BASE_URL}/api/player/login`,
   PLAYER_ME: `${API_BASE_URL}/api/player/me`,
+  PLAYER_ME_UPDATE: `${API_BASE_URL}/api/player/me`,
   PLAYER_ME_PHOTO: `${API_BASE_URL}/api/player/me/photo`,
   PLAYER_ATTENDANCE: `${API_BASE_URL}/api/player/attendance`,
   PLAYER_MESSAGES: `${API_BASE_URL}/api/player/messages`,

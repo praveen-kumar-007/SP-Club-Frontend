@@ -35,6 +35,7 @@ const AdminForgotPassword = lazyWithPreload(() => import("./pages/AdminForgotPas
 const AdminSignup = lazyWithPreload(() => import("./pages/AdminSignup"));
 const AdminDashboard = lazyWithPreload(() => import("./pages/AdminDashboard"));
 const AdminRegistrationDetail = lazyWithPreload(() => import("./pages/AdminRegistrationDetail"));
+const AdminPlayers = lazyWithPreload(() => import("./pages/AdminPlayers"));
 const AdminInquiries = lazyWithPreload(() => import("./pages/AdminInquiries"));
 const AdminNews = lazyWithPreload(() => import("./pages/AdminNews"));
 const AdminPlayerAttendance = lazyWithPreload(() => import("./pages/AdminPlayerAttendance"));
@@ -106,8 +107,10 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/About" element={<About />} />
                   <Route path="/gallery" element={<Gallery />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/Register" element={<Register />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/news" element={<News />} />
                   <Route path="/news/:id" element={<NewsDetail />} />
@@ -124,6 +127,7 @@ const App = () => {
                   <Route path="/admin/mail" element={<AdminMailCenter />} />
                   <Route path="/admin/login-history" element={<AdminLoginHistory />} />
                   <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
+                  <Route path="/admin/players" element={<AdminPlayers />} />
                   <Route path="/admin/inquiries" element={<AdminInquiries />} />
                   <Route path="/admin/news" element={<AdminNews />} />
                   <Route path="/player/login" element={<PlayerLogin />} />

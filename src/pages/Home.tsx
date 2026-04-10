@@ -1,4 +1,5 @@
 // ...existing code...
+import { useEffect, useState } from "react";
 import { Play, Users, Trophy, Calendar, ArrowRight } from "lucide-react";
 import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
@@ -6,12 +7,50 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
 const Home = () => {
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
   // #################################################################
   // #############  PASTE YOUR VIDEO AND PHOTO LINKS HERE  #############
   // #################################################################
 
   // 1. Hero Section Background Video
   const heroVideoUrl = "/home_assets/main.mp4";
+
+  useEffect(() => {
+    type ConnectionInfo = {
+      saveData?: boolean;
+      effectiveType?: string;
+    };
+
+    const connection = (navigator as unknown as { connection?: ConnectionInfo }).connection;
+    const isSlowConnection =
+      connection?.saveData || /(2g|slow-2g)/.test(connection?.effectiveType || "");
+
+    if (isSlowConnection) {
+      setShouldLoadVideo(false);
+      return;
+    }
+
+    const loadVideo = () => setShouldLoadVideo(true);
+    const idleCallback = window.requestIdleCallback?.bind(window);
+    let callbackId: number | null = null;
+
+    if (idleCallback) {
+      callbackId = idleCallback(loadVideo);
+      return () => {
+        if (window.cancelIdleCallback && callbackId !== null) {
+          window.cancelIdleCallback(callbackId);
+        }
+      };
+    }
+
+    callbackId = window.setTimeout(loadVideo, 400);
+    return () => {
+      if (callbackId !== null) {
+        window.clearTimeout(callbackId);
+      }
+    };
+  }, []);
 
   // 2. "Our Story" Section Video (any YouTube URL — will be converted to embed)
   const storyVideoUrl = "https://youtu.be/Xh0fFo3rsG4?si=SRhJWgB1U1zgBRqC";
@@ -70,16 +109,29 @@ const Home = () => {
       />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
-        <video
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          src={heroVideoUrl}
-          poster="/home_assets/poster.jpg"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-        />
+        <div className="absolute top-0 left-0 w-full h-full">
+          {shouldLoadVideo ? (
+            <video
+              id="hero-video"
+              className="absolute top-0 left-0 w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              poster="/home_assets/poster.jpg"
+            >
+              <source src={heroVideoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              className="absolute top-0 left-0 w-full h-full object-cover"
+              src="/home_assets/poster.jpg"
+              alt="SP Kabaddi Group Dhanbad hero"
+            />
+          )}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight animate-fade-in-up shadow-text">
@@ -89,12 +141,12 @@ const Home = () => {
             Where Champions Are Forged and Legacies Are Built
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in delay-400">
-            <Link to="/Register">
+            <Link to="/register">
               <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
                 Become a Champion
               </Button>
             </Link>
-            <Link to="/Gallery">
+            <Link to="/gallery">
               <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
                 Our Legacy
               </Button>
@@ -219,12 +271,12 @@ const Home = () => {
             Take the first step towards achieving your sporting dreams with SP Kabaddi Group Dhanbad.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/Register">
+            <Link to="/register">
               <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-lg px-8 py-4 transform hover:scale-105 transition-transform shadow-lg">
                 Start Your Journey
               </Button>
             </Link>
-            <Link to="/About">
+            <Link to="/about">
               <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 font-bold transform hover:scale-105 transition-transform">
                 Learn More
               </Button>

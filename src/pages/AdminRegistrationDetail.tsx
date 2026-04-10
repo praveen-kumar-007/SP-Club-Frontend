@@ -626,6 +626,14 @@ const RegistrationDetail = () => {
                   <p className="font-medium">{registration.role}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-gray-600">Kit Size</p>
+                  <p className="font-medium">{registration.kitSize || 'Not selected'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Jersey Number</p>
+                  <p className="font-medium">{registration.jerseyNumber ?? 'Not assigned'}</p>
+                </div>
+                <div>
                   <p className="text-sm text-gray-600">Club Details</p>
                   <p className="font-medium">{registration.clubDetails}</p>
                 </div>
