@@ -33,6 +33,7 @@ const formSchema = z.object({
   experience: z.string().min(1, "Please select your experience"),
   address: z.string().min(5, "Please enter your address"),
   clubDetails: z.string().min(10, "Please provide details about why you want to join the club"),
+  kitSize: z.string().optional(),
   message: z.string().min(1, "Please provide a message"),
   photo: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Passport photo is required"),
   aadharFront: z.any().refine((file) => file instanceof File || (typeof file === 'string' && file.length > 0), "Aadhar front image is required"),
@@ -79,6 +80,7 @@ const Register = () => {
       kabaddiPositions: [],
       newsletter: true,
       terms: false,
+      kitSize: "",
     },
   });
 
@@ -132,6 +134,7 @@ const Register = () => {
       formData.append('dob', data.dob.toISOString());
       formData.append('aadharNumber', data.aadharNumber);
       formData.append('clubDetails', data.clubDetails);
+      formData.append('kitSize', data.kitSize || '');
       formData.append('message', data.message || '');
       formData.append('newsletter', String(data.newsletter));
       formData.append('terms', String(data.terms));
@@ -285,58 +288,24 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a192f]">
+    <div className="min-h-screen bg-slate-950 text-white">
       <Seo
         title="Register"
         description="Register with SP Kabaddi Group Dhanbad to join training, events, and community programs."
         url="https://spkabaddi.me/register"
         keywords="register SP Kabaddi Group Dhanbad, spkg register"
       />
-      {/* Hero Section with Background Container */}
-      <div className="relative">
-        {/* START: Background Element */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          {/* 
-            ============================================================
-            == PASTE YOUR IMAGE OR VIDEO TAG HERE                       ==
-            ==                                                          ==
-            == Example Image:                                           ==
-            == <img src="/your-background-image.jpg" alt="Background" className="w-full h-full object-cover" /> ==
-            ==                                                          ==
-            == Example Video:                                           ==
-            == <video                                                   ==
-            ==   src="/your-background-video.mp4"                       ==
-            ==   autoPlay                                               ==
-            ==   loop                                                   ==
-            ==   muted                                                  ==
-            ==   className="w-full h-full object-cover"                 ==
-            == />                                                       ==
-            ============================================================
-          */}
 
-          {/* This dark overlay improves text readability over the background. Adjust opacity as needed. */}
-          <div className="absolute inset-0 bg-black opacity-50"></div>
-          <img src="/register.png" alt="Background" className="w-full h-full object-cover" />
+      <header className="bg-[radial-gradient(circle_at_top,_rgba(250,204,21,0.15),_transparent_35%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+        <div className="mx-auto max-w-6xl text-center">
+          <p className="text-sm uppercase tracking-[0.3em] text-yellow-300">Register for SP Kabaddi Group</p>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Join SP Kabaddi Group Dhanbad today</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">Fill out your application to get approval, receive updates, and access the player dashboard once verified.</p>
         </div>
-        {/* END: Background Element */}
-
-        {/* Hero Section Content */}
-        <section className="relative z-10 bg-transparent text-white py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Join <span className="text-[#facc15]">SP Kabaddi Group Dhanbad</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
-                Register as a player or fan and be part of our growing community
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
+      </header>
 
       <section className="py-16">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Registration Form</h2>
             <p className="text-lg text-gray-400">
@@ -344,84 +313,7 @@ const Register = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Why Register Benefits */}
-            <div className="space-y-6">
-              <Card className="bg-[#1e3a5f] border-gray-700 text-white">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-xl">
-                    <Trophy className="w-6 h-6 mr-3 text-[#facc15]" />
-                    Why Register with Us?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-sm text-gray-300">
-                    <li className="flex items-start">
-                      <Star className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
-                      Get access to exclusive tournaments and events
-                    </li>
-                    <li className="flex items-start">
-                      <Users className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
-                      Receive regular updates about upcoming matches and training sessions
-                    </li>
-                    <li className="flex items-start">
-                      <Target className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
-                      Connect with other sports enthusiasts and players
-                    </li>
-                    <li className="flex items-start">
-                      <Shield className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
-                      Opportunity to participate in our community programs
-                    </li>
-                    <li className="flex items-start">
-                      <CalendarIcon className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
-                      Access to coaching and training resources
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              {/* Testimonials */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-white">What Our Members Say</h3>
-
-                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
-                  <CardContent className="p-4">
-                    <p className="text-sm italic mb-3 text-gray-300">
-                      "SP Kabaddi Group Dhanbad has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
-                    </p>
-                    <div className="text-xs">
-                      <p className="font-semibold text-white">Vikram Singh</p>
-                      <p className="text-yellow-400">Raider, Member since 2018</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
-                  <CardContent className="p-4">
-                    <p className="text-sm italic mb-3 text-gray-300">
-                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Kabaddi Group Dhanbad's championship run in 2024 was the highlight of my sports career."
-                    </p>
-                    <div className="text-xs">
-                      <p className="font-semibold text-white">Aditya Kumar</p>
-                      <p className="text-yellow-400">Defender, Member since 2019</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
-                  <CardContent className="p-4">
-                    <p className="text-sm italic mb-3 text-gray-300">
-                      "Joined as a beginner with no kabaddi experience. The patience and dedication of coaches like Praveen helped me become a state-level competitor within two years."
-                    </p>
-                    <div className="text-xs">
-                      <p className="font-semibold text-white">Sneha Sharma</p>
-                      <p className="text-yellow-400">All-rounder, Member since 2022</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
+          <div className="space-y-10">
             {/* Registration Form */}
             <div className="lg:col-span-2">
               <Card className="bg-[#1e3a5f] border-gray-700 text-white">
@@ -433,7 +325,12 @@ const Register = () => {
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                      <div className="space-y-2 border-b border-gray-700 pb-5">
+                        <p className="text-base font-semibold text-yellow-300">Personal Information</p>
+                        <p className="text-sm text-gray-400">Provide your basic profile details to complete the registration.</p>
+                      </div>
+
                       {/* Full Name */}
                       <FormField
                         control={form.control}
@@ -464,8 +361,8 @@ const Register = () => {
                         )}
                       />
 
-                      {/* Email and Phone */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Contact Information */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <FormField
                           control={form.control}
                           name="email"
@@ -507,6 +404,11 @@ const Register = () => {
                             </FormItem>
                           )}
                         />
+                      </div>
+
+                      <div className="space-y-2 border-b border-gray-700 pb-5">
+                        <p className="text-base font-semibold text-yellow-300">Sport Profile</p>
+                        <p className="text-sm text-gray-400">Tell us your role, experience, and kit preferences.</p>
                       </div>
 
                       {/* Gender and Blood Group */}
@@ -561,6 +463,87 @@ const Register = () => {
                             </FormItem>
                           )}
                         />
+                      </div>
+
+                      {/* Role, Experience and Kit Size */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="role"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Register As <span className="text-red-500">*</span></FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select your role" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  {roles.map((role) => (
+                                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="experience"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Sports Experience <span className="text-red-500">*</span></FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select your experience level" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  {experienceLevels.map((level) => (
+                                    <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="kitSize"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Kit Size</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
+                                    <SelectValue placeholder="Select kit size" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
+                                  <SelectItem value="XS">XS</SelectItem>
+                                  <SelectItem value="S">S</SelectItem>
+                                  <SelectItem value="M">M</SelectItem>
+                                  <SelectItem value="L">L</SelectItem>
+                                  <SelectItem value="XL">XL</SelectItem>
+                                  <SelectItem value="XXL">XXL</SelectItem>
+                                  <SelectItem value="XXXL">XXXL</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-2 border-b border-gray-700 pb-5">
+                        <p className="text-base font-semibold text-yellow-300">Verification & Documents</p>
+                        <p className="text-sm text-gray-400">Upload your Aadhar details and proof images below.</p>
                       </div>
 
                       {/* DOB and Aadhar */}
@@ -629,57 +612,6 @@ const Register = () => {
                         />
                       </div>
 
-                      {/* Role and Age Group */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField
-                          control={form.control}
-                          name="role"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Register As <span className="text-red-500">*</span></FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                    <SelectValue placeholder="Select your role" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  {roles.map((role) => (
-                                    <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Experience */}
-                        <FormField
-                          control={form.control}
-                          name="experience"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Sports Experience <span className="text-red-500">*</span></FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
-                                    <SelectValue placeholder="Select your experience level" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  {experienceLevels.map((level) => (
-                                    <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Address */}
                       <FormField
                         control={form.control}
                         name="address"
@@ -693,6 +625,11 @@ const Register = () => {
                           </FormItem>
                         )}
                       />
+
+                      <div className="space-y-2 border-b border-gray-700 pb-5">
+                        <p className="text-base font-semibold text-yellow-300">Club Motivation</p>
+                        <p className="text-sm text-gray-400">Tell us why you want to join and what you want to achieve.</p>
+                      </div>
 
                       {/* Club Details */}
                       <FormField
@@ -1210,6 +1147,81 @@ const Register = () => {
                   </Form>
                 </CardContent>
               </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card className="bg-[#1e3a5f] border-gray-700 text-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-xl">
+                    <Trophy className="w-6 h-6 mr-3 text-[#facc15]" />
+                    Why Register with Us?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 text-sm text-gray-300">
+                    <li className="flex items-start">
+                      <Star className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Get access to exclusive tournaments and events
+                    </li>
+                    <li className="flex items-start">
+                      <Users className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Receive regular updates about upcoming matches and training sessions
+                    </li>
+                    <li className="flex items-start">
+                      <Target className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Connect with other sports enthusiasts and players
+                    </li>
+                    <li className="flex items-start">
+                      <Shield className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Opportunity to participate in our community programs
+                    </li>
+                    <li className="flex items-start">
+                      <CalendarIcon className="w-4 h-4 mt-1 mr-2 text-[#facc15] flex-shrink-0" />
+                      Access to coaching and training resources
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-white">What Our Members Say</h3>
+
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
+                  <CardContent className="p-4">
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "SP Kabaddi Group Dhanbad has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
+                    </p>
+                    <div className="text-xs">
+                      <p className="font-semibold text-white">Vikram Singh</p>
+                      <p className="text-yellow-400">Raider, Member since 2018</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
+                  <CardContent className="p-4">
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Kabaddi Group Dhanbad's championship run in 2024 was the highlight of my sports career."
+                    </p>
+                    <div className="text-xs">
+                      <p className="font-semibold text-white">Aditya Kumar</p>
+                      <p className="text-yellow-400">Defender, Member since 2019</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
+                  <CardContent className="p-4">
+                    <p className="text-sm italic mb-3 text-gray-300">
+                      "Joined as a beginner with no kabaddi experience. The patience and dedication of coaches like Praveen helped me become a state-level competitor within two years."
+                    </p>
+                    <div className="text-xs">
+                      <p className="font-semibold text-white">Sneha Sharma</p>
+                      <p className="text-yellow-400">All-rounder, Member since 2022</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
