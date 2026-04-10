@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -906,15 +906,46 @@ const AdminDashboard = () => {
                                     className="bg-blue-600 hover:bg-blue-700 text-white"
                                     onClick={() => navigate(`/admin/registration/${reg._id}`)}
                                   >
-                                    Edit Registration
+                                    View Details
                                   </Button>
                                   {reg.status === 'pending' && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                        onClick={() => handleApprove(reg._id)}
+                                      >
+                                        Approve
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => {
+                                          const reason = prompt("Enter rejection reason:") || "";
+                                          if (!reason.trim()) return;
+                                          handleReject(reg._id, reason);
+                                        }}
+                                      >
+                                        Reject
+                                      </Button>
+                                    </>
+                                  )}
+                                  {reg.status === 'approved' && (
                                     <Button
                                       size="sm"
-                                      className="bg-green-600 hover:bg-green-700 text-white"
-                                      onClick={() => handleApprove(reg._id)}
+                                      variant="outline"
+                                      onClick={() => window.open(`/id-card/${reg._id}`, "_blank")}
                                     >
-                                      Approve
+                                      View ID Card
+                                    </Button>
+                                  )}
+                                  {isSuperAdmin && (reg.status === 'approved' || reg.status === 'rejected') && (
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => handleDelete(reg._id, reg.name)}
+                                    >
+                                      <Trash2 size={16} />
                                     </Button>
                                   )}
                                 </div>

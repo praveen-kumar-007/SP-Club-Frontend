@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect, useMemo, type ChangeEvent } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -137,12 +137,16 @@ const RegistrationDetail = () => {
   const [aadharFrontPreview, setAadharFrontPreview] = useState<string>("");
   const [aadharBackPreview, setAadharBackPreview] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [isGeneratingId, setIsGeneratingId] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState(false);
   const [customIdNumber, setCustomIdNumber] = useState("");
   const [showIdDialog, setShowIdDialog] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ username?: string; role?: string } | null>(null);
   // Role selection for ID card
   const [idCardRole, setIdCardRole] = useState("");
   const [customRole, setCustomRole] = useState("");
@@ -158,11 +162,20 @@ const RegistrationDetail = () => {
   ];
 
   const token = localStorage.getItem("adminToken");
+  const isSuperAdmin = useMemo(() => {
+    const role = (adminUser?.role || "").toLowerCase().trim();
+    return role === "super admin" || role === "superadmin" || role === "super_admin";
+  }, [adminUser]);
 
   useEffect(() => {
     if (!token) {
       navigate("/admin/login");
       return;
+    }
+
+    const admin = localStorage.getItem("adminUser");
+    if (admin) {
+      setAdminUser(JSON.parse(admin));
     }
 
     fetchRegistration();
@@ -246,6 +259,97 @@ const RegistrationDetail = () => {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to approve",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      toast({
+        title: "Error",
+        description: "Please provide a rejection reason",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRejecting(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}/reject`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reason: rejectionReason }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({ message: 'Failed to reject' }));
+        throw new Error(data.message || "Failed to reject");
+      }
+
+      toast({
+        title: "Success",
+        description: "Registration rejected successfully",
+      });
+      setShowRejectDialog(false);
+      setRejectionReason("");
+      fetchRegistration();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to reject",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!isSuperAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only super admins can delete player registrations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!confirm("Are you sure you want to permanently delete this registration? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({ message: 'Failed to delete' }));
+        throw new Error(data.message || "Failed to delete");
+      }
+
+      toast({
+        title: "Success",
+        description: "Registration deleted permanently",
+      });
+      setTimeout(() => navigate("/admin/dashboard"), 1200);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete",
         variant: "destructive",
       });
     }
@@ -968,10 +1072,16 @@ const RegistrationDetail = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {!isEditing ? (
-                  <Button className="w-full" variant="outline" onClick={startEditing}>
-                    <Edit3 size={16} className="mr-2" />
-                    Edit All Details
-                  </Button>
+                  <>
+                    <Button className="w-full" variant="outline" onClick={startEditing}>
+                      <Edit3 size={16} className="mr-2" />
+                      Edit All Details
+                    </Button>
+                    <Button className="w-full" variant="outline" onClick={startEditing}>
+                      <Edit3 size={16} className="mr-2" />
+                      Edit Role
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button
@@ -1006,6 +1116,95 @@ const RegistrationDetail = () => {
                   >
                     {registration.status === "pending" ? "Approve Registration" : "Approve This Application"}
                   </Button>
+                  <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        Reject Registration
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Reject Registration</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Textarea
+                          placeholder="Enter reason for rejection..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          className="min-h-24"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={handleReject}
+                          disabled={isRejecting}
+                        >
+                          {isRejecting ? "Rejecting..." : "Reject"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            )}
+
+            {registration.status === 'approved' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Approval Review</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="destructive" className="w-full">
+                        Reject This Approval
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Reject Approved Registration</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Textarea
+                          placeholder="Enter reason for rejection..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          className="min-h-24"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={handleReject}
+                          disabled={isRejecting}
+                        >
+                          {isRejecting ? "Rejecting..." : "Reject"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            )}
+
+            {isSuperAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Delete Registration</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button variant="destructive" className="w-full" onClick={handleDelete}>
+                    <Trash2 size={16} className="mr-2" />
+                    Delete Permanently
+                  </Button>
+                  <p className="text-xs text-gray-500">Only super admin can do this. This action cannot be undone.</p>
                 </CardContent>
               </Card>
             )}
