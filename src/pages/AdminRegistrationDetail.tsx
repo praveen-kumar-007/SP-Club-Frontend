@@ -146,6 +146,11 @@ const RegistrationDetail = () => {
   const [isDeletingId, setIsDeletingId] = useState(false);
   const [customIdNumber, setCustomIdNumber] = useState("");
   const [showIdDialog, setShowIdDialog] = useState(false);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [isSavingRoleEdit, setIsSavingRoleEdit] = useState(false);
+  const [roleSelection, setRoleSelection] = useState("");
+  const [customRoleInput, setCustomRoleInput] = useState("");
+  const [editableIdNumber, setEditableIdNumber] = useState("");
   const [adminUser, setAdminUser] = useState<{ username?: string; role?: string } | null>(null);
   // Role selection for ID card
   const [idCardRole, setIdCardRole] = useState("");
@@ -154,11 +159,15 @@ const RegistrationDetail = () => {
   const defaultRoles = [
     "Player",
     "Coach",
+    "Team Manager",
     "Fan",
     "Manager",
     "Referee",
     "Captain",
-    "Member"
+    "Member",
+    "Physio",
+    "Analyst",
+    "Other"
   ];
 
   const token = localStorage.getItem("adminToken");
@@ -411,6 +420,81 @@ const RegistrationDetail = () => {
     setAadharFrontPreview(registration.aadharFront || "");
     setAadharBackPreview(registration.aadharBack || "");
     setIsEditing(false);
+  };
+
+  const openRoleDialog = () => {
+    const currentRole = (registration?.role || "").trim();
+    const matchingRole = defaultRoles.find(
+      (role) => role.toLowerCase() === currentRole.toLowerCase(),
+    );
+
+    if (matchingRole && matchingRole !== "Other") {
+      setRoleSelection(matchingRole);
+      setCustomRoleInput("");
+    } else {
+      setRoleSelection("Other");
+      setCustomRoleInput(currentRole);
+    }
+
+    setEditableIdNumber(registration?.idCardNumber || "");
+    setShowRoleDialog(true);
+  };
+
+  const handleSaveRoleAndId = async () => {
+    if (!token || !id) return;
+
+    const finalRole =
+      roleSelection === "Other" ? customRoleInput.trim() : roleSelection.trim();
+
+    if (!finalRole) {
+      toast({
+        title: "Validation error",
+        description: "Please select or enter a valid role.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSavingRoleEdit(true);
+    try {
+      const payload = new FormData();
+      payload.append("role", finalRole);
+
+      if (registration?.status === "approved") {
+        payload.append("idCardRole", finalRole);
+        payload.append("idCardNumber", editableIdNumber.trim());
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/admin/registrations/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: payload,
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update role details");
+      }
+
+      toast({
+        title: "Success",
+        description: "Role details updated successfully.",
+      });
+
+      setShowRoleDialog(false);
+      await fetchRegistration();
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description:
+          error instanceof Error ? error.message : "Failed to update role details",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingRoleEdit(false);
+    }
   };
 
   const saveEdit = async () => {
@@ -1077,9 +1161,9 @@ const RegistrationDetail = () => {
                       <Edit3 size={16} className="mr-2" />
                       Edit All Details
                     </Button>
-                    <Button className="w-full" variant="outline" onClick={startEditing}>
+                    <Button className="w-full" variant="outline" onClick={openRoleDialog}>
                       <Edit3 size={16} className="mr-2" />
-                      Edit Role
+                      Edit Role & ID
                     </Button>
                   </>
                 ) : (
@@ -1103,6 +1187,64 @@ const RegistrationDetail = () => {
                 </p>
               </CardContent>
             </Card>
+
+            <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Role & ID Details</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Player Role</label>
+                    <select
+                      className="w-full border rounded-md px-3 py-2"
+                      value={roleSelection}
+                      onChange={(e) => setRoleSelection(e.target.value)}
+                    >
+                      <option value="">Select role</option>
+                      {defaultRoles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {roleSelection === "Other" && (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Custom Role</label>
+                      <Input
+                        value={customRoleInput}
+                        onChange={(e) => setCustomRoleInput(e.target.value)}
+                        placeholder="Enter custom role"
+                      />
+                    </div>
+                  )}
+
+                  {registration?.status === "approved" && (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">ID Card Number</label>
+                      <Input
+                        value={editableIdNumber}
+                        onChange={(e) => setEditableIdNumber(e.target.value)}
+                        placeholder="e.g., SPKG-1234"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        You can update ID card number for approved registrations.
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowRoleDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveRoleAndId} disabled={isSavingRoleEdit}>
+                    {isSavingRoleEdit ? "Saving..." : "Save"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             {registration.status !== "approved" && (
               <Card>
