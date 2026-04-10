@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -906,7 +906,7 @@ const AdminDashboard = () => {
                                     className="bg-blue-600 hover:bg-blue-700 text-white"
                                     onClick={() => navigate(`/admin/registration/${reg._id}`)}
                                   >
-                                    View Details
+                                    Edit Registration
                                   </Button>
                                   {reg.status === 'pending' && (
                                     <Button
@@ -915,15 +915,6 @@ const AdminDashboard = () => {
                                       onClick={() => handleApprove(reg._id)}
                                     >
                                       Approve
-                                    </Button>
-                                  )}
-                                  {isSuperAdmin && (reg.status === 'approved' || reg.status === 'rejected') && (
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() => handleDelete(reg._id, reg.name)}
-                                    >
-                                      <Trash2 size={16} />
                                     </Button>
                                   )}
                                 </div>
