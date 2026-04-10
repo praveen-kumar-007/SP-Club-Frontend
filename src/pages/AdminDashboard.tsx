@@ -484,7 +484,7 @@ const AdminDashboard = () => {
       </AlertDialog>
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {/* Top row: Title and Logout */}
           <div className="flex items-start justify-between gap-3 mb-3 md:mb-0">
