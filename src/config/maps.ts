@@ -4,7 +4,24 @@ export const SP_KABADDI_LOCATION = {
     "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
   query:
     "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
+  latitude: 23.7811364,
+  longitude: 86.4234188,
 };
+
+const parseAttendanceRadiusMeters = (value?: string): number => {
+  const fallback = 250;
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  return parsed;
+};
+
+export const PLAYER_ATTENDANCE_RADIUS_METERS = parseAttendanceRadiusMeters(
+  import.meta.env.VITE_PLAYER_ATTENDANCE_RADIUS_METERS,
+);
 
 export const GOOGLE_MAPS_API_KEY =
   import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";

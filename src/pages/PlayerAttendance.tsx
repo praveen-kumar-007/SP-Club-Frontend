@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
+import { PLAYER_ATTENDANCE_RADIUS_METERS, SP_KABADDI_LOCATION } from "@/config/maps";
 import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCalendar";
 import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager";
 import { ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, MapPin } from "lucide-react";
@@ -25,6 +26,36 @@ const hasValidCoordinates = (latitude: number, longitude: number) => {
     const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
     const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
     return validRange && notZeroPair;
+};
+
+const toRadians = (value: number) => (value * Math.PI) / 180;
+
+const calculateDistanceMeters = (
+    sourceLatitude: number,
+    sourceLongitude: number,
+    destinationLatitude: number,
+    destinationLongitude: number
+) => {
+    const earthRadiusMeters = 6371000;
+    const dLatitude = toRadians(destinationLatitude - sourceLatitude);
+    const dLongitude = toRadians(destinationLongitude - sourceLongitude);
+
+    const latitude1 = toRadians(sourceLatitude);
+    const latitude2 = toRadians(destinationLatitude);
+
+    const haversine =
+        Math.sin(dLatitude / 2) * Math.sin(dLatitude / 2) +
+        Math.sin(dLongitude / 2) * Math.sin(dLongitude / 2) * Math.cos(latitude1) * Math.cos(latitude2);
+
+    const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    return earthRadiusMeters * arc;
+};
+
+const formatDistanceAway = (distanceMeters: number) => {
+    const safeDistance = Math.max(0, Math.round(distanceMeters));
+    const kilometers = Math.floor(safeDistance / 1000);
+    const meters = safeDistance % 1000;
+    return `${kilometers} km and ${meters} meter`;
 };
 
 interface ClientContext {
@@ -222,6 +253,19 @@ const PlayerAttendance = () => {
                 );
             }
 
+            const distanceFromClubMeters = calculateDistanceMeters(
+                position.coords.latitude,
+                position.coords.longitude,
+                SP_KABADDI_LOCATION.latitude,
+                SP_KABADDI_LOCATION.longitude
+            );
+
+            if (distanceFromClubMeters > PLAYER_ATTENDANCE_RADIUS_METERS) {
+                throw new Error(
+                    `You are ${formatDistanceAway(distanceFromClubMeters)} away from the club location. Attendance can be marked only within ${PLAYER_ATTENDANCE_RADIUS_METERS} meter radius.`
+                );
+            }
+
             const deviceId = getOrCreatePlayerDeviceId();
             const deviceName = getDeviceName();
 
@@ -379,7 +423,7 @@ const PlayerAttendance = () => {
                         </div>
 
                         <p className="text-xs text-slate-500">
-                            Location access is mandatory. If permission is denied, attendance cannot be marked.
+                            Location access is mandatory. Attendance can be marked only within 250 meter radius of club ground.
                         </p>
 
                         <p className="text-sm font-medium text-blue-800">Today's Marking Date: {todayMarkDateLabel}</p>

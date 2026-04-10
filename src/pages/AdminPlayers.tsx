@@ -109,10 +109,10 @@ const AdminPlayers = () => {
         current.map((player) =>
           player._id === playerId
             ? {
-                ...player,
-                kitSize: editingKitSize || undefined,
-                jerseyNumber: editingJerseyNumber ? Number(editingJerseyNumber) : undefined,
-              }
+              ...player,
+              kitSize: editingKitSize || undefined,
+              jerseyNumber: editingJerseyNumber ? Number(editingJerseyNumber) : undefined,
+            }
             : player,
         ),
       );
