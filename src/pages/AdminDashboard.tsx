@@ -638,6 +638,13 @@ const AdminDashboard = () => {
               </span>
             </Button>
             <Button
+              onClick={() => navigate("/admin/players")}
+              className="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 h-auto"
+            >
+              <Search size={18} className="mr-2" />
+              <span>Player Directory</span>
+            </Button>
+            <Button
               onClick={() => navigate("/admin/mail")}
               className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 h-auto"
             >

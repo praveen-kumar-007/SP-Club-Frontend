@@ -52,7 +52,7 @@ const AdminPlayers = () => {
       setLoading(true);
       setError(null);
       try {
-        const url = `${API_ENDPOINTS.ADMIN_PLAYERS}?search=${encodeURIComponent(search)}`;
+        const url = `${API_ENDPOINTS.ADMIN_PLAYERS}?search=${encodeURIComponent(search)}&all=true`;
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
