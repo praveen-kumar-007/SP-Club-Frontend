@@ -80,6 +80,23 @@ const hasValidCoordinates = (latitude: number, longitude: number) => {
     return validRange && notZeroPair;
 };
 
+const normalizeSearchText = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
+
+const matchesRelatedSearch = (fields: Array<string | undefined>, query: string) => {
+    const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) return true;
+
+    const queryTokens = normalizedQuery.split(" ").filter(Boolean);
+    const normalizedFields = fields.map((field) => normalizeSearchText(field || ""));
+    const joinedFields = normalizedFields.join(" ");
+    const compactFields = joinedFields.replace(/[^a-z0-9]/g, "");
+
+    return queryTokens.every((token) => {
+        const compactToken = token.replace(/[^a-z0-9]/g, "");
+        return joinedFields.includes(token) || (compactToken ? compactFields.includes(compactToken) : false);
+    });
+};
+
 const AdminPlayerAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -101,12 +118,12 @@ const AdminPlayerAttendance = () => {
         [attendance]
     );
 
-    const loadPlayers = async (query = "") => {
+    const loadPlayers = async () => {
         if (!token) return;
         setLoadingPlayers(true);
 
         try {
-            const response = await fetch(`${API_ENDPOINTS.ADMIN_PLAYERS}?search=${encodeURIComponent(query)}`, {
+            const response = await fetch(API_ENDPOINTS.ADMIN_PLAYERS, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -134,6 +151,15 @@ const AdminPlayerAttendance = () => {
             setLoadingPlayers(false);
         }
     };
+
+    const filteredPlayers = useMemo(() => {
+        return players.filter((player) =>
+            matchesRelatedSearch(
+                [player.name, player.email, player.phone, player.idCardNumber],
+                search
+            )
+        );
+    }, [players, search]);
 
     const saveByAdmin = async () => {
         if (!token || !selectedPlayer) return;
@@ -230,13 +256,8 @@ const AdminPlayerAttendance = () => {
 
     useEffect(() => {
         if (!token) return;
-
-        const timer = setTimeout(() => {
-            loadPlayers(search);
-        }, 350);
-
-        return () => clearTimeout(timer);
-    }, [token, search]);
+        loadPlayers();
+    }, [token]);
 
     useEffect(() => {
         if (!selectedPlayer) {
@@ -282,11 +303,11 @@ const AdminPlayerAttendance = () => {
                                 />
                             </div>
                             <p className="text-xs text-slate-500">
-                                {loadingPlayers ? "Searching players..." : `${players.length} matching player(s)`}
+                                {loadingPlayers ? "Searching players..." : `${filteredPlayers.length} matching player(s)`}
                             </p>
                         </CardHeader>
                         <CardContent className="space-y-2 max-h-[65vh] overflow-auto">
-                            {players.map((player) => (
+                            {filteredPlayers.map((player) => (
                                 <button
                                     key={player._id}
                                     type="button"
@@ -301,7 +322,7 @@ const AdminPlayerAttendance = () => {
                                     <p className="text-xs text-slate-500 mt-1">Phone: {player.phone || "N/A"}</p>
                                 </button>
                             ))}
-                            {!players.length && <p className="text-sm text-slate-500">No player found.</p>}
+                            {!filteredPlayers.length && <p className="text-sm text-slate-500">No player found.</p>}
                         </CardContent>
                     </Card>
 

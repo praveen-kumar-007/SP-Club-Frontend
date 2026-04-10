@@ -56,6 +56,23 @@ const getToday = () => {
     return `${year}-${month}-${day}`;
 };
 
+const normalizeSearchText = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
+
+const matchesRelatedSearch = (fields: Array<string | undefined>, query: string) => {
+    const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) return true;
+
+    const queryTokens = normalizedQuery.split(" ").filter(Boolean);
+    const normalizedFields = fields.map((field) => normalizeSearchText(field || ""));
+    const joinedFields = normalizedFields.join(" ");
+    const compactFields = joinedFields.replace(/[^a-z0-9]/g, "");
+
+    return queryTokens.every((token) => {
+        const compactToken = token.replace(/[^a-z0-9]/g, "");
+        return joinedFields.includes(token) || (compactToken ? compactFields.includes(compactToken) : false);
+    });
+};
+
 const AdminDateAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -183,8 +200,6 @@ const AdminDateAttendance = () => {
     }, [token]);
 
     const filteredPlayers = useMemo(() => {
-        const term = search.trim().toLowerCase();
-
         const withStatus = players.map((player) => {
             const record = (player.attendance || []).find((entry) => entry.date === date);
             const status = record?.status || "not_marked";
@@ -194,18 +209,10 @@ const AdminDateAttendance = () => {
             };
         });
 
-        if (!term) return withStatus;
-
         return withStatus.filter((player) => {
-            const name = player.name?.toLowerCase() || "";
-            const email = player.email?.toLowerCase() || "";
-            const phone = player.phone?.toLowerCase() || "";
-            const idCard = player.idCardNumber?.toLowerCase() || "";
-            return (
-                name.includes(term) ||
-                email.includes(term) ||
-                phone.includes(term) ||
-                idCard.includes(term)
+            return matchesRelatedSearch(
+                [player.name, player.email, player.phone, player.idCardNumber],
+                search
             );
         });
     }, [players, search, date]);
