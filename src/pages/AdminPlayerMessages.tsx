@@ -92,6 +92,8 @@ const AdminPlayerMessages = () => {
                 return;
             }
 
+            localStorage.setItem("adminSeenPlayerMessagesAt", String(Date.now()));
+
             try {
                 await Promise.all([fetchPlayers(), fetchMessages()]);
             } catch (error) {

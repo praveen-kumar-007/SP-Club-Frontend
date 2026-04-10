@@ -123,6 +123,9 @@ const AdminInquiries = () => {
       navigate("/admin/login");
       return;
     }
+
+    localStorage.setItem("adminSeenInquiriesAt", String(Date.now()));
+
     const admin = localStorage.getItem("adminUser");
     if (admin) {
       setAdminUser(JSON.parse(admin));
@@ -365,22 +368,25 @@ const AdminInquiries = () => {
               {/* Contact Forms Tab */}
               <TabsContent value="contacts" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                     <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
+                      className="w-full sm:w-auto"
                     >
                       All
                     </Button>
                     <Button
                       variant={currentStatus === 'new' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('new')}
+                      className="w-full sm:w-auto"
                     >
                       New
                     </Button>
                     <Button
                       variant={currentStatus === 'completed' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('completed')}
+                      className="w-full sm:w-auto"
                     >
                       Completed
                     </Button>
@@ -431,7 +437,7 @@ const AdminInquiries = () => {
                               {getStatusBadge(contact.status)}
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex flex-wrap gap-2 justify-end">
                                 {contact.status === 'new' && (
                                   <Button
                                     size="sm"
@@ -461,22 +467,25 @@ const AdminInquiries = () => {
               {/* Newsletter Tab */}
               <TabsContent value="newsletters" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                     <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
+                      className="w-full sm:w-auto"
                     >
                       All
                     </Button>
                     <Button
                       variant={currentStatus === 'new' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('new')}
+                      className="w-full sm:w-auto"
                     >
                       New
                     </Button>
                     <Button
                       variant={currentStatus === 'completed' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('completed')}
+                      className="w-full sm:w-auto"
                     >
                       Completed
                     </Button>
@@ -518,7 +527,7 @@ const AdminInquiries = () => {
                               </p>
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex flex-wrap gap-2 justify-end">
                                 {newsletter.status === 'new' && (
                                   <Button
                                     size="sm"
@@ -548,22 +557,25 @@ const AdminInquiries = () => {
               {/* Player Messages Tab */}
               <TabsContent value="playerMessages" className="mt-4">
                 <div className="space-y-4 mb-4">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                     <Button
                       variant={currentStatus === 'all' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('all')}
+                      className="w-full sm:w-auto"
                     >
                       All
                     </Button>
                     <Button
                       variant={currentStatus === 'new' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('new')}
+                      className="w-full sm:w-auto"
                     >
                       New
                     </Button>
                     <Button
                       variant={currentStatus === 'completed' ? 'default' : 'outline'}
                       onClick={() => setCurrentStatus('completed')}
+                      className="w-full sm:w-auto"
                     >
                       Completed
                     </Button>
@@ -610,7 +622,7 @@ const AdminInquiries = () => {
                             </TableCell>
                             <TableCell>{getStatusBadge(item.status)}</TableCell>
                             <TableCell className="text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex flex-wrap gap-2 justify-end">
                                 {item.status === 'new' && (
                                   <Button
                                     size="sm"

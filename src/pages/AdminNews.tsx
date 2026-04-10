@@ -8,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Clock, LogOut, Search, Eye, Trash2, Edit, Plus, 
-  ChevronLeft, Upload, X, Globe2, Image as ImageIcon 
+import {
+  Clock, LogOut, Search, Eye, Trash2, Edit, Plus,
+  ChevronLeft, Upload, X, Globe2, Image as ImageIcon
 } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
@@ -61,7 +61,7 @@ const AdminNews = () => {
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<number | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
   const [countdown, setCountdown] = useState(5);
-  
+
   // Create/Edit Dialog State
   const [showDialog, setShowDialog] = useState(false);
   const [editingArticle, setEditingArticle] = useState<NewsArticle | null>(null);
@@ -119,7 +119,7 @@ const AdminNews = () => {
       const timeElapsedSinceStart = Date.now() - parseInt(sessionStart);
       const remainingMs = SESSION_TIMEOUT - timeElapsedSinceStart;
       const remainingMinutes = Math.max(0, Math.floor(remainingMs / 60000));
-      
+
       setSessionTimeRemaining(remainingMinutes);
     };
 
@@ -195,13 +195,13 @@ const AdminNews = () => {
   const removeImage = (index: number) => {
     const newImages = [...selectedImages];
     const newPreviews = [...previewImages];
-    
+
     // Revoke the URL to free memory
     URL.revokeObjectURL(newPreviews[index]);
-    
+
     newImages.splice(index, 1);
     newPreviews.splice(index, 1);
-    
+
     setSelectedImages(newImages);
     setPreviewImages(newPreviews);
   };
@@ -236,7 +236,7 @@ const AdminNews = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.content) {
       toast({
         title: "Missing Fields",
@@ -268,10 +268,10 @@ const AdminNews = () => {
         formDataToSend.append('images', image);
       });
 
-      const url = editingArticle 
+      const url = editingArticle
         ? `${API_ENDPOINTS.NEWS}/${editingArticle._id}`
         : API_ENDPOINTS.NEWS;
-      
+
       const method = editingArticle ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -418,7 +418,7 @@ const AdminNews = () => {
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -431,7 +431,7 @@ const AdminNews = () => {
           </div>
           <Button
             onClick={openCreateDialog}
-            className="bg-red-600 hover:bg-red-700"
+            className="w-full bg-red-600 hover:bg-red-700 md:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" />
             Create News Article
@@ -439,7 +439,7 @@ const AdminNews = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm text-gray-400">Total Articles</CardTitle>
@@ -507,10 +507,9 @@ const AdminNews = () => {
                       +{article.images.length - 1}
                     </Badge>
                   )}
-                  <Badge 
-                    className={`absolute bottom-2 left-2 ${
-                      article.published ? 'bg-green-600' : 'bg-yellow-600'
-                    } border-0`}
+                  <Badge
+                    className={`absolute bottom-2 left-2 ${article.published ? 'bg-green-600' : 'bg-yellow-600'
+                      } border-0`}
                   >
                     {article.published ? 'Published' : 'Draft'}
                   </Badge>
@@ -592,7 +591,7 @@ const AdminNews = () => {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="bg-gray-700 border-gray-600"
                 placeholder="Enter news title"
                 required
@@ -604,7 +603,7 @@ const AdminNews = () => {
               <Textarea
                 id="content"
                 value={formData.content}
-                onChange={(e) => setFormData({...formData, content: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 className="bg-gray-700 border-gray-600 min-h-[200px]"
                 placeholder="Enter news content"
                 required
@@ -616,7 +615,7 @@ const AdminNews = () => {
               <Input
                 id="author"
                 value={formData.author}
-                onChange={(e) => setFormData({...formData, author: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                 className="bg-gray-700 border-gray-600"
                 placeholder="Author name"
               />
@@ -627,7 +626,7 @@ const AdminNews = () => {
                 type="checkbox"
                 id="published"
                 checked={formData.published}
-                onChange={(e) => setFormData({...formData, published: e.target.checked})}
+                onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
                 className="h-4 w-4"
               />
               <Label htmlFor="published" className="cursor-pointer">
@@ -655,7 +654,7 @@ const AdminNews = () => {
 
               {/* Image Previews */}
               {previewImages.length > 0 && (
-                <div className="grid grid-cols-3 gap-4 mt-4">
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
                   {previewImages.map((preview, index) => (
                     <div key={index} className="relative group">
                       <img
@@ -721,7 +720,7 @@ const AdminNews = () => {
                 <img
                   src={viewingArticle.images[currentImageIndex]}
                   alt={`Image ${currentImageIndex + 1}`}
-                  className="w-full h-96 object-cover object-top rounded-lg"
+                  className="h-64 w-full rounded-lg object-cover object-top sm:h-80 md:h-96"
                 />
                 {viewingArticle.images.length > 1 && (
                   <>

@@ -28,8 +28,10 @@ const AdminRegistrationDetail = lazy(() => import("./pages/AdminRegistrationDeta
 const AdminInquiries = lazy(() => import("./pages/AdminInquiries"));
 const AdminNews = lazy(() => import("./pages/AdminNews"));
 const AdminPlayerAttendance = lazy(() => import("./pages/AdminPlayerAttendance"));
+const AdminDateAttendance = lazy(() => import("./pages/AdminDateAttendance.tsx"));
 const AdminPlayerMessages = lazy(() => import("./pages/AdminPlayerMessages"));
 const AdminMailCenter = lazy(() => import("./pages/AdminMailCenter"));
+const AdminLoginHistory = lazy(() => import("./pages/AdminLoginHistory"));
 const PlayerLogin = lazy(() => import("./pages/PlayerLogin"));
 const PlayerDashboard = lazy(() => import("./pages/PlayerDashboard"));
 const PlayerAttendance = lazy(() => import("./pages/PlayerAttendance"));
@@ -74,8 +76,10 @@ const App = () => (
                 <Route path="/sp-auth-x7k9-admin-init-portal-2025" element={<AdminSignup />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/player-attendance" element={<AdminPlayerAttendance />} />
+                <Route path="/admin/date-attendance" element={<AdminDateAttendance />} />
                 <Route path="/admin/messages" element={<AdminPlayerMessages />} />
                 <Route path="/admin/mail" element={<AdminMailCenter />} />
+                <Route path="/admin/login-history" element={<AdminLoginHistory />} />
                 <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
                 <Route path="/admin/inquiries" element={<AdminInquiries />} />
                 <Route path="/admin/news" element={<AdminNews />} />

@@ -45,7 +45,7 @@ const Footer = () => {
 
   const handleNewsletterSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast({
         title: "Error",
@@ -108,14 +108,14 @@ const Footer = () => {
 
   return (
     <footer className="bg-slate-900 text-white">
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-4 py-12 sm:px-6">
         {/* Newsletter Section */}
-        <div className="bg-slate-800 rounded-lg p-8 md:p-12 mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="mb-12 flex flex-col items-start justify-between gap-6 rounded-lg bg-slate-800 p-6 md:flex-row md:items-center md:p-12">
           <div>
-            <h3 className="text-3xl font-bold mb-2">Stay Ahead of the Game</h3>
+            <h3 className="mb-2 text-2xl font-bold sm:text-3xl">Stay Ahead of the Game</h3>
             <p className="text-slate-400">Subscribe to our newsletter for the latest updates, news, and offers from SP Kabaddi Group Dhanbad.</p>
           </div>
-          <div className="flex w-full max-w-md space-x-2">
+          <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row sm:items-center">
             <Input
               type="email"
               placeholder="Enter your email address"
@@ -123,9 +123,9 @@ const Footer = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Button 
-              variant="default" 
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold"
+            <Button
+              variant="default"
+              className="w-full bg-amber-500 font-bold text-slate-900 hover:bg-amber-600 sm:w-auto"
               onClick={handleNewsletterSubmit}
               disabled={isLoading}
             >
@@ -191,11 +191,11 @@ const Footer = () => {
             <ul className="space-y-4 text-slate-300">
               <li className="flex items-center space-x-3">
                 <Phone size={18} className="text-amber-400" />
-                <span>+91 9504904499, +91 8271882034</span>
+                <span className="break-all">+91 9504904499, +91 8271882034</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={18} className="text-amber-400" />
-                <span>spkabaddigroupdhanbad@gmail.com</span>
+                <span className="break-all">spkabaddigroupdhanbad@gmail.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <MapPin size={18} className="text-amber-400" />

@@ -176,6 +176,8 @@ const AdminPlayerAttendance = () => {
             navigate("/admin/login");
             return;
         }
+
+        localStorage.setItem("adminSeenAttendanceAt", String(Date.now()));
     }, [token, navigate]);
 
     useEffect(() => {
@@ -241,8 +243,8 @@ const AdminPlayerAttendance = () => {
                                     key={player._id}
                                     type="button"
                                     className={`w-full text-left rounded-md border p-3 transition ${selectedPlayer?._id === player._id
-                                            ? "border-emerald-500 bg-emerald-50"
-                                            : "border-slate-200 hover:border-slate-300"
+                                        ? "border-emerald-500 bg-emerald-50"
+                                        : "border-slate-200 hover:border-slate-300"
                                         }`}
                                     onClick={() => setSelectedPlayer(player)}
                                 >
@@ -342,38 +344,42 @@ const AdminPlayerAttendance = () => {
 
                         <Card>
                             <CardHeader>
-                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>Attendance Calendar</CardTitle>
                                         <CardDescription>
                                             Present is green and absent is red. Admin can only view this data.
                                         </CardDescription>
                                     </div>
-                                    <input
-                                        type="month"
-                                        value={month}
-                                        onChange={(e) => setMonth(e.target.value)}
-                                        className="rounded-md border border-slate-300 px-3 py-2"
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setMonth((prev) => shiftMonth(prev, -1))}
-                                        >
-                                            <ChevronLeft size={14} className="mr-1" />
-                                            Previous
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setMonth((prev) => shiftMonth(prev, 1))}
-                                        >
-                                            Next
-                                            <ChevronRight size={14} className="ml-1" />
-                                        </Button>
+                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                        <input
+                                            type="month"
+                                            value={month}
+                                            onChange={(e) => setMonth(e.target.value)}
+                                            className="w-full rounded-md border border-slate-300 px-3 py-2 sm:w-auto"
+                                        />
+                                        <div className="grid grid-cols-2 gap-2 sm:flex">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setMonth((prev) => shiftMonth(prev, -1))}
+                                                className="w-full"
+                                            >
+                                                <ChevronLeft size={14} className="mr-1" />
+                                                Previous
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setMonth((prev) => shiftMonth(prev, 1))}
+                                                className="w-full"
+                                            >
+                                                Next
+                                                <ChevronRight size={14} className="ml-1" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -382,7 +388,7 @@ const AdminPlayerAttendance = () => {
                                     <>
                                         <AttendanceCalendar month={month} attendance={attendanceForCalendar} />
 
-                                        <div className="overflow-auto rounded-md border">
+                                        <div className="hidden overflow-auto rounded-md border md:block">
                                             <table className="w-full text-sm">
                                                 <thead className="bg-slate-100">
                                                     <tr>
@@ -422,6 +428,34 @@ const AdminPlayerAttendance = () => {
                                                     )}
                                                 </tbody>
                                             </table>
+                                        </div>
+
+                                        <div className="space-y-3 md:hidden">
+                                            {attendance.map((record) => (
+                                                <div key={`${record.date}-${record.markedAt || "na"}`} className="rounded-md border p-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className="font-semibold text-slate-800">{record.date}</p>
+                                                        <p className="text-sm capitalize text-slate-700">{record.status}</p>
+                                                    </div>
+                                                    <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-slate-600">
+                                                        <p>Lat: {record.location?.latitude?.toFixed(5) ?? "-"}</p>
+                                                        <p>Lng: {record.location?.longitude?.toFixed(5) ?? "-"}</p>
+                                                        <p>Marked By: {record.markedByType || "player"}</p>
+                                                        <p>Device ID: {record.deviceId || "-"}</p>
+                                                        <p>Device Name: {record.deviceName || "-"}</p>
+                                                        <p>
+                                                            Admin ID: {typeof record.markedByAdminId === "string" ? record.markedByAdminId : record.markedByAdminId?._id || "-"}
+                                                        </p>
+                                                        <p>Admin Note: {record.adminNote || "-"}</p>
+                                                        <p>Marked At: {record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {!attendance.length && (
+                                                <p className="rounded-md border p-3 text-sm text-slate-500">
+                                                    No attendance records found for this month.
+                                                </p>
+                                            )}
                                         </div>
                                     </>
                                 ) : (

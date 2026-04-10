@@ -95,23 +95,23 @@ const Header = () => {
           bg-gradient-to-b from-black/60 to-transparent ${hasScrolled ? "bg-slate-900/80 backdrop-blur-xl shadow-2xl" : ""
           }`}
       >
-        <nav className="container mx-auto px-6 py-4">
+        <nav className="container mx-auto px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="group flex items-center space-x-3">
+            <Link to="/" className="group flex min-w-0 items-center space-x-2 sm:space-x-3">
               <div className="relative">
                 <img
                   src="/Logo.png"
                   alt="SP Kabaddi Group Dhanbad Logo"
-                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-500 transition-transform duration-300 group-hover:scale-110"
+                  className="h-10 w-10 rounded-full object-cover border-2 border-slate-500 transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12"
                 />
                 <div className="absolute inset-0 rounded-full transition-all duration-500 opacity-0 group-hover:opacity-100 
                   bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-400/50 to-amber-400/0 scale-150">
                 </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-amber-400 transition-colors duration-300 group-hover:text-amber-300">SP Kabaddi Group Dhanbad</h1>
-                <p className="text-xs text-slate-400">Sports Excellence</p>
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-bold text-amber-400 transition-colors duration-300 group-hover:text-amber-300 sm:text-xl">SP Kabaddi Group Dhanbad</h1>
+                <p className="truncate text-[11px] text-slate-400 sm:text-xs">Sports Excellence</p>
               </div>
             </Link>
 
@@ -170,7 +170,7 @@ const Header = () => {
             {/* Mobile Menu Button */}
             <button
               aria-label="Toggle Menu"
-              className="md:hidden p-2 text-white z-50"
+              className="z-50 p-2 text-white md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -184,12 +184,12 @@ const Header = () => {
         className={`fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-2xl transform transition-opacity duration-500 ease-in-out md:hidden ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
           }`}
       >
-        <div className="flex flex-col items-center justify-center h-full space-y-10">
+        <div className="flex h-full flex-col items-center justify-center space-y-8 px-4">
           {navLinks.map((link, index) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`text-4xl font-bold transition-all duration-300 ${location.pathname === link.path ? "text-amber-400" : "text-white"
+              className={`text-3xl font-bold transition-all duration-300 sm:text-4xl ${location.pathname === link.path ? "text-amber-400" : "text-white"
                 }`}
               style={{
                 opacity: isMenuOpen ? 1 : 0,
@@ -211,7 +211,7 @@ const Header = () => {
             }}
             className="flex flex-col items-center gap-4 mt-6"
           >
-            <Link to="/player/login" onClick={() => setIsMenuOpen(false)} className="w-full">
+            <Link to="/player/login" onClick={() => setIsMenuOpen(false)} className="w-full max-w-xs">
               <Button size="lg" variant="outline" className="w-full border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white font-semibold">
                 Player Login
               </Button>

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -25,6 +25,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+const LAST_SEEN_KEYS = {
+  inquiries: "adminSeenInquiriesAt",
+  playerMessages: "adminSeenPlayerMessagesAt",
+  attendance: "adminSeenAttendanceAt",
+  loginHistory: "adminSeenLoginHistoryAt",
+};
+
+const getDateMs = (value?: string | null) => {
+  if (!value) return 0;
+  const ms = new Date(value).getTime();
+  return Number.isNaN(ms) ? 0 : ms;
+};
+
+const getLocalSeenMs = (key: string) => {
+  const raw = localStorage.getItem(key);
+  const value = Number(raw || 0);
+  return Number.isFinite(value) ? value : 0;
+};
 
 interface Registration {
   _id: string;
@@ -50,6 +69,13 @@ interface Stats {
   pending: number;
   approved: number;
   rejected: number;
+}
+
+interface AdminIndicatorCounts {
+  inquiries: number;
+  playerMessages: number;
+  attendance: number;
+  loginHistory: number;
 }
 
 const AdminDashboard = () => {
@@ -83,6 +109,13 @@ const AdminDashboard = () => {
       navigate("/admin/login");
       return;
     }
+
+    Object.values(LAST_SEEN_KEYS).forEach((key) => {
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, String(Date.now()));
+      }
+    });
+
     const admin = localStorage.getItem("adminUser");
     if (admin) {
       setAdminUser(JSON.parse(admin));
@@ -180,9 +213,83 @@ const AdminDashboard = () => {
     enabled: !!token,
   });
 
+  const { data: indicatorsData } = useQuery({
+    queryKey: ['admin-indicators', token],
+    queryFn: async () => {
+      const readJson = async (url: string) => {
+        const response = await fetch(url, {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          return null;
+        }
+        return response.json().catch(() => null);
+      };
+
+      const [contactsData, newslettersData, playerMessagesData, playersData, loginHistoryData] = await Promise.all([
+        readJson(`${API_BASE_URL}/api/contact/admin`),
+        readJson(`${API_BASE_URL}/api/newsletter/admin`),
+        readJson(`${API_BASE_URL}/api/admin/player-messages`),
+        readJson(`${API_BASE_URL}/api/admin/players`),
+        readJson(`${API_BASE_URL}/api/admin/login-history`),
+      ]);
+
+      const seenInquiriesAt = getLocalSeenMs(LAST_SEEN_KEYS.inquiries);
+      const seenMessagesAt = getLocalSeenMs(LAST_SEEN_KEYS.playerMessages);
+      const seenAttendanceAt = getLocalSeenMs(LAST_SEEN_KEYS.attendance);
+      const seenLoginHistoryAt = getLocalSeenMs(LAST_SEEN_KEYS.loginHistory);
+
+      const contacts = Array.isArray(contactsData?.contacts) ? contactsData.contacts : [];
+      const newsletters = Array.isArray(newslettersData?.newsletters) ? newslettersData.newsletters : [];
+      const messageItems = Array.isArray(playerMessagesData?.items) ? playerMessagesData.items : [];
+      const players = Array.isArray(playersData?.players) ? playersData.players : [];
+      const admins = Array.isArray(loginHistoryData?.admins) ? loginHistoryData.admins : [];
+      const loginPlayers = Array.isArray(loginHistoryData?.players) ? loginHistoryData.players : [];
+
+      const inquiries =
+        contacts.filter((item: any) => item?.status === 'new' && getDateMs(item?.createdAt) > seenInquiriesAt).length +
+        newsletters.filter((item: any) => item?.status === 'new' && getDateMs(item?.subscribedAt || item?.createdAt) > seenInquiriesAt).length;
+
+      const playerMessages = messageItems.filter(
+        (item: any) =>
+          item?.type === 'player_to_admin' &&
+          item?.status === 'new' &&
+          getDateMs(item?.createdAt) > seenMessagesAt
+      ).length;
+
+      const attendance = players.reduce((total: number, player: any) => {
+        const attendanceEntries = Array.isArray(player?.attendance) ? player.attendance : [];
+        const newEntries = attendanceEntries.filter((entry: any) => getDateMs(entry?.markedAt) > seenAttendanceAt).length;
+        return total + newEntries;
+      }, 0);
+
+      const loginHistory = [...admins, ...loginPlayers].reduce((total: number, user: any) => {
+        const logs = Array.isArray(user?.loginHistory) ? user.loginHistory : [];
+        const newLogs = logs.filter((log: any) => getDateMs(log?.loggedInAt) > seenLoginHistoryAt).length;
+        return total + newLogs;
+      }, 0);
+
+      return {
+        inquiries,
+        playerMessages,
+        attendance,
+        loginHistory,
+      } as AdminIndicatorCounts;
+    },
+    enabled: !!token,
+    refetchInterval: 30000,
+    staleTime: 15000,
+  });
+
   const stats = statsData?.stats ?? { total: 0, pending: 0, approved: 0, rejected: 0 };
   const registrations = registrationsData?.registrations ?? [];
   const pagination = registrationsData?.pagination ?? { total: 0, pages: 1 };
+  const indicators: AdminIndicatorCounts = indicatorsData ?? {
+    inquiries: 0,
+    playerMessages: 0,
+    attendance: 0,
+    loginHistory: 0,
+  };
 
   // Memoize refetch functions to avoid unnecessary re-renders
   const refetchData = useCallback(() => {
@@ -326,15 +433,25 @@ const AdminDashboard = () => {
     </Card>
   );
 
+  const CountBadge = ({ count }: { count: number }) => {
+    if (count <= 0) return null;
+
+    return (
+      <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+        {count > 99 ? "99+" : count}
+      </span>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Session Timer Banner */}
       {sessionTimeRemaining !== null && (
         <div className={`sticky top-0 z-50 px-4 py-3 ${sessionTimeRemaining === 0 && sessionSecondsRemaining! <= 30
-            ? 'bg-red-500'
-            : sessionTimeRemaining <= 1
-              ? 'bg-yellow-500'
-              : 'bg-blue-500'
+          ? 'bg-red-500'
+          : sessionTimeRemaining <= 1
+            ? 'bg-yellow-500'
+            : 'bg-blue-500'
           }`}>
           <div className="max-w-7xl mx-auto flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
@@ -393,7 +510,18 @@ const AdminDashboard = () => {
               className="bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-700 font-semibold"
             >
               <UserRoundCheck size={18} className="mr-2" />
-              Player Attendance
+              <span className="flex items-center gap-2">
+                Player Attendance
+                <CountBadge count={indicators.attendance} />
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/date-attendance")}
+              className="bg-teal-50 hover:bg-teal-100 border-teal-300 text-teal-700 font-semibold"
+            >
+              <CalendarDays size={18} className="mr-2" />
+              <span>Date Attendance</span>
             </Button>
             <Button
               variant="outline"
@@ -401,7 +529,10 @@ const AdminDashboard = () => {
               className="bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700 font-semibold"
             >
               <Mail size={18} className="mr-2" />
-              View Inquiries
+              <span className="flex items-center gap-2">
+                View Inquiries
+                <CountBadge count={indicators.inquiries} />
+              </span>
             </Button>
             <Button
               variant="outline"
@@ -409,7 +540,10 @@ const AdminDashboard = () => {
               className="bg-indigo-50 hover:bg-indigo-100 border-indigo-300 text-indigo-700 font-semibold"
             >
               <MessageSquare size={18} className="mr-2" />
-              Player Messages
+              <span className="flex items-center gap-2">
+                Player Messages
+                <CountBadge count={indicators.playerMessages} />
+              </span>
             </Button>
             <Button
               variant="outline"
@@ -418,6 +552,17 @@ const AdminDashboard = () => {
             >
               <Send size={18} className="mr-2" />
               Mail Center
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/login-history")}
+              className="bg-violet-50 hover:bg-violet-100 border-violet-300 text-violet-700 font-semibold"
+            >
+              <History size={18} className="mr-2" />
+              <span className="flex items-center gap-2">
+                Login History
+                <CountBadge count={indicators.loginHistory} />
+              </span>
             </Button>
             <Button
               variant="outline"
@@ -439,21 +584,37 @@ const AdminDashboard = () => {
               onClick={() => navigate("/admin/player-attendance")}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
             >
-              <span>Players</span>
+              <span className="flex items-center gap-2">
+                Players
+                <CountBadge count={indicators.attendance} />
+              </span>
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/date-attendance")}
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 h-auto"
+            >
+              <CalendarDays size={18} className="mr-2" />
+              <span>Date View</span>
             </Button>
             <Button
               onClick={() => navigate("/admin/inquiries")}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 h-auto"
             >
               <Mail size={18} className="mr-2" />
-              <span>Inquiries</span>
+              <span className="flex items-center gap-2">
+                Inquiries
+                <CountBadge count={indicators.inquiries} />
+              </span>
             </Button>
             <Button
               onClick={() => navigate("/admin/messages")}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 h-auto"
             >
               <MessageSquare size={18} className="mr-2" />
-              <span>Messages</span>
+              <span className="flex items-center gap-2">
+                Messages
+                <CountBadge count={indicators.playerMessages} />
+              </span>
             </Button>
             <Button
               onClick={() => navigate("/admin/mail")}
@@ -463,8 +624,18 @@ const AdminDashboard = () => {
               <span>Mail</span>
             </Button>
             <Button
+              onClick={() => navigate("/admin/login-history")}
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 h-auto"
+            >
+              <History size={18} className="mr-2" />
+              <span className="flex items-center gap-2">
+                Logs
+                <CountBadge count={indicators.loginHistory} />
+              </span>
+            </Button>
+            <Button
               onClick={() => navigate("/admin/news")}
-              className="col-span-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 h-auto"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 h-auto"
             >
               <span>📰 News</span>
             </Button>

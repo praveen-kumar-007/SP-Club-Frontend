@@ -45,6 +45,7 @@ export const API_ENDPOINTS = {
   ADMIN_FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/admin/password/forgot/reset`,
   ADMIN_MAIL_SETTINGS: `${API_BASE_URL}/api/admin/mail/settings`,
   ADMIN_MAIL_SEND: `${API_BASE_URL}/api/admin/mail/send`,
+  ADMIN_LOGIN_HISTORY: `${API_BASE_URL}/api/admin/login-history`,
   PLAYER_LOGIN: `${API_BASE_URL}/api/player/login`,
   PLAYER_ME: `${API_BASE_URL}/api/player/me`,
   PLAYER_ME_PHOTO: `${API_BASE_URL}/api/player/me/photo`,
