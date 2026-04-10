@@ -107,19 +107,19 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-slate-900 text-white">
+    <footer className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
       <div className="container mx-auto px-4 py-12 sm:px-6">
         {/* Newsletter Section */}
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 rounded-lg bg-slate-800 p-6 md:flex-row md:items-center md:p-12">
+        <div className="mb-12 flex flex-col items-start justify-between gap-6 rounded-3xl border border-amber-500/20 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl md:flex-row md:items-center md:p-12">
           <div>
-            <h3 className="mb-2 text-2xl font-bold sm:text-3xl">Stay Ahead of the Game</h3>
-            <p className="text-slate-400">Subscribe to our newsletter for the latest updates, news, and offers from SP Kabaddi Group Dhanbad.</p>
+            <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">Stay Ahead of the Game</h3>
+            <p className="max-w-xl text-slate-300">Subscribe to our newsletter for the latest updates, news, and offers from SP Kabaddi Group Dhanbad.</p>
           </div>
-          <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex w-full max-w-lg flex-col gap-3 rounded-2xl bg-slate-950/90 p-4 shadow-inner shadow-slate-900/40 sm:flex-row sm:items-center">
             <Input
               type="email"
               placeholder="Enter your email address"
-              className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 flex-grow"
+              className="bg-slate-800 border-slate-700 text-white placeholder-slate-400 flex-grow"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -134,88 +134,87 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-12">
           {/* Club Info */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-1 cursor-pointer"
-                role="button"
-                aria-label="SP Kabaddi Group Dhanbad logo (click 7 times for admin)"
-                title="SP Kabaddi Group Dhanbad"
-                onClick={handleLogoClick}
-              >
+          <div className="xl:col-span-4 rounded-3xl border border-amber-400/10 bg-slate-900/80 p-8 shadow-2xl shadow-amber-500/5">
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <img
                   src="/Logo.png"
                   alt="SP Kabaddi Group Dhanbad Logo"
-                  className="w-full h-full rounded-full object-cover select-none"
+                  className="h-16 w-16 rounded-full border-2 border-amber-300/30 object-cover shadow-lg transition-transform duration-300 hover:scale-105 sm:h-20 sm:w-20"
                   draggable={false}
                 />
+                <div className="min-w-0">
+                  <h3 className="text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">SP Kabaddi Group Dhanbad</h3>
+                  <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Team spirit. Pride. Passion.</p>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-amber-400">SP Kabaddi Group Dhanbad</h3>
-            </div>
-            <p className="text-slate-400">
-              Building champions, fostering community, and celebrating the spirit of sports in India.
-            </p>
-            <div className="flex space-x-4 pt-2">
-              <a href="https://www.facebook.com/SpKGDH" className="text-slate-400 hover:text-amber-400 transition-colors duration-300 transform hover:scale-110">
-                <Facebook size={24} />
-              </a>
-              <a href="https://www.instagram.com/spkabaddigroup/" className="text-slate-400 hover:text-amber-400 transition-colors duration-300 transform hover:scale-110">
-                <Instagram size={24} />
-              </a>
-              <a href="https://x.com/SPClub_Dhanbad" className="text-slate-400 hover:text-amber-400 transition-colors duration-300 transform hover:scale-110">
-                <Twitter size={24} />
-              </a>
-              <a href="https://www.youtube.com/@SP_CLUB_Dhanbad" className="text-slate-400 hover:text-amber-400 transition-colors duration-300 transform hover:scale-110">
-                <Youtube size={24} />
-              </a>
+
+              <p className="text-slate-300 leading-7">
+                Building champions, fostering community, and celebrating the spirit of sports in India.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 text-slate-300">
+                <a href="https://www.facebook.com/SpKGDH" className="rounded-full border border-slate-700/70 p-2 text-slate-300 transition-all duration-300 hover:border-amber-400 hover:text-amber-300 hover:shadow-[0_0_10px_rgba(251,191,36,0.25)]">
+                  <Facebook size={20} />
+                </a>
+                <a href="https://www.instagram.com/spkabaddigroup/" className="rounded-full border border-slate-700/70 p-2 text-slate-300 transition-all duration-300 hover:border-amber-400 hover:text-amber-300 hover:shadow-[0_0_10px_rgba(251,191,36,0.25)]">
+                  <Instagram size={20} />
+                </a>
+                <a href="https://x.com/SPClub_Dhanbad" className="rounded-full border border-slate-700/70 p-2 text-slate-300 transition-all duration-300 hover:border-amber-400 hover:text-amber-300 hover:shadow-[0_0_10px_rgba(251,191,36,0.25)]">
+                  <Twitter size={20} />
+                </a>
+                <a href="https://www.youtube.com/@SP_CLUB_Dhanbad" className="rounded-full border border-slate-700/70 p-2 text-slate-300 transition-all duration-300 hover:border-amber-400 hover:text-amber-300 hover:shadow-[0_0_10px_rgba(251,191,36,0.25)]">
+                  <Youtube size={20} />
+                </a>
+              </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Quick Links</h4>
-            <ul className="space-y-3">
-              <li><a href="/about" className="hover:text-amber-400 transition-colors duration-300">About Us</a></li>
-              <li><a href="/gallery" className="hover:text-amber-400 transition-colors duration-300">Gallery</a></li>
-              <li><a href="/news" className="hover:text-amber-400 transition-colors duration-300">News & Updates</a></li>
-              <li><a href="/register" className="hover:text-amber-400 transition-colors duration-300">Membership</a></li>
-              <li><a href="/contact" className="hover:text-amber-400 transition-colors duration-300">Contact Us</a></li>
+            <ul className="space-y-3 text-slate-200">
+              <li><a href="/about" className="hover:text-amber-300 transition-colors duration-300">About Us</a></li>
+              <li><a href="/gallery" className="hover:text-amber-300 transition-colors duration-300">Gallery</a></li>
+              <li><a href="/news" className="hover:text-amber-300 transition-colors duration-300">News & Updates</a></li>
+              <li><a href="/register" className="hover:text-amber-300 transition-colors duration-300">Membership</a></li>
+              <li><a href="/contact" className="hover:text-amber-300 transition-colors duration-300">Contact Us</a></li>
             </ul>
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Contact</h4>
             <ul className="space-y-4 text-slate-300">
-              <li className="flex items-center space-x-3">
-                <Phone size={18} className="text-amber-400" />
-                <span className="break-all">+91 9504904499, +91 8271882034</span>
+              <li className="flex items-start gap-3">
+                <Phone size={18} className="mt-1 text-amber-400" />
+                <span className="break-words">+91 9504904499, +91 8271882034</span>
               </li>
-              <li className="flex items-center space-x-3">
-                <Mail size={18} className="text-amber-400" />
-                <span className="break-all">spkabaddigroupdhanbad@gmail.com</span>
+              <li className="flex items-start gap-3">
+                <Mail size={18} className="mt-1 text-amber-400" />
+                <span className="break-words">spkabaddigroupdhanbad@gmail.com</span>
               </li>
-              <li className="flex items-center space-x-3">
-                <MapPin size={18} className="text-amber-400" />
+              <li className="flex items-start gap-3">
+                <MapPin size={18} className="mt-1 text-amber-400" />
                 <span>Dhanbad, Jharkhand, India</span>
               </li>
             </ul>
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Legal</h4>
-            <ul className="space-y-3">
-              <li><a href="/terms-conditions" className="hover:text-amber-400 transition-colors duration-300">Terms & Conditions</a></li>
-              <li><a href="/privacy-policy" className="hover:text-amber-400 transition-colors duration-300">Privacy Policy</a></li>
-              <li><a href="/kabaddi-rules" className="hover:text-amber-400 transition-colors duration-300">Kabaddi Rules</a></li>
+            <ul className="space-y-3 text-slate-200">
+              <li><a href="/terms-conditions" className="hover:text-amber-300 transition-colors duration-300">Terms & Conditions</a></li>
+              <li><a href="/privacy-policy" className="hover:text-amber-300 transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="/kabaddi-rules" className="hover:text-amber-300 transition-colors duration-300">Kabaddi Rules</a></li>
             </ul>
           </div>
 
           {/* Map Card */}
-          <div className="md:col-span-2 lg:col-span-1">
+          <div className="md:col-span-2 xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Find Us</h4>
             <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
               <div className="aspect-video">
@@ -243,10 +242,11 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-700 mt-10 pt-8 text-center">
-          <p className="text-slate-500">
+        <div className="border-t border-slate-700/50 mt-10 pt-8 text-center">
+          <p className="text-slate-400">
             © {new Date().getFullYear()} SP Kabaddi Group Dhanbad. All rights reserved. Built with passion for sports.
           </p>
+          <p className="mt-2 text-sm text-slate-500">Experience stronger branding with bold visuals and polished footer layout.</p>
         </div>
       </div>
     </footer>

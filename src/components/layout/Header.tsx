@@ -103,15 +103,15 @@ const Header = () => {
                 <img
                   src="/Logo.png"
                   alt="SP Kabaddi Group Dhanbad Logo"
-                  className="h-10 w-10 rounded-full object-cover border-2 border-slate-500 transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12"
+                  className="h-12 w-12 rounded-full object-cover border-2 border-amber-400/40 shadow-lg transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14"
                 />
                 <div className="absolute inset-0 rounded-full transition-all duration-500 opacity-0 group-hover:opacity-100 
-                  bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-400/50 to-amber-400/0 scale-150">
+                  bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-400/40 to-amber-400/0 scale-150">
                 </div>
               </div>
               <div className="min-w-0">
-                <h1 className="truncate text-base font-bold text-amber-400 transition-colors duration-300 group-hover:text-amber-300 sm:text-xl">SP Kabaddi Group Dhanbad</h1>
-                <p className="truncate text-[11px] text-slate-400 sm:text-xs">Sports Excellence</p>
+                <h1 className="truncate text-base font-extrabold text-amber-300 transition-colors duration-300 group-hover:text-amber-200 sm:text-2xl">SP Kabaddi Group Dhanbad</h1>
+                <p className="truncate text-[12px] uppercase tracking-[0.25em] text-slate-300 sm:text-[13px]">Sports Excellence</p>
               </div>
             </Link>
 
