@@ -137,12 +137,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-12">
           {/* Club Info */}
           <div className="xl:col-span-4 rounded-3xl border border-amber-400/10 bg-slate-900/80 p-8 shadow-2xl shadow-amber-500/5">
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-center gap-5 text-center sm:items-start sm:text-left">
+              <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
                 <img
                   src="/Logo.png"
                   alt="SP Kabaddi Group Dhanbad Logo"
-                  className="h-16 w-16 rounded-full border-2 border-amber-300/30 object-cover shadow-lg transition-transform duration-300 hover:scale-105 sm:h-20 sm:w-20"
+                  className="h-20 w-20 rounded-full border-2 border-amber-300/30 object-cover shadow-lg transition-transform duration-300 hover:scale-105 sm:h-24 sm:w-24"
                   draggable={false}
                 />
                 <div className="min-w-0">
@@ -176,12 +176,21 @@ const Footer = () => {
           <div className="xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Quick Links</h4>
             <ul className="space-y-3 text-slate-200">
+              <li><a href="/" className="hover:text-amber-300 transition-colors duration-300">Home</a></li>
               <li><a href="/about" className="hover:text-amber-300 transition-colors duration-300">About Us</a></li>
               <li><a href="/gallery" className="hover:text-amber-300 transition-colors duration-300">Gallery</a></li>
               <li><a href="/news" className="hover:text-amber-300 transition-colors duration-300">News & Updates</a></li>
               <li><a href="/register" className="hover:text-amber-300 transition-colors duration-300">Membership</a></li>
               <li><a href="/contact" className="hover:text-amber-300 transition-colors duration-300">Contact Us</a></li>
+              <li><a href="/terms-conditions" className="hover:text-amber-300 transition-colors duration-300">Terms & Conditions</a></li>
+              <li><a href="/privacy-policy" className="hover:text-amber-300 transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="/kabaddi-rules" className="hover:text-amber-300 transition-colors duration-300">Kabaddi Rules</a></li>
             </ul>
+            <div className="mt-6">
+              <a href="/admin/login" className="inline-flex items-center justify-center rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-all duration-300 hover:bg-amber-400">
+                Admin Login
+              </a>
+            </div>
           </div>
 
           {/* Contact Info */}
