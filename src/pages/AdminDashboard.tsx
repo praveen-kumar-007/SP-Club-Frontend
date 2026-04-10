@@ -94,6 +94,10 @@ const AdminDashboard = () => {
   const [sessionSecondsRemaining, setSessionSecondsRemaining] = useState<number | null>(null);
 
   const token = localStorage.getItem("adminToken");
+  const isSuperAdmin = useMemo(() => {
+    const role = (adminUser?.role || "").toLowerCase().trim();
+    return role === "super admin" || role === "superadmin" || role === "super_admin";
+  }, [adminUser]);
 
   // Debounce search input (wait 500ms after user stops typing)
   useEffect(() => {
@@ -366,6 +370,15 @@ const AdminDashboard = () => {
   };
 
   const handleDelete = async (id: string, name: string) => {
+    if (!isSuperAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only super admins can delete player registrations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!confirm(`Are you sure you want to permanently delete ${name}'s registration? This cannot be undone.`)) {
       return;
     }
@@ -889,7 +902,7 @@ const AdminDashboard = () => {
                                       Approve
                                     </Button>
                                   )}
-                                  {(reg.status === 'approved' || reg.status === 'rejected') && (
+                                  {isSuperAdmin && (reg.status === 'approved' || reg.status === 'rejected') && (
                                     <Button
                                       variant="destructive"
                                       size="sm"

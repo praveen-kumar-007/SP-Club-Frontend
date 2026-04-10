@@ -91,6 +91,7 @@ const RegistrationDetail = () => {
   const [isDeletingId, setIsDeletingId] = useState(false);
   const [customIdNumber, setCustomIdNumber] = useState("");
   const [showIdDialog, setShowIdDialog] = useState(false);
+  const [adminUser, setAdminUser] = useState<{ username?: string; role?: string } | null>(null);
   // Role selection for ID card
   const [idCardRole, setIdCardRole] = useState("");
   const [customRole, setCustomRole] = useState("");
@@ -106,12 +107,22 @@ const RegistrationDetail = () => {
   ];
 
   const token = localStorage.getItem("adminToken");
+  const isSuperAdmin = useMemo(() => {
+    const role = (adminUser?.role || "").toLowerCase().trim();
+    return role === "super admin" || role === "superadmin" || role === "super_admin";
+  }, [adminUser]);
 
   useEffect(() => {
     if (!token) {
       navigate("/admin/login");
       return;
     }
+
+    const admin = localStorage.getItem("adminUser");
+    if (admin) {
+      setAdminUser(JSON.parse(admin));
+    }
+
     fetchRegistration();
 
     // Initialize session timeout manager
@@ -238,6 +249,15 @@ const RegistrationDetail = () => {
   };
 
   const handleDelete = async () => {
+    if (!isSuperAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only super admins can delete player registrations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!confirm(`Are you sure you want to permanently delete this registration? This cannot be undone.`)) {
       return;
     }
@@ -924,42 +944,44 @@ const RegistrationDetail = () => {
               </>
             )}
 
-            {/* Delete Action - Available for all statuses */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {registration.status === 'rejected' ? 'Permanent Deletion' : 'Delete Registration'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {registration.status === 'rejected' && (
-                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Rejected Registration:</strong> This registration is stored in rejected status.
-                      You can permanently delete it from the database if needed.
-                    </p>
-                    {registration.rejectionReason && (
-                      <p className="text-xs text-yellow-700 mt-2">
-                        <strong>Reason:</strong> {registration.rejectionReason}
+            {/* Delete Action - Super admin only */}
+            {isSuperAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {registration.status === 'rejected' ? 'Permanent Deletion' : 'Delete Registration'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {registration.status === 'rejected' && (
+                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Rejected Registration:</strong> This registration is stored in rejected status.
+                        You can permanently delete it from the database if needed.
                       </p>
-                    )}
-                  </div>
-                )}
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleDelete}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {registration.status === 'rejected' ? 'Delete from Database Permanently' : 'Delete Permanently'}
-                </Button>
-                <p className="text-xs text-gray-500 mt-2">
-                  {registration.status === 'rejected'
-                    ? 'This will permanently remove the rejected registration from the database.'
-                    : 'This action cannot be undone.'}
-                </p>
-              </CardContent>
-            </Card>
+                      {registration.rejectionReason && (
+                        <p className="text-xs text-yellow-700 mt-2">
+                          <strong>Reason:</strong> {registration.rejectionReason}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {registration.status === 'rejected' ? 'Delete from Database Permanently' : 'Delete Permanently'}
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {registration.status === 'rejected'
+                      ? 'This will permanently remove the rejected registration from the database.'
+                      : 'This action cannot be undone.'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Engagement */}
             <Card>
