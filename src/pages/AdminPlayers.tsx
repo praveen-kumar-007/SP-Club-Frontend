@@ -236,7 +236,15 @@ const AdminPlayers = () => {
                         </td>
                         <td className="px-4 py-3">{player.idCardNumber || "N/A"}</td>
                         <td className="px-4 py-3">
-                          <Badge className="bg-green-100 text-green-800">{player.status}</Badge>
+                          {player.status === 'approved' ? (
+                            <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                          ) : player.status === 'rejected' ? (
+                            <Badge className="bg-red-100 text-red-800">Rejected</Badge>
+                          ) : player.status === 'pending' ? (
+                            <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+                          ) : (
+                            <Badge className="bg-slate-100 text-slate-700">{player.status}</Badge>
+                          )}
                         </td>
                         <td className="px-4 py-3 space-x-2">
                           {editingId === player._id ? (

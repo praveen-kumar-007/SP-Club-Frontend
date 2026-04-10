@@ -422,13 +422,13 @@ const AdminDashboard = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-500">Approved</Badge>;
+        return <Badge className="bg-green-500 text-white">Approved</Badge>;
       case 'rejected':
-        return <Badge className="bg-red-500">Rejected</Badge>;
+        return <Badge className="bg-red-500 text-white">Rejected</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-yellow-400 text-slate-900">Pending</Badge>;
       default:
-        return <Badge>Unknown</Badge>;
+        return <Badge className="bg-slate-200 text-slate-700">Unknown</Badge>;
     }
   };
 
