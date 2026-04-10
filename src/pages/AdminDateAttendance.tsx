@@ -25,7 +25,7 @@ interface PlayerItem {
     attendance?: AttendanceItem[];
 }
 
-const todayLocalDate = () => {
+const getToday = () => {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -37,7 +37,7 @@ const AdminDateAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
 
-    const [date, setDate] = useState(todayLocalDate());
+    const [date, setDate] = useState(getToday());
     const [search, setSearch] = useState("");
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ const AdminDateAttendance = () => {
 
     const token = localStorage.getItem("adminToken");
 
-    const fetchPlayers = async () => {
+    const loadPlayers = async () => {
         if (!token) return;
 
         setLoading(true);
@@ -73,7 +73,7 @@ const AdminDateAttendance = () => {
         }
     };
 
-    const updateAttendance = async (playerId: string, checked: boolean) => {
+    const saveStatus = async (playerId: string, checked: boolean) => {
         if (!token) return;
 
         setSavingPlayerId(playerId);
@@ -140,7 +140,7 @@ const AdminDateAttendance = () => {
         }
 
         localStorage.setItem("adminSeenAttendanceAt", String(Date.now()));
-        fetchPlayers();
+        loadPlayers();
     }, [token]);
 
     const filteredPlayers = useMemo(() => {
@@ -184,7 +184,7 @@ const AdminDateAttendance = () => {
                         <p className="text-sm text-slate-600">View and update attendance for every player using Present/Absent toggle.</p>
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                        <Button variant="outline" onClick={fetchPlayers} disabled={loading} className="w-full sm:w-auto">
+                        <Button variant="outline" onClick={loadPlayers} disabled={loading} className="w-full sm:w-auto">
                             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCcw className="mr-2 h-4 w-4" />}
                             Refresh
                         </Button>
@@ -255,54 +255,68 @@ const AdminDateAttendance = () => {
                         <CardDescription>Toggle ON = Present, OFF = Absent for selected date.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        {filteredPlayers.map((player) => {
-                            const status = player.selectedDateStatus;
-                            const isPresent = status === "present";
-                            const isSaving = savingPlayerId === player._id;
+                        <div className="overflow-x-auto rounded-md border">
+                            <table className="min-w-[760px] w-full text-sm">
+                                <thead className="bg-slate-100">
+                                    <tr>
+                                        <th className="p-2 text-left">Player</th>
+                                        <th className="p-2 text-left">Email</th>
+                                        <th className="p-2 text-left">ID Card</th>
+                                        <th className="p-2 text-left">Status</th>
+                                        <th className="p-2 text-left">Toggle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredPlayers.map((player) => {
+                                        const status = player.selectedDateStatus;
+                                        const isPresent = status === "present";
+                                        const isSaving = savingPlayerId === player._id;
 
-                            return (
-                                <div key={player._id} className="rounded-md border bg-white p-3">
-                                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                        <div className="min-w-0">
-                                            <p className="truncate font-semibold text-slate-900">{player.name}</p>
-                                            <p className="truncate text-xs text-slate-600">{player.email}</p>
-                                            <p className="text-xs text-slate-500">{player.idCardNumber || "No ID"}</p>
-                                        </div>
+                                        return (
+                                            <tr key={player._id} className="border-t bg-white align-middle">
+                                                <td className="p-2 font-semibold text-slate-900">{player.name}</td>
+                                                <td className="p-2 text-slate-700">{player.email}</td>
+                                                <td className="p-2 text-slate-600">{player.idCardNumber || "No ID"}</td>
+                                                <td className="p-2">
+                                                    <Badge
+                                                        className={
+                                                            status === "present"
+                                                                ? "bg-emerald-600"
+                                                                : status === "absent"
+                                                                    ? "bg-rose-600"
+                                                                    : "bg-amber-600"
+                                                        }
+                                                    >
+                                                        {status === "present" ? "Present" : status === "absent" ? "Absent" : "Not Marked"}
+                                                    </Badge>
+                                                </td>
+                                                <td className="p-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-600">Absent</span>
+                                                        <Switch
+                                                            checked={isPresent}
+                                                            onCheckedChange={(checked) => saveStatus(player._id, checked)}
+                                                            disabled={isSaving}
+                                                            aria-label={`Toggle attendance for ${player.name}`}
+                                                        />
+                                                        <span className="text-xs text-slate-600">Present</span>
+                                                        {isSaving && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
 
-                                        <div className="flex flex-wrap items-center gap-3">
-                                            <Badge
-                                                className={
-                                                    status === "present"
-                                                        ? "bg-emerald-600"
-                                                        : status === "absent"
-                                                            ? "bg-rose-600"
-                                                            : "bg-amber-600"
-                                                }
-                                            >
-                                                {status === "present" ? "Present" : status === "absent" ? "Absent" : "Not Marked"}
-                                            </Badge>
-
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-slate-600">Absent</span>
-                                                <Switch
-                                                    checked={isPresent}
-                                                    onCheckedChange={(checked) => updateAttendance(player._id, checked)}
-                                                    disabled={isSaving}
-                                                    aria-label={`Toggle attendance for ${player.name}`}
-                                                />
-                                                <span className="text-xs text-slate-600">Present</span>
-                                            </div>
-
-                                            {isSaving && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-
-                        {!filteredPlayers.length && (
-                            <p className="rounded-md border p-3 text-sm text-slate-500">No players found for this filter.</p>
-                        )}
+                                    {!filteredPlayers.length && (
+                                        <tr>
+                                            <td className="p-3 text-sm text-slate-500" colSpan={5}>
+                                                No players found for this filter.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

@@ -37,12 +37,12 @@ interface AttendanceRecord {
     markedAt?: string;
 }
 
-const getCurrentMonth = () => {
+const currentMonth = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 };
 
-const shiftMonth = (value: string, delta: number) => {
+const changeMonth = (value: string, delta: number) => {
     const [yearStr, monthStr] = value.split("-");
     const date = new Date(Number(yearStr), Number(monthStr) - 1 + delta, 1);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -52,7 +52,7 @@ const AdminPlayerAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [search, setSearch] = useState("");
-    const [month, setMonth] = useState(getCurrentMonth());
+    const [month, setMonth] = useState(currentMonth());
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerItem | null>(null);
     const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
@@ -69,7 +69,7 @@ const AdminPlayerAttendance = () => {
         [attendance]
     );
 
-    const fetchPlayers = async (query = "") => {
+    const loadPlayers = async (query = "") => {
         if (!token) return;
         setLoadingPlayers(true);
 
@@ -103,7 +103,7 @@ const AdminPlayerAttendance = () => {
         }
     };
 
-    const handleAdminMarkAttendance = async () => {
+    const saveByAdmin = async () => {
         if (!token || !selectedPlayer) return;
 
         if (!markDate) {
@@ -141,7 +141,7 @@ const AdminPlayerAttendance = () => {
                 description: data.message || "Admin marked attendance successfully.",
             });
 
-            await fetchAttendance(selectedPlayer._id, month);
+            await loadAttendance(selectedPlayer._id, month);
             setAdminNote("");
         } catch (error) {
             toast({
@@ -154,7 +154,7 @@ const AdminPlayerAttendance = () => {
         }
     };
 
-    const fetchAttendance = async (playerId: string, activeMonth: string) => {
+    const loadAttendance = async (playerId: string, activeMonth: string) => {
         if (!token) return;
 
         const response = await fetch(`${API_ENDPOINTS.ADMIN_ATTENDANCE}/${playerId}?month=${activeMonth}`, {
@@ -184,7 +184,7 @@ const AdminPlayerAttendance = () => {
         if (!token) return;
 
         const timer = setTimeout(() => {
-            fetchPlayers(search);
+            loadPlayers(search);
         }, 350);
 
         return () => clearTimeout(timer);
@@ -196,7 +196,7 @@ const AdminPlayerAttendance = () => {
             return;
         }
 
-        fetchAttendance(selectedPlayer._id, month).catch((error) => {
+        loadAttendance(selectedPlayer._id, month).catch((error) => {
             toast({
                 title: "Attendance Error",
                 description: error instanceof Error ? error.message : "Unable to fetch attendance",
@@ -326,7 +326,7 @@ const AdminPlayerAttendance = () => {
                                 </div>
 
                                 <Button
-                                    onClick={handleAdminMarkAttendance}
+                                    onClick={saveByAdmin}
                                     disabled={!selectedPlayer || markingByAdmin}
                                     className="w-full sm:w-auto bg-cyan-700 hover:bg-cyan-800"
                                 >
@@ -363,7 +363,7 @@ const AdminPlayerAttendance = () => {
                                                 type="button"
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => setMonth((prev) => shiftMonth(prev, -1))}
+                                                onClick={() => setMonth((prev) => changeMonth(prev, -1))}
                                                 className="w-full"
                                             >
                                                 <ChevronLeft size={14} className="mr-1" />
@@ -373,7 +373,7 @@ const AdminPlayerAttendance = () => {
                                                 type="button"
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => setMonth((prev) => shiftMonth(prev, 1))}
+                                                onClick={() => setMonth((prev) => changeMonth(prev, 1))}
                                                 className="w-full"
                                             >
                                                 Next
@@ -388,8 +388,8 @@ const AdminPlayerAttendance = () => {
                                     <>
                                         <AttendanceCalendar month={month} attendance={attendanceForCalendar} />
 
-                                        <div className="hidden overflow-auto rounded-md border md:block">
-                                            <table className="w-full text-sm">
+                                        <div className="overflow-x-auto rounded-md border">
+                                            <table className="min-w-[980px] w-full text-sm">
                                                 <thead className="bg-slate-100">
                                                     <tr>
                                                         <th className="p-2 text-left">Date</th>
@@ -428,34 +428,6 @@ const AdminPlayerAttendance = () => {
                                                     )}
                                                 </tbody>
                                             </table>
-                                        </div>
-
-                                        <div className="space-y-3 md:hidden">
-                                            {attendance.map((record) => (
-                                                <div key={`${record.date}-${record.markedAt || "na"}`} className="rounded-md border p-3">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="font-semibold text-slate-800">{record.date}</p>
-                                                        <p className="text-sm capitalize text-slate-700">{record.status}</p>
-                                                    </div>
-                                                    <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-slate-600">
-                                                        <p>Lat: {record.location?.latitude?.toFixed(5) ?? "-"}</p>
-                                                        <p>Lng: {record.location?.longitude?.toFixed(5) ?? "-"}</p>
-                                                        <p>Marked By: {record.markedByType || "player"}</p>
-                                                        <p>Device ID: {record.deviceId || "-"}</p>
-                                                        <p>Device Name: {record.deviceName || "-"}</p>
-                                                        <p>
-                                                            Admin ID: {typeof record.markedByAdminId === "string" ? record.markedByAdminId : record.markedByAdminId?._id || "-"}
-                                                        </p>
-                                                        <p>Admin Note: {record.adminNote || "-"}</p>
-                                                        <p>Marked At: {record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {!attendance.length && (
-                                                <p className="rounded-md border p-3 text-sm text-slate-500">
-                                                    No attendance records found for this month.
-                                                </p>
-                                            )}
                                         </div>
                                     </>
                                 ) : (
