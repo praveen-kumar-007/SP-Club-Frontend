@@ -21,6 +21,24 @@ const shiftMonth = (value: string, delta: number) => {
 
 const MAX_ALLOWED_ACCURACY_METERS = 100;
 
+const hasValidCoordinates = (latitude: number, longitude: number) => {
+    const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
+    return validRange && notZeroPair;
+};
+
+interface ClientContext {
+    ipAddress: string | null;
+    userAgent: string;
+    language: string;
+    platform: string;
+    timezone: string;
+    screenResolution: string;
+    viewport: string;
+    networkType: string | null;
+    effectiveType: string | null;
+}
+
 const PlayerAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -127,6 +145,33 @@ const PlayerAttendance = () => {
         });
     };
 
+    const getClientContext = async (): Promise<ClientContext> => {
+        const connection = (navigator as Navigator & {
+            connection?: { type?: string; effectiveType?: string };
+        }).connection;
+
+        let ipAddress: string | null = null;
+        try {
+            const response = await fetch("https://api64.ipify.org?format=json");
+            const ipData = await response.json().catch(() => ({}));
+            ipAddress = typeof ipData.ip === "string" ? ipData.ip : null;
+        } catch {
+            ipAddress = null;
+        }
+
+        return {
+            ipAddress,
+            userAgent: navigator.userAgent || "unknown",
+            language: navigator.language || "unknown",
+            platform: navigator.platform || "unknown",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
+            screenResolution: `${window.screen.width}x${window.screen.height}`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            networkType: connection?.type || null,
+            effectiveType: connection?.effectiveType || null,
+        };
+    };
+
     const handleViewAttendance = async () => {
         if (!playerToken) {
             navigate("/player/login");
@@ -164,7 +209,12 @@ const PlayerAttendance = () => {
         setMarkingAttendance(true);
         try {
             const position = await getLiveLocation();
+            const clientContext = await getClientContext();
             const locationAccuracy = Number(position.coords.accuracy);
+
+            if (!hasValidCoordinates(position.coords.latitude, position.coords.longitude)) {
+                throw new Error("Valid latitude and longitude are required to mark attendance.");
+            }
 
             if (!Number.isFinite(locationAccuracy) || locationAccuracy > MAX_ALLOWED_ACCURACY_METERS) {
                 throw new Error(
@@ -185,8 +235,29 @@ const PlayerAttendance = () => {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     accuracy: locationAccuracy,
+                    address: [
+                        clientContext.ipAddress ? `IP: ${clientContext.ipAddress}` : "IP: unavailable",
+                        `TZ: ${clientContext.timezone}`,
+                        `Lang: ${clientContext.language}`,
+                        `Platform: ${clientContext.platform}`,
+                        `Screen: ${clientContext.screenResolution}`,
+                        `Viewport: ${clientContext.viewport}`,
+                        clientContext.networkType ? `Network: ${clientContext.networkType}` : null,
+                        clientContext.effectiveType ? `Effective: ${clientContext.effectiveType}` : null,
+                    ]
+                        .filter(Boolean)
+                        .join(" | "),
                     deviceId,
                     deviceName,
+                    ipAddress: clientContext.ipAddress,
+                    userAgent: clientContext.userAgent,
+                    language: clientContext.language,
+                    platform: clientContext.platform,
+                    timezone: clientContext.timezone,
+                    screenResolution: clientContext.screenResolution,
+                    viewport: clientContext.viewport,
+                    networkType: clientContext.networkType,
+                    effectiveType: clientContext.effectiveType,
                 }),
             });
 
@@ -255,7 +326,7 @@ const PlayerAttendance = () => {
                                     }}
                                     className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
                                 />
-                                <div className="mt-2 flex gap-2">
+                                <div className="mt-2 grid grid-cols-1 gap-2 sm:flex">
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -328,13 +399,15 @@ const PlayerAttendance = () => {
                         <CardTitle>Attendance Calendar</CardTitle>
                         <CardDescription>Present days are deep blue and absent days are orange.</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="overflow-hidden">
                         {loadingAttendance ? (
                             <div className="flex items-center justify-center py-6">
                                 <Loader2 className="h-6 w-6 animate-spin text-blue-800" />
                             </div>
                         ) : attendanceLoaded ? (
-                            <AttendanceCalendar month={month} attendance={attendance} />
+                            <div className="w-full max-w-full">
+                                <AttendanceCalendar month={month} attendance={attendance} />
+                            </div>
                         ) : (
                             <p className="text-sm text-slate-500">Click View Attendance to load records.</p>
                         )}

@@ -25,6 +25,29 @@ interface PlayerItem {
     attendance?: AttendanceItem[];
 }
 
+const MAX_ALLOWED_ACCURACY_METERS = 100;
+
+const getLiveLocation = () => {
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error("Geolocation is not supported by your browser"));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 20000,
+            maximumAge: 0,
+        });
+    });
+};
+
+const hasValidCoordinates = (latitude: number, longitude: number) => {
+    const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
+    return validRange && notZeroPair;
+};
+
 const getToday = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -78,6 +101,19 @@ const AdminDateAttendance = () => {
 
         setSavingPlayerId(playerId);
         try {
+            const position = await getLiveLocation();
+            const locationAccuracy = Number(position.coords.accuracy);
+
+            if (!hasValidCoordinates(position.coords.latitude, position.coords.longitude)) {
+                throw new Error("Valid latitude and longitude are required to mark attendance.");
+            }
+
+            if (!Number.isFinite(locationAccuracy) || locationAccuracy > MAX_ALLOWED_ACCURACY_METERS) {
+                throw new Error(
+                    `Location is not precise enough (${Math.round(locationAccuracy)}m). Enable precise location and retry.`
+                );
+            }
+
             const response = await fetch(`${API_ENDPOINTS.ADMIN_ATTENDANCE}/${playerId}/mark`, {
                 method: "POST",
                 headers: {
@@ -88,7 +124,10 @@ const AdminDateAttendance = () => {
                     date,
                     status: checked ? "present" : "absent",
                     note: "Updated from Admin Date Attendance page",
-                    address: "Marked by admin from date-wise toggle",
+                    address: "Marked by admin from date-wise toggle with live location",
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: locationAccuracy,
                 }),
             });
 
@@ -180,7 +219,7 @@ const AdminDateAttendance = () => {
             <div className="mx-auto max-w-7xl space-y-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Date Wise Attendance</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Attendance by Date</h1>
                         <p className="text-sm text-slate-600">View and update attendance for every player using Present/Absent toggle.</p>
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
@@ -252,10 +291,10 @@ const AdminDateAttendance = () => {
                 <Card>
                     <CardHeader>
                         <CardTitle>Players ({filteredPlayers.length})</CardTitle>
-                        <CardDescription>Toggle ON = Present, OFF = Absent for selected date.</CardDescription>
+                        <CardDescription>Toggle ON = Present, OFF = Absent for selected date. Live location is required for every update.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <div className="overflow-x-auto rounded-md border">
+                        <div className="hidden overflow-x-auto rounded-md border md:block">
                             <table className="min-w-[760px] w-full text-sm">
                                 <thead className="bg-slate-100">
                                     <tr>
@@ -316,6 +355,50 @@ const AdminDateAttendance = () => {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div className="space-y-3 md:hidden">
+                            {filteredPlayers.map((player) => {
+                                const status = player.selectedDateStatus;
+                                const isPresent = status === "present";
+                                const isSaving = savingPlayerId === player._id;
+
+                                return (
+                                    <div key={player._id} className="rounded-md border bg-white p-3">
+                                        <p className="font-semibold text-slate-900">{player.name}</p>
+                                        <p className="text-xs text-slate-600 mt-1 break-all">{player.email}</p>
+                                        <p className="text-xs text-slate-500 mt-1">ID: {player.idCardNumber || "No ID"}</p>
+                                        <div className="mt-3 flex items-center justify-between gap-2">
+                                            <Badge
+                                                className={
+                                                    status === "present"
+                                                        ? "bg-emerald-600"
+                                                        : status === "absent"
+                                                            ? "bg-rose-600"
+                                                            : "bg-amber-600"
+                                                }
+                                            >
+                                                {status === "present" ? "Present" : status === "absent" ? "Absent" : "Not Marked"}
+                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-slate-600">Absent</span>
+                                                <Switch
+                                                    checked={isPresent}
+                                                    onCheckedChange={(checked) => saveStatus(player._id, checked)}
+                                                    disabled={isSaving}
+                                                    aria-label={`Toggle attendance for ${player.name}`}
+                                                />
+                                                <span className="text-xs text-slate-600">Present</span>
+                                                {isSaving && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
+                            {!filteredPlayers.length && (
+                                <p className="rounded-md border bg-white p-3 text-sm text-slate-500">No players found for this filter.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

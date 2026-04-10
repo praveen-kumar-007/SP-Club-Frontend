@@ -39,7 +39,7 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
     const days = [];
 
     for (let i = 0; i < parsed.firstWeekDay; i += 1) {
-        days.push(<div key={`empty-${i}`} className="h-12 rounded-md bg-slate-50" />);
+        days.push(<div key={`empty-${i}`} className="h-9 rounded-md bg-slate-50 sm:h-12" />);
     }
 
     for (let day = 1; day <= parsed.totalDays; day += 1) {
@@ -58,7 +58,7 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
             <div
                 key={dayIso}
                 className={cn(
-                    "h-12 rounded-md flex items-center justify-center text-sm font-semibold border",
+                    "h-9 rounded-md flex items-center justify-center text-xs font-semibold border sm:h-12 sm:text-sm",
                     tone,
                     dayIso === todayIso ? "ring-2 ring-amber-300 border-amber-300" : "border-transparent"
                 )}
@@ -70,10 +70,10 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
     }
 
     return (
-        <div className="space-y-3">
+        <div className="w-full max-w-full space-y-3 overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-lg font-bold text-slate-800">{parsed.label}</h3>
-                <div className="flex items-center gap-3 text-xs font-medium">
+                <h3 className="text-base font-bold text-slate-800 sm:text-lg">{parsed.label}</h3>
+                <div className="flex flex-wrap items-center gap-2 text-xs font-medium sm:gap-3">
                     <span className="inline-flex items-center gap-1">
                         <span className="h-3 w-3 rounded-sm bg-green-600" /> Present
                     </span>
@@ -83,13 +83,13 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-slate-500 sm:gap-2 sm:text-xs">
                 {weekDays.map((day) => (
                     <div key={day}>{day}</div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-2">{days}</div>
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">{days}</div>
         </div>
     );
 };

@@ -521,7 +521,7 @@ const AdminDashboard = () => {
               className="bg-teal-50 hover:bg-teal-100 border-teal-300 text-teal-700 font-semibold"
             >
               <CalendarDays size={18} className="mr-2" />
-              <span>Date Attendance</span>
+              <span>Attendance by Date</span>
             </Button>
             <Button
               variant="outline"
@@ -585,7 +585,7 @@ const AdminDashboard = () => {
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
             >
               <span className="flex items-center gap-2">
-                Players
+                Player Attendance
                 <CountBadge count={indicators.attendance} />
               </span>
             </Button>
@@ -594,7 +594,7 @@ const AdminDashboard = () => {
               className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 h-auto"
             >
               <CalendarDays size={18} className="mr-2" />
-              <span>Date View</span>
+              <span>Attendance by Date</span>
             </Button>
             <Button
               onClick={() => navigate("/admin/inquiries")}

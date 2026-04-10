@@ -25,6 +25,15 @@ interface AttendanceRecord {
     status: "present" | "absent";
     deviceId?: string | null;
     deviceName?: string | null;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+    language?: string | null;
+    platform?: string | null;
+    timezone?: string | null;
+    screenResolution?: string | null;
+    viewport?: string | null;
+    networkType?: string | null;
+    effectiveType?: string | null;
     markedByType?: "player" | "admin";
     markedByAdminId?: string | { _id?: string } | null;
     adminNote?: string | null;
@@ -46,6 +55,29 @@ const changeMonth = (value: string, delta: number) => {
     const [yearStr, monthStr] = value.split("-");
     const date = new Date(Number(yearStr), Number(monthStr) - 1 + delta, 1);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+};
+
+const MAX_ALLOWED_ACCURACY_METERS = 100;
+
+const getLiveLocation = () => {
+    return new Promise<GeolocationPosition>((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error("Geolocation is not supported by your browser"));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 20000,
+            maximumAge: 0,
+        });
+    });
+};
+
+const hasValidCoordinates = (latitude: number, longitude: number) => {
+    const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+    const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
+    return validRange && notZeroPair;
 };
 
 const AdminPlayerAttendance = () => {
@@ -117,6 +149,19 @@ const AdminPlayerAttendance = () => {
 
         setMarkingByAdmin(true);
         try {
+            const position = await getLiveLocation();
+            const locationAccuracy = Number(position.coords.accuracy);
+
+            if (!hasValidCoordinates(position.coords.latitude, position.coords.longitude)) {
+                throw new Error("Valid latitude and longitude are required to mark attendance.");
+            }
+
+            if (!Number.isFinite(locationAccuracy) || locationAccuracy > MAX_ALLOWED_ACCURACY_METERS) {
+                throw new Error(
+                    `Location is not precise enough (${Math.round(locationAccuracy)}m). Enable precise location and retry.`
+                );
+            }
+
             const response = await fetch(`${API_ENDPOINTS.ADMIN_ATTENDANCE}/${selectedPlayer._id}/mark`, {
                 method: "POST",
                 headers: {
@@ -127,7 +172,10 @@ const AdminPlayerAttendance = () => {
                     date: markDate,
                     status: markStatus,
                     note: adminNote.trim() || undefined,
-                    address: "Marked by admin due to player issue",
+                    address: "Marked by admin with live location",
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: locationAccuracy,
                 }),
             });
 
@@ -285,7 +333,7 @@ const AdminPlayerAttendance = () => {
                                     Admin Attendance Marking
                                 </CardTitle>
                                 <CardDescription>
-                                    If a player faces issues, admin can mark or update attendance with admin audit trail.
+                                    If a player faces issues, admin can mark or update attendance with admin audit trail. Live location is required.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -388,17 +436,20 @@ const AdminPlayerAttendance = () => {
                                     <>
                                         <AttendanceCalendar month={month} attendance={attendanceForCalendar} />
 
-                                        <div className="overflow-x-auto rounded-md border">
-                                            <table className="min-w-[980px] w-full text-sm">
+                                        <div className="hidden overflow-x-auto rounded-md border md:block">
+                                            <table className="min-w-[1300px] w-full text-sm">
                                                 <thead className="bg-slate-100">
                                                     <tr>
                                                         <th className="p-2 text-left">Date</th>
                                                         <th className="p-2 text-left">Status</th>
                                                         <th className="p-2 text-left">Latitude</th>
                                                         <th className="p-2 text-left">Longitude</th>
+                                                        <th className="p-2 text-left">Accuracy (m)</th>
                                                         <th className="p-2 text-left">Marked By</th>
+                                                        <th className="p-2 text-left">IP</th>
                                                         <th className="p-2 text-left">Device ID</th>
                                                         <th className="p-2 text-left">Device Name</th>
+                                                        <th className="p-2 text-left">Context</th>
                                                         <th className="p-2 text-left">Admin ID</th>
                                                         <th className="p-2 text-left">Admin Note</th>
                                                         <th className="p-2 text-left">Marked At</th>
@@ -411,9 +462,27 @@ const AdminPlayerAttendance = () => {
                                                             <td className="p-2 capitalize">{record.status}</td>
                                                             <td className="p-2">{record.location?.latitude?.toFixed(5) ?? "-"}</td>
                                                             <td className="p-2">{record.location?.longitude?.toFixed(5) ?? "-"}</td>
+                                                            <td className="p-2">{record.location?.accuracy ? Math.round(record.location.accuracy) : "-"}</td>
                                                             <td className="p-2 capitalize">{record.markedByType || "player"}</td>
+                                                            <td className="p-2">{record.ipAddress || "-"}</td>
                                                             <td className="p-2">{record.deviceId || "-"}</td>
                                                             <td className="p-2">{record.deviceName || "-"}</td>
+                                                            <td className="p-2 max-w-[280px] truncate" title={record.location?.address || ""}>
+                                                                {record.location?.address ||
+                                                                    [
+                                                                        record.userAgent,
+                                                                        record.platform,
+                                                                        record.language,
+                                                                        record.timezone,
+                                                                        record.screenResolution,
+                                                                        record.viewport,
+                                                                        record.networkType,
+                                                                        record.effectiveType,
+                                                                    ]
+                                                                        .filter(Boolean)
+                                                                        .join(" | ") ||
+                                                                    "-"}
+                                                            </td>
                                                             <td className="p-2">{typeof record.markedByAdminId === "string" ? record.markedByAdminId : record.markedByAdminId?._id || "-"}</td>
                                                             <td className="p-2">{record.adminNote || "-"}</td>
                                                             <td className="p-2">{record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</td>
@@ -421,13 +490,39 @@ const AdminPlayerAttendance = () => {
                                                     ))}
                                                     {!attendance.length && (
                                                         <tr>
-                                                            <td className="p-3 text-slate-500" colSpan={10}>
+                                                            <td className="p-3 text-slate-500" colSpan={13}>
                                                                 No attendance records found for this month.
                                                             </td>
                                                         </tr>
                                                     )}
                                                 </tbody>
                                             </table>
+                                        </div>
+
+                                        <div className="space-y-3 md:hidden">
+                                            {attendance.map((record) => (
+                                                <div key={`${record.date}-${record.markedAt || "na"}`} className="rounded-md border bg-white p-3">
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <p className="font-semibold text-slate-900">{record.date}</p>
+                                                        <span className="text-xs font-medium capitalize text-slate-700">{record.status}</span>
+                                                    </div>
+                                                    <p className="mt-2 text-xs text-slate-600 break-all">
+                                                        Lat: {record.location?.latitude?.toFixed(5) ?? "-"} | Lng: {record.location?.longitude?.toFixed(5) ?? "-"}
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-slate-600">Accuracy: {record.location?.accuracy ? Math.round(record.location.accuracy) : "-"} m</p>
+                                                    <p className="mt-1 text-xs text-slate-600">IP: {record.ipAddress || "-"}</p>
+                                                    <p className="mt-1 text-xs text-slate-600">Device: {record.deviceName || "-"}</p>
+                                                    <p className="mt-1 text-xs text-slate-600">Marked by: {record.markedByType || "player"}</p>
+                                                    <p className="mt-1 text-xs text-slate-600">Admin note: {record.adminNote || "-"}</p>
+                                                    <p className="mt-1 text-xs text-slate-500">{record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</p>
+                                                </div>
+                                            ))}
+
+                                            {!attendance.length && (
+                                                <p className="rounded-md border bg-white p-3 text-sm text-slate-500">
+                                                    No attendance records found for this month.
+                                                </p>
+                                            )}
                                         </div>
                                     </>
                                 ) : (
