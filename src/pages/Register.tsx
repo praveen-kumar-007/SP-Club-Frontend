@@ -51,13 +51,13 @@ const Register = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedAadharFront, setSelectedAadharFront] = useState<File | null>(null);
   const [selectedAadharBack, setSelectedAadharBack] = useState<File | null>(null);
-  
+
   // Camera capture states
   const [showPhotoCamera, setShowPhotoCamera] = useState(false);
   const [showAadharFrontCamera, setShowAadharFrontCamera] = useState(false);
   const [showAadharBackCamera, setShowAadharBackCamera] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-  
+
   // Calendar popover state
   const [dobPopoverOpen, setDobPopoverOpen] = useState(false);
 
@@ -122,7 +122,7 @@ const Register = () => {
       }
 
       const formData = new FormData();
-      
+
       // Append all text fields
       formData.append('name', data.name);
       formData.append('fathersName', data.fathersName);
@@ -141,12 +141,12 @@ const Register = () => {
       formData.append('message', data.message || '');
       formData.append('newsletter', String(data.newsletter));
       formData.append('terms', String(data.terms));
-      
+
       // Append kabaddi positions as JSON string
       if (data.kabaddiPositions && data.kabaddiPositions.length > 0) {
         formData.append('kabaddiPositions', JSON.stringify(data.kabaddiPositions));
       }
-      
+
       // Append photos if selected
       if (selectedFile) {
         formData.append('photo', selectedFile);
@@ -199,7 +199,7 @@ const Register = () => {
       const facingMode = cameraType === 'photo' ? 'user' : 'environment';
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
       setCameraStream(stream);
-      
+
       // Set the stream to the video element after state is updated
       setTimeout(() => {
         const video = document.querySelector(`video[data-camera="${cameraType}"]`) as HTMLVideoElement;
@@ -208,7 +208,7 @@ const Register = () => {
           video.play().catch(err => console.error("Play error:", err));
         }
       }, 0);
-      
+
       if (cameraType === 'photo') setShowPhotoCamera(true);
       else if (cameraType === 'aadharFront') setShowAadharFrontCamera(true);
       else if (cameraType === 'aadharBack') setShowAadharBackCamera(true);
@@ -233,7 +233,7 @@ const Register = () => {
         canvas.toBlob((blob) => {
           if (blob) {
             const file = new File([blob], `capture-${cameraType}.jpg`, { type: 'image/jpeg' });
-            
+
             if (cameraType === 'photo') {
               setSelectedFile(file);
               form.setValue('photo', file);
@@ -244,7 +244,7 @@ const Register = () => {
               setSelectedAadharBack(file);
               form.setValue('aadharBack', file);
             }
-            
+
             stopCamera(cameraType);
           }
         });
@@ -257,7 +257,7 @@ const Register = () => {
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
     }
-    
+
     if (cameraType === 'photo') setShowPhotoCamera(false);
     else if (cameraType === 'aadharFront') setShowAadharFrontCamera(false);
     else if (cameraType === 'aadharBack') setShowAadharBackCamera(false);
@@ -1062,10 +1062,10 @@ const Register = () => {
                                               return checked
                                                 ? field.onChange([...(field.value || []), position.id])
                                                 : field.onChange(
-                                                    field.value?.filter(
-                                                      (value) => value !== position.id
-                                                    )
-                                                  );
+                                                  field.value?.filter(
+                                                    (value) => value !== position.id
+                                                  )
+                                                );
                                             }}
                                           />
                                         </FormControl>

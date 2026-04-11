@@ -10,7 +10,9 @@ export const KIT_SIZE_OPTIONS = [
 
 export const getKitSizeRange = (kitSize?: string | null) => {
   if (!kitSize) return null;
-  return KIT_SIZE_OPTIONS.find((option) => option.value === kitSize)?.range || null;
+  return (
+    KIT_SIZE_OPTIONS.find((option) => option.value === kitSize)?.range || null
+  );
 };
 
 export const formatKitSizeWithRange = (
