@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
 import { PLAYER_ATTENDANCE_RADIUS_METERS, SP_KABADDI_LOCATION } from "@/config/maps";
 import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager";
+import { KIT_SIZE_OPTIONS, formatKitSizeWithRange, getKitSizeRange } from "@/utils/kitSizes";
 import { Award, Bell, CalendarDays, Camera, CreditCard, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2 } from "lucide-react";
 
 interface PlayerProfile {
@@ -84,6 +85,7 @@ const PlayerDashboard = () => {
     const [markingTodayAttendance, setMarkingTodayAttendance] = useState(false);
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const photoInputRef = useRef<HTMLInputElement | null>(null);
+    const selectedKitRange = getKitSizeRange(kitSize);
 
     const storedPlayer = localStorage.getItem("playerUser");
     const parsedPlayer = (() => {
@@ -313,21 +315,21 @@ const PlayerDashboard = () => {
 
         setSavingKitDetails(true);
         try {
-if (player?.status !== "approved" && jerseyNumber) {
-            throw new Error(
-                "Jersey numbers can only be selected after approval."
-            );
-        }
+            if (player?.status !== "approved" && jerseyNumber) {
+                throw new Error(
+                    "Jersey numbers can only be selected after approval."
+                );
+            }
 
-        const response = await fetch(API_ENDPOINTS.PLAYER_ME_UPDATE, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${playerToken}`,
-            },
-            body: JSON.stringify({
-                kitSize: kitSize || null,
-                jerseyNumber: player?.status === "approved" ? jerseyNumber || null : null,
+            const response = await fetch(API_ENDPOINTS.PLAYER_ME_UPDATE, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${playerToken}`,
+                },
+                body: JSON.stringify({
+                    kitSize: kitSize || null,
+                    jerseyNumber: player?.status === "approved" ? jerseyNumber || null : null,
                 }),
             });
 
@@ -524,14 +526,14 @@ if (player?.status !== "approved" && jerseyNumber) {
                             Kit & Jersey
                         </CardTitle>
                         <CardDescription>
-                        Update your kit size anytime. Jersey number selection is only enabled once your registration is approved.
-                    </CardDescription>
+                            Update your kit size anytime. Jersey number selection is only enabled once your registration is approved.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4 sm:grid-cols-2 items-end">
                             <div>
                                 <p className="text-xs text-slate-500">Kit Size</p>
-                                <p className="font-medium text-slate-800">{player?.kitSize || "Not selected"}</p>
+                                <p className="font-medium text-slate-800">{formatKitSizeWithRange(player?.kitSize)}</p>
                             </div>
                             <div>
                                 <p className="text-xs text-slate-500">Jersey Number</p>
@@ -541,20 +543,25 @@ if (player?.status !== "approved" && jerseyNumber) {
                                 {editingKitDetails ? (
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div>
-                                            <p className="text-xs text-slate-500">Kit Size</p>
+                                            <div className="flex items-center justify-between gap-2 whitespace-nowrap">
+                                                <p className="text-xs text-slate-500">Kit Size</p>
+                                                <p className="text-[11px] text-slate-500 sm:text-xs">
+                                                    {selectedKitRange
+                                                        ? `Size ${kitSize} (${selectedKitRange})`
+                                                        : "Auto size range"}
+                                                </p>
+                                            </div>
                                             <select
                                                 className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900"
                                                 value={kitSize}
                                                 onChange={(e) => setKitSize(e.target.value)}
                                             >
                                                 <option value="">Not selected</option>
-                                                <option value="XS">XS</option>
-                                                <option value="S">S</option>
-                                                <option value="M">M</option>
-                                                <option value="L">L</option>
-                                                <option value="XL">XL</option>
-                                                <option value="XXL">XXL</option>
-                                                <option value="XXXL">XXXL</option>
+                                                {KIT_SIZE_OPTIONS.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.value} ({option.range})
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div>

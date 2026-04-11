@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
+import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -1020,16 +1021,14 @@ const RegistrationDetail = () => {
                       onChange={(e) => setEditForm((prev) => prev ? { ...prev, kitSize: e.target.value } : prev)}
                     >
                       <option value="">Not selected</option>
-                      <option value="XS">XS</option>
-                      <option value="S">S</option>
-                      <option value="M">M</option>
-                      <option value="L">L</option>
-                      <option value="XL">XL</option>
-                      <option value="XXL">XXL</option>
-                      <option value="XXXL">XXXL</option>
+                      {KIT_SIZE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.value} ({option.range})
+                        </option>
+                      ))}
                     </select>
                   ) : (
-                    <p className="font-medium">{registration.kitSize || "Not selected"}</p>
+                    <p className="font-medium">{formatKitSizeWithRange(registration.kitSize)}</p>
                   )}
                 </div>
                 <div>

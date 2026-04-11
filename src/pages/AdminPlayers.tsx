@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { API_ENDPOINTS } from "@/config/api";
+import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
 import { Search, Edit3, Save, X } from "lucide-react";
 import Seo from "@/components/Seo";
 
@@ -208,16 +209,14 @@ const AdminPlayers = () => {
                               onChange={(e) => setEditingKitSize(e.target.value)}
                             >
                               <option value="">Not selected</option>
-                              <option value="XS">XS</option>
-                              <option value="S">S</option>
-                              <option value="M">M</option>
-                              <option value="L">L</option>
-                              <option value="XL">XL</option>
-                              <option value="XXL">XXL</option>
-                              <option value="XXXL">XXXL</option>
+                              {KIT_SIZE_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.value} ({option.range})
+                                </option>
+                              ))}
                             </select>
                           ) : (
-                            player.kitSize || "-"
+                            formatKitSizeWithRange(player.kitSize, "-")
                           )}
                         </td>
                         <td className="px-4 py-3">

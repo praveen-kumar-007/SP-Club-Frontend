@@ -17,6 +17,7 @@ import Seo from "@/components/Seo";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { API_ENDPOINTS } from "@/config/api";
+import { KIT_SIZE_OPTIONS, getKitSizeRange } from "@/utils/kitSizes";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -85,6 +86,8 @@ const Register = () => {
   });
 
   const { isSubmitting } = form.formState;
+  const selectedKitSize = form.watch("kitSize");
+  const selectedKitRange = getKitSizeRange(selectedKitSize);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -518,23 +521,31 @@ const Register = () => {
                           name="kitSize"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Kit Size</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                              <div className="flex items-center justify-between gap-2 whitespace-nowrap">
+                                <FormLabel className="text-gray-300">Kit Size</FormLabel>
+                                <span className="text-[11px] text-gray-400 sm:text-xs">
+                                  {selectedKitRange
+                                    ? `Size ${field.value} (${selectedKitRange})`
+                                    : "Auto size range"}
+                                </span>
+                              </div>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
                                 <FormControl>
                                   <SelectTrigger className="bg-[#0a192f] border-gray-600 text-white">
                                     <SelectValue placeholder="Select kit size" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="bg-[#1e3a5f] text-white border-gray-600">
-                                  <SelectItem value="XS">XS</SelectItem>
-                                  <SelectItem value="S">S</SelectItem>
-                                  <SelectItem value="M">M</SelectItem>
-                                  <SelectItem value="L">L</SelectItem>
-                                  <SelectItem value="XL">XL</SelectItem>
-                                  <SelectItem value="XXL">XXL</SelectItem>
-                                  <SelectItem value="XXXL">XXXL</SelectItem>
+                                  {KIT_SIZE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.value} ({option.range})
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
+                              {selectedKitRange && (
+                                <p className="text-xs text-gray-400">Selected size range: {selectedKitRange}</p>
+                              )}
                               <FormMessage />
                             </FormItem>
                           )}
