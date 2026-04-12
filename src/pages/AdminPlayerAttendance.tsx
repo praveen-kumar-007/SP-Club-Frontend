@@ -105,6 +105,7 @@ const AdminPlayerAttendance = () => {
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerItem | null>(null);
     const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
+    const [practiceDates, setPracticeDates] = useState<string[]>([]);
     const [loadingPlayers, setLoadingPlayers] = useState(false);
     const [markingByAdmin, setMarkingByAdmin] = useState(false);
     const [markDate, setMarkDate] = useState(new Date().toISOString().split("T")[0]);
@@ -243,6 +244,7 @@ const AdminPlayerAttendance = () => {
         }
 
         setAttendance(data.attendance || []);
+        setPracticeDates(Array.isArray(data.practiceDates) ? data.practiceDates : []);
     };
 
     useEffect(() => {
@@ -262,6 +264,7 @@ const AdminPlayerAttendance = () => {
     useEffect(() => {
         if (!selectedPlayer) {
             setAttendance([]);
+            setPracticeDates([]);
             return;
         }
 
@@ -417,7 +420,7 @@ const AdminPlayerAttendance = () => {
                                     <div>
                                         <CardTitle>Attendance Calendar</CardTitle>
                                         <CardDescription>
-                                            Present is green and absent is red. Admin can only view this data.
+                                            Present is green, absent is red, and Practice Not Done is deep blue after day end.
                                         </CardDescription>
                                     </div>
                                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -455,7 +458,7 @@ const AdminPlayerAttendance = () => {
                             <CardContent className="space-y-4">
                                 {selectedPlayer ? (
                                     <>
-                                        <AttendanceCalendar month={month} attendance={attendanceForCalendar} />
+                                        <AttendanceCalendar month={month} attendance={attendanceForCalendar} practiceDates={practiceDates} />
 
                                         <div className="hidden overflow-x-auto rounded-md border md:block">
                                             <table className="min-w-[1300px] w-full text-sm">

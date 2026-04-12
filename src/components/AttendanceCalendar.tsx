@@ -9,11 +9,23 @@ export interface AttendanceEntry {
 interface AttendanceCalendarProps {
     month: string;
     attendance: AttendanceEntry[];
+    practiceDates?: string[];
 }
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
+const getTodayInIST = () => {
+    const formatter = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    });
+
+    return formatter.format(new Date());
+};
+
+const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: AttendanceCalendarProps) => {
     const parsed = useMemo(() => {
         const [yearStr, monthStr] = month.split("-");
         const year = Number(yearStr);
@@ -35,7 +47,11 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
         return new Set(attendance.filter((entry) => entry.status === "present").map((entry) => entry.date));
     }, [attendance]);
 
-    const todayIso = new Date().toISOString().split("T")[0];
+    const practiceDateSet = useMemo(() => {
+        return new Set(practiceDates);
+    }, [practiceDates]);
+
+    const todayIso = getTodayInIST();
     const days = [];
 
     for (let i = 0; i < parsed.firstWeekDay; i += 1) {
@@ -45,13 +61,26 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
     for (let day = 1; day <= parsed.totalDays; day += 1) {
         const dayIso = `${parsed.year}-${String(parsed.monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const isFuture = dayIso > todayIso;
+        const isPast = dayIso < todayIso;
         const isPresent = presentDates.has(dayIso);
+        const isPracticeDone = practiceDateSet.has(dayIso);
 
         let tone = "bg-slate-100 text-slate-700";
         if (!isFuture && isPresent) {
             tone = "bg-green-600 text-white";
+        } else if (isPast && !isPracticeDone) {
+            tone = "bg-blue-900 text-white";
         } else if (!isFuture && !isPresent) {
             tone = "bg-red-500 text-white";
+        }
+
+        let title = "Future day";
+        if (!isFuture && isPresent) {
+            title = "Present";
+        } else if (isPast && !isPracticeDone) {
+            title = "Practice Not Done";
+        } else if (!isFuture) {
+            title = "Absent";
         }
 
         days.push(
@@ -62,7 +91,7 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
                     tone,
                     dayIso === todayIso ? "ring-2 ring-amber-300 border-amber-300" : "border-transparent"
                 )}
-                title={isFuture ? "Future day" : isPresent ? "Present" : "Absent"}
+                title={title}
             >
                 {day}
             </div>
@@ -79,6 +108,9 @@ const AttendanceCalendar = ({ month, attendance }: AttendanceCalendarProps) => {
                     </span>
                     <span className="inline-flex items-center gap-1">
                         <span className="h-3 w-3 rounded-sm bg-red-500" /> Absent
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                        <span className="h-3 w-3 rounded-sm bg-blue-900" /> Practice Not Done
                     </span>
                 </div>
             </div>

@@ -76,6 +76,7 @@ const PlayerAttendance = () => {
 
     const [month, setMonth] = useState(getCurrentMonth());
     const [attendance, setAttendance] = useState<AttendanceEntry[]>([]);
+    const [practiceDates, setPracticeDates] = useState<string[]>([]);
     const [loadingPage, setLoadingPage] = useState(true);
     const [loadingAttendance, setLoadingAttendance] = useState(false);
     const [markingAttendance, setMarkingAttendance] = useState(false);
@@ -126,6 +127,7 @@ const PlayerAttendance = () => {
         }
 
         setAttendance(data.attendance || []);
+        setPracticeDates(Array.isArray(data.practiceDates) ? data.practiceDates : []);
         setAttendanceLoaded(true);
         setLoadingAttendance(false);
     };
@@ -343,7 +345,7 @@ const PlayerAttendance = () => {
                     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <CardTitle className="text-2xl text-slate-800">Attendance</CardTitle>
-                            <CardDescription>Mark and view your attendance records.</CardDescription>
+                            <CardDescription>Mark and view attendance with practice-day colors.</CardDescription>
                         </div>
                         <Button variant="outline" className="w-full sm:w-auto" onClick={() => navigate("/player/dashboard")}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -450,7 +452,7 @@ const PlayerAttendance = () => {
                             </div>
                         ) : attendanceLoaded ? (
                             <div className="w-full max-w-full">
-                                <AttendanceCalendar month={month} attendance={attendance} />
+                                <AttendanceCalendar month={month} attendance={attendance} practiceDates={practiceDates} />
                             </div>
                         ) : (
                             <p className="text-sm text-slate-500">Click View Attendance to load records.</p>

@@ -202,7 +202,7 @@ const AdminDateAttendance = () => {
     const filteredPlayers = useMemo(() => {
         const withStatus = players.map((player) => {
             const record = (player.attendance || []).find((entry) => entry.date === date);
-            const status = record?.status || "not_marked";
+            const status = record?.status || "absent";
             return {
                 ...player,
                 selectedDateStatus: status,
@@ -219,7 +219,8 @@ const AdminDateAttendance = () => {
 
     const presentCount = filteredPlayers.filter((p) => p.selectedDateStatus === "present").length;
     const absentCount = filteredPlayers.filter((p) => p.selectedDateStatus === "absent").length;
-    const notMarkedCount = filteredPlayers.filter((p) => p.selectedDateStatus === "not_marked").length;
+    const isPastDate = date < getToday();
+    const isPracticeDone = presentCount > 0;
 
     return (
         <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -289,8 +290,10 @@ const AdminDateAttendance = () => {
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Not Marked</CardDescription>
-                            <CardTitle className="text-2xl text-amber-700">{notMarkedCount}</CardTitle>
+                            <CardDescription>Practice Day Status</CardDescription>
+                            <CardTitle className={`text-2xl ${isPracticeDone ? "text-emerald-700" : isPastDate ? "text-blue-900" : "text-amber-700"}`}>
+                                {isPracticeDone ? "Practice Done" : isPastDate ? "Practice Not Done" : "Practice Pending"}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
@@ -328,12 +331,10 @@ const AdminDateAttendance = () => {
                                                         className={
                                                             status === "present"
                                                                 ? "bg-emerald-600"
-                                                                : status === "absent"
-                                                                    ? "bg-rose-600"
-                                                                    : "bg-amber-600"
+                                                                : "bg-rose-600"
                                                         }
                                                     >
-                                                        {status === "present" ? "Present" : status === "absent" ? "Absent" : "Not Marked"}
+                                                        {status === "present" ? "Present" : "Absent"}
                                                     </Badge>
                                                 </td>
                                                 <td className="p-2">
@@ -380,12 +381,10 @@ const AdminDateAttendance = () => {
                                                 className={
                                                     status === "present"
                                                         ? "bg-emerald-600"
-                                                        : status === "absent"
-                                                            ? "bg-rose-600"
-                                                            : "bg-amber-600"
+                                                        : "bg-rose-600"
                                                 }
                                             >
-                                                {status === "present" ? "Present" : status === "absent" ? "Absent" : "Not Marked"}
+                                                {status === "present" ? "Present" : "Absent"}
                                             </Badge>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-xs text-slate-600">Absent</span>
