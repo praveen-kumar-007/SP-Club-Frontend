@@ -55,6 +55,7 @@ const AdminFeePayments = () => {
   const [month, setMonth] = useState(getCurrentMonth());
   const [selectedMonthPaid, setSelectedMonthPaid] = useState(false);
   const [history, setHistory] = useState<FeeHistoryItem[]>([]);
+  const [historyPlayer, setHistoryPlayer] = useState<FeePlayer | null>(null);
   const [loadingPlayers, setLoadingPlayers] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [savingPayment, setSavingPayment] = useState(false);
@@ -157,6 +158,28 @@ const AdminFeePayments = () => {
     }
   };
 
+  const loadSelectedMonthStatus = async (playerId: string, activeMonth: string) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.ADMIN_FEE_PLAYER_STATUS}/${playerId}?month=${activeMonth}&months=1`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load selected month status");
+      }
+
+      setSelectedMonthPaid(Boolean(data.selectedMonthStatus?.isPaid));
+    } catch {
+      setSelectedMonthPaid(false);
+    }
+  };
+
   const togglePlayerFeeAccess = async (player: FeePlayer, enabled: boolean) => {
     if (!token) return;
 
@@ -197,6 +220,9 @@ const AdminFeePayments = () => {
       if (!enabled) {
         setSelectedMonthPaid(false);
         setHistory([]);
+        if (historyPlayer?._id === player._id) {
+          setHistoryPlayer(null);
+        }
       } else {
         await loadFeeHistory(player._id, month);
       }
@@ -214,6 +240,23 @@ const AdminFeePayments = () => {
     } finally {
       setUpdatingFeeAccessFor(null);
     }
+  };
+
+  const handleViewHistory = async (player: FeePlayer) => {
+    setSelectedPlayer(player);
+    setHistoryPlayer(player);
+
+    if (!player.feeAccessEnabled) {
+      setHistory([]);
+      toast({
+        title: "Player Not Enabled",
+        description: "Enable this player in fee module before opening history.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await loadFeeHistory(player._id, month);
   };
 
   const toggleMonthlyPayment = async (checked: boolean) => {
@@ -245,7 +288,9 @@ const AdminFeePayments = () => {
       }
 
       setSelectedMonthPaid(checked);
-      await loadFeeHistory(selectedPlayer._id, month);
+      if (historyPlayer?._id === selectedPlayer._id) {
+        await loadFeeHistory(selectedPlayer._id, month);
+      }
 
       toast({
         title: checked ? "Payment Marked Paid" : "Payment Marked Pending",
@@ -273,19 +318,24 @@ const AdminFeePayments = () => {
 
   useEffect(() => {
     if (!selectedPlayer) {
-      setHistory([]);
       setSelectedMonthPaid(false);
       return;
     }
 
     if (!selectedPlayer.feeAccessEnabled) {
-      setHistory([]);
       setSelectedMonthPaid(false);
       return;
     }
 
-    loadFeeHistory(selectedPlayer._id, month);
+    loadSelectedMonthStatus(selectedPlayer._id, month);
   }, [selectedPlayer, month]);
+
+  useEffect(() => {
+    if (!historyPlayer) return;
+    if (!historyPlayer.feeAccessEnabled) return;
+
+    loadFeeHistory(historyPlayer._id, month);
+  }, [historyPlayer, month]);
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -463,7 +513,9 @@ const AdminFeePayments = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Month-wise Payment History</CardTitle>
-                <CardDescription>Green means paid. Red means pending.</CardDescription>
+                <CardDescription>
+                  Full history appears only after clicking View History for a dedicated player.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {loadingHistory ? (
@@ -471,12 +523,15 @@ const AdminFeePayments = () => {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Loading fee history...
                   </div>
-                ) : !selectedPlayer ? (
-                  <p className="text-sm text-slate-500">Select a participant to view history.</p>
-                ) : !selectedPlayer.feeAccessEnabled ? (
-                  <p className="text-sm text-slate-500">Fee history is hidden because this participant is not in fee list.</p>
+                ) : !historyPlayer ? (
+                  <p className="text-sm text-slate-500">Click View History on any enabled player to open full payment history.</p>
+                ) : !historyPlayer.feeAccessEnabled ? (
+                  <p className="text-sm text-slate-500">Selected history player is not enabled in fee list.</p>
                 ) : (
                   <div className="space-y-3">
+                    <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
+                      Showing history for: {historyPlayer.name}
+                    </div>
                     {history.map((item) => (
                       <div
                         key={item.month}
@@ -523,15 +578,13 @@ const AdminFeePayments = () => {
                 ) : (
                   <div className="space-y-2">
                     {enabledPlayers.map((player) => (
-                      <button
+                      <div
                         key={player._id}
-                        type="button"
                         className={`w-full rounded-md border p-3 text-left transition ${
                           selectedPlayer?._id === player._id
                             ? "border-emerald-500 bg-emerald-50"
                             : "border-slate-200 hover:border-slate-300"
                         }`}
-                        onClick={() => setSelectedPlayer(player)}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div>
@@ -540,11 +593,26 @@ const AdminFeePayments = () => {
                               {player.idCardNumber || "ID not generated"}
                             </p>
                           </div>
-                          <Badge className="bg-emerald-600 text-white">
-                            <CheckCircle2 className="mr-1 h-4 w-4" /> Enabled
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-emerald-600 text-white">
+                              <CheckCircle2 className="mr-1 h-4 w-4" /> Enabled
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedPlayer(player)}
+                            >
+                              Select
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleViewHistory(player)}
+                            >
+                              View History
+                            </Button>
+                          </div>
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
