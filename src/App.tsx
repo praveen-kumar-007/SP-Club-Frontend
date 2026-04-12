@@ -43,12 +43,14 @@ const AdminDateAttendance = lazyWithPreload(() => import("./pages/AdminDateAtten
 const AdminPlayerMessages = lazyWithPreload(() => import("./pages/AdminPlayerMessages"));
 const AdminMailCenter = lazyWithPreload(() => import("./pages/AdminMailCenter"));
 const AdminLoginHistory = lazyWithPreload(() => import("./pages/AdminLoginHistory"));
+const AdminFeePayments = lazyWithPreload(() => import("./pages/AdminFeePayments"));
 const PlayerLogin = lazyWithPreload(() => import("./pages/PlayerLogin"));
 const PlayerDashboard = lazyWithPreload(() => import("./pages/PlayerDashboard"));
 const PlayerAttendance = lazyWithPreload(() => import("./pages/PlayerAttendance"));
 const PlayerMessages = lazyWithPreload(() => import("./pages/PlayerMessages"));
 const PlayerForgotPassword = lazyWithPreload(() => import("./pages/PlayerForgotPassword"));
 const PlayerChangePassword = lazyWithPreload(() => import("./pages/PlayerChangePassword"));
+const PlayerFeeStatus = lazyWithPreload(() => import("./pages/PlayerFeeStatus"));
 const IDCardGenerator = lazyWithPreload(() => import("./pages/IDCard/IDCardGenerator"));
 
 // Loading fallback component
@@ -126,6 +128,7 @@ const App = () => {
                   <Route path="/admin/messages" element={<AdminPlayerMessages />} />
                   <Route path="/admin/mail" element={<AdminMailCenter />} />
                   <Route path="/admin/login-history" element={<AdminLoginHistory />} />
+                  <Route path="/admin/fees" element={<AdminFeePayments />} />
                   <Route path="/admin/registration/:id" element={<AdminRegistrationDetail />} />
                   <Route path="/admin/players" element={<AdminPlayers />} />
                   <Route path="/admin/inquiries" element={<AdminInquiries />} />
@@ -136,6 +139,7 @@ const App = () => {
                   <Route path="/player/attendance" element={<PlayerAttendance />} />
                   <Route path="/player/messages" element={<PlayerMessages />} />
                   <Route path="/player/change-password" element={<PlayerChangePassword />} />
+                  <Route path="/player/fees" element={<PlayerFeeStatus />} />
                   <Route path="/id-card/:id" element={<IDCardGenerator />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

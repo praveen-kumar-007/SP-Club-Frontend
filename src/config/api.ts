@@ -46,6 +46,8 @@ export const API_ENDPOINTS = {
   ADMIN_MAIL_SETTINGS: `${API_BASE_URL}/api/admin/mail/settings`,
   ADMIN_MAIL_SEND: `${API_BASE_URL}/api/admin/mail/send`,
   ADMIN_LOGIN_HISTORY: `${API_BASE_URL}/api/admin/login-history`,
+  ADMIN_FEE_PLAYERS: `${API_BASE_URL}/api/admin/fees/players`,
+  ADMIN_FEE_PLAYER_STATUS: `${API_BASE_URL}/api/admin/fees`,
   PLAYER_LOGIN: `${API_BASE_URL}/api/player/login`,
   PLAYER_ME: `${API_BASE_URL}/api/player/me`,
   PLAYER_ME_UPDATE: `${API_BASE_URL}/api/player/me`,
@@ -57,6 +59,7 @@ export const API_ENDPOINTS = {
   PLAYER_FORGOT_PASSWORD_REQUEST: `${API_BASE_URL}/api/player/password/forgot/request`,
   PLAYER_FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/player/password/forgot/reset`,
   PLAYER_CHANGE_PASSWORD: `${API_BASE_URL}/api/player/password/change`,
+  PLAYER_FEES: `${API_BASE_URL}/api/player/fees`,
 };
 
 export const getNewsShareUrl = (newsId: string): string =>

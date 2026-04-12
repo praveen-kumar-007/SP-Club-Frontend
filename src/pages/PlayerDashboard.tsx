@@ -1,13 +1,15 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
 import { PLAYER_ATTENDANCE_RADIUS_METERS, SP_KABADDI_LOCATION } from "@/config/maps";
+import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCalendar";
+import Seo from "@/components/Seo";
 import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange, getKitSizeRange } from "@/utils/kitSizes";
-import { Award, Bell, CalendarDays, Camera, CreditCard, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2 } from "lucide-react";
+import { AlertTriangle, Award, Bell, CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, CreditCard, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2, Wallet } from "lucide-react";
 
 interface PlayerProfile {
     id: string;
@@ -26,6 +28,7 @@ interface PlayerProfile {
     kitSize?: string;
     jerseyNumber?: number;
     status?: string;
+    feeAccessEnabled?: boolean;
     photo: string;
     certificates: Array<{
         title: string;
@@ -72,6 +75,17 @@ const formatDistanceAway = (distanceMeters: number) => {
     return `${kilometers} km and ${meters} meter`;
 };
 
+const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+};
+
+const shiftMonth = (value: string, delta: number) => {
+    const [yearStr, monthStr] = value.split("-");
+    const date = new Date(Number(yearStr), Number(monthStr) - 1 + delta, 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+};
+
 const PlayerDashboard = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -84,8 +98,17 @@ const PlayerDashboard = () => {
     const [jerseyNumber, setJerseyNumber] = useState("");
     const [markingTodayAttendance, setMarkingTodayAttendance] = useState(false);
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+    const [attendanceMonth, setAttendanceMonth] = useState(getCurrentMonth());
+    const [attendanceEntries, setAttendanceEntries] = useState<AttendanceEntry[]>([]);
+    const [practiceDates, setPracticeDates] = useState<string[]>([]);
+    const [loadingAttendance, setLoadingAttendance] = useState(false);
     const photoInputRef = useRef<HTMLInputElement | null>(null);
     const selectedKitRange = getKitSizeRange(kitSize);
+    const attendanceMonthLabel = useMemo(() => {
+        const [yearStr, monthStr] = attendanceMonth.split("-");
+        const date = new Date(Number(yearStr), Number(monthStr) - 1, 1);
+        return date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+    }, [attendanceMonth]);
 
     const storedPlayer = localStorage.getItem("playerUser");
     const parsedPlayer = (() => {
@@ -131,6 +154,33 @@ const PlayerDashboard = () => {
         setUnreadMessageCount(Number(data.unreadCount || 0));
     };
 
+    const fetchAttendance = async (activePlayerToken: string, month: string) => {
+        setLoadingAttendance(true);
+        try {
+            const response = await fetch(`${API_ENDPOINTS.PLAYER_ATTENDANCE}?month=${month}`, {
+                headers: {
+                    Authorization: `Bearer ${activePlayerToken}`,
+                },
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to load attendance calendar");
+            }
+
+            setAttendanceEntries(Array.isArray(data.attendance) ? data.attendance : []);
+            setPracticeDates(Array.isArray(data.practiceDates) ? data.practiceDates : []);
+        } catch (error) {
+            toast({
+                title: "Attendance Calendar",
+                description: error instanceof Error ? error.message : "Unable to load attendance",
+                variant: "destructive",
+            });
+        } finally {
+            setLoadingAttendance(false);
+        }
+    };
+
     useEffect(() => {
         const initialize = async () => {
             if (!playerId || !playerToken) {
@@ -157,6 +207,11 @@ const PlayerDashboard = () => {
 
         initialize();
     }, [navigate, playerId, playerToken, toast]);
+
+    useEffect(() => {
+        if (!playerToken || isLoading) return;
+        fetchAttendance(playerToken, attendanceMonth);
+    }, [attendanceMonth, playerToken, isLoading]);
 
     useEffect(() => {
         if (!isLoading && player && player.status !== "approved") {
@@ -296,6 +351,8 @@ const PlayerDashboard = () => {
                 title: "Attendance Marked",
                 description: "Today's attendance marked successfully.",
             });
+
+            await fetchAttendance(playerToken, attendanceMonth);
         } catch (error) {
             toast({
                 title: "Attendance Failed",
@@ -377,13 +434,19 @@ const PlayerDashboard = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 p-3 sm:p-4 md:p-8">
+            <Seo
+                title="Player Dashboard"
+                description="Player dashboard for attendance, fee status, profile, and admin communication."
+                url="https://spkabaddi.me/player/dashboard"
+                keywords="player dashboard, attendance, fee status, SP Kabaddi"
+            />
             <div className="max-w-6xl mx-auto space-y-6">
                 <Card className="border-blue-200 shadow-sm">
                     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <CardTitle className="text-2xl text-slate-800">Student Dashboard</CardTitle>
+                            <CardTitle className="text-2xl text-slate-800">Player Dashboard</CardTitle>
                             <CardDescription>
-                                Welcome {player?.name} ({player?.idCardNumber || "ID not generated"})
+                                Hello {player?.name}. Your ID: {player?.idCardNumber || "Not ready yet"}
                             </CardDescription>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">
@@ -410,13 +473,105 @@ const PlayerDashboard = () => {
                     </CardHeader>
                 </Card>
 
+                <Card className="border-emerald-200 bg-emerald-50/50">
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 text-lg">Quick Guide</CardTitle>
+                        <CardDescription>Recommended daily order.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm text-slate-700">
+                        <p>1. Mark attendance.</p>
+                        <p>2. Review fee status.</p>
+                        <p>3. Message admin if support is needed.</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-orange-200 bg-orange-50/60">
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 flex items-center gap-2">
+                            <MapPin className="h-5 w-5 text-orange-700" />
+                            Daily Quick Action
+                        </CardTitle>
+                        <CardDescription>Mark attendance once daily after reaching the ground.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button
+                            className="w-full bg-orange-600 py-6 text-base font-bold hover:bg-orange-700"
+                            disabled={markingTodayAttendance}
+                            onClick={handleMarkTodayAttendance}
+                        >
+                            {markingTodayAttendance ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Marking Attendance...
+                                </>
+                            ) : (
+                                <>
+                                    <MapPin className="mr-2 h-5 w-5" />
+                                    Mark Attendance
+                                </>
+                            )}
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 flex items-center gap-2">
+                            <CalendarDays className="h-5 w-5 text-blue-800" />
+                            Attendance Calendar
+                        </CardTitle>
+                        <CardDescription>Green means present. Red means absent.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, -1))}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <div className="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                                {attendanceMonthLabel}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, 1))}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="ml-auto"
+                                onClick={() => navigate("/player/attendance")}
+                            >
+                                See Full Attendance
+                            </Button>
+                        </div>
+
+                        {loadingAttendance ? (
+                            <div className="flex items-center py-6 text-sm text-slate-600">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Loading attendance calendar...
+                            </div>
+                        ) : (
+                            <AttendanceCalendar
+                                month={attendanceMonth}
+                                attendance={attendanceEntries}
+                                practiceDates={practiceDates}
+                            />
+                        )}
+                    </CardContent>
+                </Card>
+
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-slate-800 flex items-center gap-2">
                             <UserCircle2 className="h-5 w-5 text-blue-800" />
-                            Profile Details
+                            Your Details
                         </CardTitle>
-                        <CardDescription>All your registration details are visible here in read-only format.</CardDescription>
+                        <CardDescription>This is your saved profile information.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-lg border border-blue-100 bg-blue-50/40 p-4">
@@ -523,10 +678,10 @@ const PlayerDashboard = () => {
                     <CardHeader>
                         <CardTitle className="text-slate-800 flex items-center gap-2">
                             <CreditCard className="h-5 w-5 text-blue-800" />
-                            Kit & Jersey
+                            Kit and Jersey
                         </CardTitle>
                         <CardDescription>
-                            Update your kit size anytime. Jersey number selection is only enabled once your registration is approved.
+                            Choose your kit size. Jersey number is available after approval.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -610,7 +765,7 @@ const PlayerDashboard = () => {
                                 </>
                             ) : (
                                 <Button className="bg-blue-800 hover:bg-blue-900" onClick={() => setEditingKitDetails(true)}>
-                                    Edit Kit & Jersey
+                                    Edit Kit and Jersey
                                 </Button>
                             )}
                         </div>
@@ -622,9 +777,9 @@ const PlayerDashboard = () => {
                         <CardHeader>
                             <CardTitle className="text-slate-800 flex items-center gap-2">
                                 <CreditCard className="h-5 w-5 text-blue-800" />
-                                ID Card
+                                Your ID Card
                             </CardTitle>
-                            <CardDescription>Your player ID card details.</CardDescription>
+                            <CardDescription>See your player ID details.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <p className="text-sm text-slate-600">
@@ -645,9 +800,9 @@ const PlayerDashboard = () => {
                         <CardHeader>
                             <CardTitle className="text-slate-800 flex items-center gap-2">
                                 <Award className="h-5 w-5 text-blue-800" />
-                                Certificates
+                                Your Certificates
                             </CardTitle>
-                            <CardDescription>Your uploaded/issued certificates.</CardDescription>
+                            <CardDescription>All your certificate files are here.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             {player?.certificates?.length ? (
@@ -679,13 +834,13 @@ const PlayerDashboard = () => {
                         <CardHeader>
                             <CardTitle className="text-slate-800 flex items-center gap-2">
                                 <KeyRound className="h-5 w-5 text-blue-800" />
-                                Change Password
+                                Change Login Password
                             </CardTitle>
-                            <CardDescription>Keep your account secure by updating your password regularly.</CardDescription>
+                            <CardDescription>Update your password anytime for safety.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Button className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700" onClick={() => navigate("/player/change-password")}>
-                                Open Change Password
+                                Change Password
                             </Button>
                         </CardContent>
                     </Card>
@@ -695,14 +850,14 @@ const PlayerDashboard = () => {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-slate-800 flex items-center gap-2">
-                                <CalendarDays className="h-5 w-5 text-blue-800" />
-                                Full Attendance
+                                <Send className="h-5 w-5 text-blue-800" />
+                                Message Admin
                             </CardTitle>
-                            <CardDescription>Open dedicated attendance page to view complete attendance details.</CardDescription>
+                            <CardDescription>Send a message and see old replies.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Button className="w-full sm:w-auto bg-blue-800 hover:bg-blue-900" onClick={() => navigate("/player/attendance")}>
-                                Open Full Attendance Page
+                            <Button className="w-full sm:w-auto bg-blue-800 hover:bg-blue-900" onClick={() => navigate("/player/messages")}>
+                                Open Messages
                             </Button>
                         </CardContent>
                     </Card>
@@ -710,47 +865,39 @@ const PlayerDashboard = () => {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-slate-800 flex items-center gap-2">
-                                <Send className="h-5 w-5 text-blue-800" />
-                                Send Message To Admin
+                                <Wallet className="h-5 w-5 text-blue-800" />
+                                Fee Status
                             </CardTitle>
-                            <CardDescription>Open dedicated page to send letter/notice and view your message history.</CardDescription>
+                            <CardDescription>
+                                {player?.feeAccessEnabled
+                                    ? "See if your monthly payment is done or pending."
+                                    : "Fee section is not enabled for your account yet."}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Button className="w-full sm:w-auto bg-blue-800 hover:bg-blue-900" onClick={() => navigate("/player/messages")}>
-                                Open Message Page
-                            </Button>
+                            {player?.feeAccessEnabled ? (
+                                <div className="space-y-3">
+                                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">
+                                            <CheckCircle2 className="h-4 w-4" /> Paid
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-1 text-red-800">
+                                            <AlertTriangle className="h-4 w-4" /> Pending
+                                        </span>
+                                    </div>
+                                    <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700" onClick={() => navigate("/player/fees")}>
+                                        See Fee History
+                                    </Button>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-600">
+                                    Ask admin to add your name in fee list.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-slate-800 flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-blue-800" />
-                            Mark Today's Attendance
-                        </CardTitle>
-                        <CardDescription>This quick action marks only today's attendance from dashboard bottom.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button
-                            className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
-                            disabled={markingTodayAttendance}
-                            onClick={handleMarkTodayAttendance}
-                        >
-                            {markingTodayAttendance ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Capturing Location...
-                                </>
-                            ) : (
-                                <>
-                                    <MapPin className="mr-2 h-4 w-4" />
-                                    Mark Attendance For Today
-                                </>
-                            )}
-                        </Button>
-                    </CardContent>
-                </Card>
             </div>
         </div>
     );

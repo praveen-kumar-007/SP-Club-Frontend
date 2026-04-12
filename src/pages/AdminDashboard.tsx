@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays, Wallet } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -568,6 +568,14 @@ const AdminDashboard = () => {
             </Button>
             <Button
               variant="outline"
+              onClick={() => navigate("/admin/fees")}
+              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-700 font-semibold"
+            >
+              <Wallet size={18} className="mr-2" />
+              <span>Fee Payments</span>
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => navigate("/admin/mail")}
               className="bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-700 font-semibold"
             >
@@ -643,6 +651,13 @@ const AdminDashboard = () => {
             >
               <Search size={18} className="mr-2" />
               <span>Player Directory</span>
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/fees")}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 h-auto"
+            >
+              <Wallet size={18} className="mr-2" />
+              <span>Fee Payments</span>
             </Button>
             <Button
               onClick={() => navigate("/admin/mail")}
