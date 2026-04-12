@@ -37,6 +37,12 @@ interface PlayerProfile {
     }>;
 }
 
+interface DashboardFeeStatus {
+    month: string;
+    isPaid: boolean;
+    updatedAt: string | null;
+}
+
 const MAX_ALLOWED_ACCURACY_METERS = 100;
 
 const hasValidCoordinates = (latitude: number, longitude: number) => {
@@ -98,6 +104,8 @@ const PlayerDashboard = () => {
     const [jerseyNumber, setJerseyNumber] = useState("");
     const [markingTodayAttendance, setMarkingTodayAttendance] = useState(false);
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+    const [feeStatus, setFeeStatus] = useState<DashboardFeeStatus | null>(null);
+    const [loadingFeeStatus, setLoadingFeeStatus] = useState(false);
     const [attendanceMonth, setAttendanceMonth] = useState(getCurrentMonth());
     const [attendanceEntries, setAttendanceEntries] = useState<AttendanceEntry[]>([]);
     const [practiceDates, setPracticeDates] = useState<string[]>([]);
@@ -181,6 +189,39 @@ const PlayerDashboard = () => {
         }
     };
 
+    const fetchCurrentMonthFeeStatus = async (activePlayerToken: string) => {
+        setLoadingFeeStatus(true);
+        try {
+            const currentMonth = getCurrentMonth();
+            const response = await fetch(`${API_ENDPOINTS.PLAYER_FEES}?month=${currentMonth}&months=1`, {
+                headers: {
+                    Authorization: `Bearer ${activePlayerToken}`,
+                },
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (response.status === 403) {
+                setFeeStatus(null);
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to fetch fee status");
+            }
+
+            setFeeStatus({
+                month: data.month || currentMonth,
+                isPaid: Boolean(data.selectedMonthStatus?.isPaid),
+                updatedAt: data.selectedMonthStatus?.updatedAt || null,
+            });
+        } catch (error) {
+            setFeeStatus(null);
+        } finally {
+            setLoadingFeeStatus(false);
+        }
+    };
+
     useEffect(() => {
         const initialize = async () => {
             if (!playerId || !playerToken) {
@@ -191,6 +232,7 @@ const PlayerDashboard = () => {
             try {
                 await fetchPlayerProfile(playerToken);
                 await fetchUnreadMessageCount(playerToken);
+                await fetchCurrentMonthFeeStatus(playerToken);
             } catch (error) {
                 localStorage.removeItem("playerToken");
                 localStorage.removeItem("playerUser");
@@ -353,6 +395,7 @@ const PlayerDashboard = () => {
             });
 
             await fetchAttendance(playerToken, attendanceMonth);
+            await fetchCurrentMonthFeeStatus(playerToken);
         } catch (error) {
             toast({
                 title: "Attendance Failed",
@@ -877,6 +920,19 @@ const PlayerDashboard = () => {
                         <CardContent>
                             {player?.feeAccessEnabled ? (
                                 <div className="space-y-3">
+                                    <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                                        <p className="text-xs text-slate-500">Current Month Fee Status</p>
+                                        {loadingFeeStatus ? (
+                                            <p className="mt-1 text-sm font-semibold text-slate-700">Checking status...</p>
+                                        ) : feeStatus?.isPaid ? (
+                                            <p className="mt-1 text-sm font-semibold text-emerald-700">Payment Done</p>
+                                        ) : (
+                                            <p className="mt-1 text-sm font-semibold text-red-700">Payment Pending</p>
+                                        )}
+                                        <p className="mt-2 text-xs text-amber-700 font-medium">
+                                            Note: Fee payment last day is 5 of every month.
+                                        </p>
+                                    </div>
                                     <div className="flex flex-wrap items-center gap-2 text-sm">
                                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">
                                             <CheckCircle2 className="h-4 w-4" /> Paid

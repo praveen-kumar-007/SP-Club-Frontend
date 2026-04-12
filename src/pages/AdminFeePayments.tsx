@@ -53,14 +53,15 @@ const AdminFeePayments = () => {
   const [players, setPlayers] = useState<FeePlayer[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<FeePlayer | null>(null);
   const [month, setMonth] = useState(getCurrentMonth());
-  const [selectedMonthPaid, setSelectedMonthPaid] = useState(false);
   const [history, setHistory] = useState<FeeHistoryItem[]>([]);
   const [historyPlayer, setHistoryPlayer] = useState<FeePlayer | null>(null);
   const [loadingPlayers, setLoadingPlayers] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [savingPayment, setSavingPayment] = useState(false);
+  const [savingPaymentFor, setSavingPaymentFor] = useState<string | null>(null);
   const [updatingFeeAccessFor, setUpdatingFeeAccessFor] = useState<string | null>(null);
   const [isPlayerListOpen, setIsPlayerListOpen] = useState(false);
+  const [loadingMonthStatuses, setLoadingMonthStatuses] = useState(false);
+  const [monthStatusByPlayer, setMonthStatusByPlayer] = useState<Record<string, boolean>>({});
 
   const token = localStorage.getItem("adminToken");
 
@@ -259,10 +260,10 @@ const AdminFeePayments = () => {
     await loadFeeHistory(player._id, month);
   };
 
-  const toggleMonthlyPayment = async (checked: boolean) => {
-    if (!token || !selectedPlayer) return;
+  const toggleMonthlyPayment = async (player: FeePlayer, checked: boolean) => {
+    if (!token) return;
 
-    if (!selectedPlayer.feeAccessEnabled) {
+    if (!player.feeAccessEnabled) {
       toast({
         title: "Not In Fee List",
         description: "Enable this participant in fee list before updating payment status.",
@@ -271,9 +272,9 @@ const AdminFeePayments = () => {
       return;
     }
 
-    setSavingPayment(true);
+    setSavingPaymentFor(player._id);
     try {
-      const response = await fetch(`${API_ENDPOINTS.ADMIN_FEE_PLAYER_STATUS}/${selectedPlayer._id}/toggle`, {
+      const response = await fetch(`${API_ENDPOINTS.ADMIN_FEE_PLAYER_STATUS}/${player._id}/toggle`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -287,9 +288,21 @@ const AdminFeePayments = () => {
         throw new Error(data.message || "Failed to update payment status");
       }
 
-      setSelectedMonthPaid(checked);
-      if (historyPlayer?._id === selectedPlayer._id) {
-        await loadFeeHistory(selectedPlayer._id, month);
+      setMonthStatusByPlayer((prev) => ({
+        ...prev,
+        [player._id]: checked,
+      }));
+
+      setPlayers((current) =>
+        current.map((item) =>
+          item._id === player._id && month === getCurrentMonth()
+            ? { ...item, currentMonthPaid: checked }
+            : item,
+        ),
+      );
+
+      if (historyPlayer?._id === player._id) {
+        await loadFeeHistory(player._id, month);
       }
 
       toast({
@@ -303,7 +316,7 @@ const AdminFeePayments = () => {
         variant: "destructive",
       });
     } finally {
-      setSavingPayment(false);
+      setSavingPaymentFor(null);
     }
   };
 
@@ -317,18 +330,48 @@ const AdminFeePayments = () => {
   }, [token, navigate]);
 
   useEffect(() => {
-    if (!selectedPlayer) {
-      setSelectedMonthPaid(false);
-      return;
-    }
+    const loadMonthStatuses = async () => {
+      if (!token) return;
 
-    if (!selectedPlayer.feeAccessEnabled) {
-      setSelectedMonthPaid(false);
-      return;
-    }
+      const currentEnabledPlayers = players.filter((player) => player.feeAccessEnabled);
+      if (!currentEnabledPlayers.length) {
+        setMonthStatusByPlayer({});
+        return;
+      }
 
-    loadSelectedMonthStatus(selectedPlayer._id, month);
-  }, [selectedPlayer, month]);
+      setLoadingMonthStatuses(true);
+      try {
+        const results = await Promise.all(
+          currentEnabledPlayers.map(async (player) => {
+            const response = await fetch(
+              `${API_ENDPOINTS.ADMIN_FEE_PLAYER_STATUS}/${player._id}?month=${month}&months=1`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            );
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              return [player._id, false] as const;
+            }
+
+            return [player._id, Boolean(data.selectedMonthStatus?.isPaid)] as const;
+          }),
+        );
+
+        const nextStatusMap: Record<string, boolean> = {};
+        for (const [playerId, isPaid] of results) {
+          nextStatusMap[playerId] = isPaid;
+        }
+
+        setMonthStatusByPlayer(nextStatusMap);
+      } finally {
+        setLoadingMonthStatuses(false);
+      }
+    };
+
+    loadMonthStatuses();
+  }, [token, players, month]);
 
   useEffect(() => {
     if (!historyPlayer) return;
@@ -446,12 +489,10 @@ const AdminFeePayments = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Wallet className="h-5 w-5 text-emerald-700" />
-                  Monthly Payment Toggle
+                  Monthly Fee Payment Dashboard
                 </CardTitle>
                 <CardDescription>
-                  {selectedPlayer
-                    ? `Player: ${selectedPlayer.name}`
-                    : "Please select a player first."}
+                  On/Off controls are available here directly for all enabled players.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -467,46 +508,58 @@ const AdminFeePayments = () => {
                   </Button>
                 </div>
 
-                {!selectedPlayer ? (
-                  <p className="text-sm text-slate-500">Choose a participant from the left panel.</p>
-                ) : !selectedPlayer.feeAccessEnabled ? (
-                  <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                    This player is not in fee list. Turn on the list switch to enable monthly payment tracking.
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <Label className="text-base font-semibold text-slate-800">
+                      Payment Status For {selectedMonthLabel}
+                    </Label>
+                    {loadingMonthStatuses ? (
+                      <span className="inline-flex items-center text-xs text-slate-500">
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Loading
+                      </span>
+                    ) : null}
                   </div>
-                ) : (
-                  <div className="rounded-lg border border-slate-200 bg-white p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <Label htmlFor="payment-toggle" className="text-base font-semibold text-slate-800">
-                          Payment Received For {selectedMonthLabel}
-                        </Label>
-                        <p className="mt-1 text-sm text-slate-600">
-                          ON = Paid, OFF = Pending.
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {savingPayment && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
-                        <Switch
-                          id="payment-toggle"
-                          checked={selectedMonthPaid}
-                          disabled={savingPayment || loadingHistory}
-                          onCheckedChange={toggleMonthlyPayment}
-                        />
-                      </div>
+
+                  {enabledPlayers.length === 0 ? (
+                    <p className="text-sm text-slate-500">No enabled player found. Enable players from Approved Players list.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {enabledPlayers.map((player) => {
+                        const isPaid = Boolean(monthStatusByPlayer[player._id]);
+                        const isSaving = savingPaymentFor === player._id;
+
+                        return (
+                          <div
+                            key={`payment-${player._id}`}
+                            className="flex items-center justify-between gap-3 rounded-md border border-slate-200 px-3 py-2"
+                          >
+                            <div>
+                              <p className="font-medium text-slate-800">{player.name}</p>
+                              <p className="text-xs text-slate-500">{player.idCardNumber || "ID not generated"}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isPaid ? (
+                                <Badge className="bg-emerald-100 text-emerald-700">
+                                  <CheckCircle2 className="mr-1 h-4 w-4" /> Paid
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-red-100 text-red-700">
+                                  <AlertTriangle className="mr-1 h-4 w-4" /> Pending
+                                </Badge>
+                              )}
+
+                              <Switch
+                                checked={isPaid}
+                                disabled={isSaving || loadingMonthStatuses}
+                                onCheckedChange={(checked) => toggleMonthlyPayment(player, checked)}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="mt-4">
-                      {selectedMonthPaid ? (
-                        <Badge className="bg-emerald-100 text-emerald-700">
-                          <CheckCircle2 className="mr-1 h-4 w-4" /> Payment Done
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-red-100 text-red-700">
-                          <AlertTriangle className="mr-1 h-4 w-4" /> Payment Pending
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -597,13 +650,6 @@ const AdminFeePayments = () => {
                             <Badge className="bg-emerald-600 text-white">
                               <CheckCircle2 className="mr-1 h-4 w-4" /> Enabled
                             </Badge>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setSelectedPlayer(player)}
-                            >
-                              Select
-                            </Button>
                             <Button
                               size="sm"
                               onClick={() => handleViewHistory(player)}
