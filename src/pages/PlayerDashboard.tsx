@@ -473,98 +473,6 @@ const PlayerDashboard = () => {
                     </CardHeader>
                 </Card>
 
-                <Card className="border-emerald-200 bg-emerald-50/50">
-                    <CardHeader>
-                        <CardTitle className="text-slate-800 text-lg">Quick Guide</CardTitle>
-                        <CardDescription>Recommended daily order.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm text-slate-700">
-                        <p>1. Mark attendance.</p>
-                        <p>2. Review fee status.</p>
-                        <p>3. Message admin if support is needed.</p>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-orange-200 bg-orange-50/60">
-                    <CardHeader>
-                        <CardTitle className="text-slate-800 flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-orange-700" />
-                            Daily Quick Action
-                        </CardTitle>
-                        <CardDescription>Mark attendance once daily after reaching the ground.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button
-                            className="w-full bg-orange-600 py-6 text-base font-bold hover:bg-orange-700"
-                            disabled={markingTodayAttendance}
-                            onClick={handleMarkTodayAttendance}
-                        >
-                            {markingTodayAttendance ? (
-                                <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Marking Attendance...
-                                </>
-                            ) : (
-                                <>
-                                    <MapPin className="mr-2 h-5 w-5" />
-                                    Mark Attendance
-                                </>
-                            )}
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-slate-800 flex items-center gap-2">
-                            <CalendarDays className="h-5 w-5 text-blue-800" />
-                            Attendance Calendar
-                        </CardTitle>
-                        <CardDescription>Green means present. Red means absent.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, -1))}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-                            <div className="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
-                                {attendanceMonthLabel}
-                            </div>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, 1))}
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="ml-auto"
-                                onClick={() => navigate("/player/attendance")}
-                            >
-                                See Full Attendance
-                            </Button>
-                        </div>
-
-                        {loadingAttendance ? (
-                            <div className="flex items-center py-6 text-sm text-slate-600">
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Loading attendance calendar...
-                            </div>
-                        ) : (
-                            <AttendanceCalendar
-                                month={attendanceMonth}
-                                attendance={attendanceEntries}
-                                practiceDates={practiceDates}
-                            />
-                        )}
-                    </CardContent>
-                </Card>
-
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-slate-800 flex items-center gap-2">
@@ -671,6 +579,98 @@ const PlayerDashboard = () => {
                                 <p className="font-medium text-slate-800">{player?.clubDetails || "N/A"}</p>
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-emerald-200 bg-emerald-50/50">
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 text-lg">Quick Guide</CardTitle>
+                        <CardDescription>Recommended daily order.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm text-slate-700">
+                        <p>1. Mark attendance.</p>
+                        <p>2. Review fee status.</p>
+                        <p>3. Message admin if support is needed.</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-orange-200 bg-orange-50/60">
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 flex items-center gap-2">
+                            <MapPin className="h-5 w-5 text-orange-700" />
+                            Daily Quick Action
+                        </CardTitle>
+                        <CardDescription>Mark attendance once daily after reaching the ground.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button
+                            className="w-full bg-orange-600 py-6 text-base font-bold hover:bg-orange-700"
+                            disabled={markingTodayAttendance}
+                            onClick={handleMarkTodayAttendance}
+                        >
+                            {markingTodayAttendance ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Marking Attendance...
+                                </>
+                            ) : (
+                                <>
+                                    <MapPin className="mr-2 h-5 w-5" />
+                                    Mark Attendance
+                                </>
+                            )}
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-slate-800 flex items-center gap-2">
+                            <CalendarDays className="h-5 w-5 text-blue-800" />
+                            Attendance Calendar
+                        </CardTitle>
+                        <CardDescription>Green means present. Red means absent.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, -1))}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <div className="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                                {attendanceMonthLabel}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setAttendanceMonth((prev) => shiftMonth(prev, 1))}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="ml-auto"
+                                onClick={() => navigate("/player/attendance")}
+                            >
+                                See Full Attendance
+                            </Button>
+                        </div>
+
+                        {loadingAttendance ? (
+                            <div className="flex items-center py-6 text-sm text-slate-600">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Loading attendance calendar...
+                            </div>
+                        ) : (
+                            <AttendanceCalendar
+                                month={attendanceMonth}
+                                attendance={attendanceEntries}
+                                practiceDates={practiceDates}
+                            />
+                        )}
                     </CardContent>
                 </Card>
 

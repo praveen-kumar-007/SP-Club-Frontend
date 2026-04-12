@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import Seo from "@/components/Seo";
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Loader2, Search, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Loader2, Search, Users, Wallet } from "lucide-react";
 
 interface FeePlayer {
   _id: string;
@@ -59,6 +59,7 @@ const AdminFeePayments = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [savingPayment, setSavingPayment] = useState(false);
   const [updatingFeeAccessFor, setUpdatingFeeAccessFor] = useState<string | null>(null);
+  const [isPlayerListOpen, setIsPlayerListOpen] = useState(false);
 
   const token = localStorage.getItem("adminToken");
 
@@ -71,6 +72,11 @@ const AdminFeePayments = () => {
       return text.includes(q);
     });
   }, [players, search]);
+
+  const enabledPlayers = useMemo(
+    () => players.filter((player) => player.feeAccessEnabled),
+    [players],
+  );
 
   const selectedMonthLabel = useMemo(() => formatMonthLabel(month), [month]);
 
@@ -181,17 +187,16 @@ const AdminFeePayments = () => {
         ),
       );
 
-      setSelectedPlayer((prev) =>
-        prev && prev._id === player._id
-          ? {
-              ...prev,
-              feeAccessEnabled: enabled,
-            }
-          : prev,
-      );
+      const updatedSelectedPlayer = {
+        ...player,
+        feeAccessEnabled: enabled,
+      };
+
+      setSelectedPlayer(updatedSelectedPlayer);
 
       if (!enabled) {
         setSelectedMonthPaid(false);
+        setHistory([]);
       } else {
         await loadFeeHistory(player._id, month);
       }
@@ -305,19 +310,45 @@ const AdminFeePayments = () => {
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-4 w-4" />
-                Participants
-              </CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Approved Players
+                </CardTitle>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsPlayerListOpen((prev) => !prev)}
+                >
+                  {isPlayerListOpen ? (
+                    <>
+                      <ChevronUp className="mr-1 h-4 w-4" /> Close List
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="mr-1 h-4 w-4" /> Open List
+                    </>
+                  )}
+                </Button>
+              </div>
               <CardDescription>Turn switch ON to include player in fee module.</CardDescription>
-              <Input
-                placeholder="Search by name, phone, email"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
+              {isPlayerListOpen ? (
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+                  <Input
+                    className="pl-9"
+                    placeholder="Search by name, phone, email"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                  />
+                </div>
+              ) : null}
             </CardHeader>
             <CardContent className="max-h-[70vh] space-y-2 overflow-auto">
-              {loadingPlayers ? (
+              {!isPlayerListOpen ? (
+                <p className="text-sm text-slate-500">Click Open List to view approved players.</p>
+              ) : loadingPlayers ? (
                 <div className="flex items-center justify-center py-8 text-sm text-slate-600">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Loading participants...
@@ -473,6 +504,47 @@ const AdminFeePayments = () => {
                           </Badge>
                         )}
                       </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Players Enabled For Fee Module</CardTitle>
+                <CardDescription>
+                  These players can view fee status in player login.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {enabledPlayers.length === 0 ? (
+                  <p className="text-sm text-slate-500">No player is enabled yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {enabledPlayers.map((player) => (
+                      <button
+                        key={player._id}
+                        type="button"
+                        className={`w-full rounded-md border p-3 text-left transition ${
+                          selectedPlayer?._id === player._id
+                            ? "border-emerald-500 bg-emerald-50"
+                            : "border-slate-200 hover:border-slate-300"
+                        }`}
+                        onClick={() => setSelectedPlayer(player)}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-slate-800">{player.name}</p>
+                            <p className="text-xs text-slate-500">
+                              {player.idCardNumber || "ID not generated"}
+                            </p>
+                          </div>
+                          <Badge className="bg-emerald-600 text-white">
+                            <CheckCircle2 className="mr-1 h-4 w-4" /> Enabled
+                          </Badge>
+                        </div>
+                      </button>
                     ))}
                   </div>
                 )}

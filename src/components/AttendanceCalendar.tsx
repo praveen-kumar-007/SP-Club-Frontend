@@ -13,6 +13,7 @@ interface AttendanceCalendarProps {
 }
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const ATTENDANCE_FEATURE_START_DATE = "2026-04-10";
 
 const getTodayInIST = () => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -60,13 +61,16 @@ const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: Attendanc
 
     for (let day = 1; day <= parsed.totalDays; day += 1) {
         const dayIso = `${parsed.year}-${String(parsed.monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const isBeforeFeatureStart = dayIso < ATTENDANCE_FEATURE_START_DATE;
         const isFuture = dayIso > todayIso;
         const isPast = dayIso < todayIso;
         const isPresent = presentDates.has(dayIso);
         const isPracticeDone = practiceDateSet.has(dayIso);
 
         let tone = "bg-slate-100 text-slate-700";
-        if (!isFuture && isPresent) {
+        if (isBeforeFeatureStart) {
+            tone = "bg-white text-slate-500 border-slate-200";
+        } else if (!isFuture && isPresent) {
             tone = "bg-green-600 text-white";
         } else if (isPast && !isPracticeDone) {
             tone = "bg-blue-900 text-white";
@@ -75,7 +79,9 @@ const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: Attendanc
         }
 
         let title = "Future day";
-        if (!isFuture && isPresent) {
+        if (isBeforeFeatureStart) {
+            title = "Attendance not started";
+        } else if (!isFuture && isPresent) {
             title = "Present";
         } else if (isPast && !isPracticeDone) {
             title = "Practice Not Done";
@@ -103,6 +109,9 @@ const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: Attendanc
             <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-slate-800 sm:text-lg">{parsed.label}</h3>
                 <div className="flex flex-wrap items-center gap-2 text-xs font-medium sm:gap-3">
+                        <span className="inline-flex items-center gap-1">
+                            <span className="h-3 w-3 rounded-sm border border-slate-300 bg-white" /> Not Started
+                        </span>
                     <span className="inline-flex items-center gap-1">
                         <span className="h-3 w-3 rounded-sm bg-green-600" /> Present
                     </span>
