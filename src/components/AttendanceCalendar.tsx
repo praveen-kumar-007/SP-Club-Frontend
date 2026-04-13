@@ -109,9 +109,9 @@ const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: Attendanc
             <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-slate-800 sm:text-lg">{parsed.label}</h3>
                 <div className="flex flex-wrap items-center gap-2 text-xs font-medium sm:gap-3">
-                        <span className="inline-flex items-center gap-1">
-                            <span className="h-3 w-3 rounded-sm border border-slate-300 bg-white" /> Not Started
-                        </span>
+                    <span className="inline-flex items-center gap-1">
+                        <span className="h-3 w-3 rounded-sm border border-slate-300 bg-white" /> Not Started
+                    </span>
                     <span className="inline-flex items-center gap-1">
                         <span className="h-3 w-3 rounded-sm bg-green-600" /> Present
                     </span>
