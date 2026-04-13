@@ -24,7 +24,9 @@ export const isCurrentAdminSuperAdmin = (): boolean => {
   try {
     const admin = JSON.parse(raw) as { role?: string };
     const role = (admin.role || "").toLowerCase().trim();
-    return role === "super admin" || role === "superadmin" || role === "super_admin";
+    return (
+      role === "super admin" || role === "superadmin" || role === "super_admin"
+    );
   } catch {
     return false;
   }
@@ -53,30 +55,35 @@ const hasValidCoordinates = (latitude: number, longitude: number) => {
     latitude <= 90 &&
     longitude >= -180 &&
     longitude <= 180;
-  const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
+  const notZeroPair = !(
+    Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001
+  );
   return validRange && notZeroPair;
 };
 
-export const getRequiredAdminLocationPayload = async (): Promise<AdminLocationPayload> => {
-  const position = await getLiveLocation();
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
-  const accuracy = Number(position.coords.accuracy);
+export const getRequiredAdminLocationPayload =
+  async (): Promise<AdminLocationPayload> => {
+    const position = await getLiveLocation();
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    const accuracy = Number(position.coords.accuracy);
 
-  if (!hasValidCoordinates(latitude, longitude)) {
-    throw new Error("Valid latitude and longitude are required to mark attendance.");
-  }
+    if (!hasValidCoordinates(latitude, longitude)) {
+      throw new Error(
+        "Valid latitude and longitude are required to mark attendance.",
+      );
+    }
 
-  if (!Number.isFinite(accuracy) || accuracy > MAX_ALLOWED_ACCURACY_METERS) {
-    throw new Error(
-      `Location is not precise enough (${Math.round(accuracy)}m). Enable precise location and retry.`
-    );
-  }
+    if (!Number.isFinite(accuracy) || accuracy > MAX_ALLOWED_ACCURACY_METERS) {
+      throw new Error(
+        `Location is not precise enough (${Math.round(accuracy)}m). Enable precise location and retry.`,
+      );
+    }
 
-  return {
-    latitude,
-    longitude,
-    accuracy,
-    address: "Marked by admin with live location",
+    return {
+      latitude,
+      longitude,
+      accuracy,
+      address: "Marked by admin with live location",
+    };
   };
-};
