@@ -4,11 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
 import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCalendar";
 import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Search, ShieldCheck } from "lucide-react";
+import {
+    getAdminAttendanceGeoEnabled,
+    getRequiredAdminLocationPayload,
+    isCurrentAdminSuperAdmin,
+    setAdminAttendanceGeoEnabled,
+} from "@/utils/adminAttendanceGeo";
 
 interface PlayerItem {
     _id: string;
@@ -57,29 +64,6 @@ const changeMonth = (value: string, delta: number) => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 };
 
-const MAX_ALLOWED_ACCURACY_METERS = 100;
-
-const getLiveLocation = () => {
-    return new Promise<GeolocationPosition>((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error("Geolocation is not supported by your browser"));
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 0,
-        });
-    });
-};
-
-const hasValidCoordinates = (latitude: number, longitude: number) => {
-    const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
-    const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
-    return validRange && notZeroPair;
-};
-
 const normalizeSearchText = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
 
 const matchesRelatedSearch = (fields: Array<string | undefined>, query: string) => {
@@ -110,11 +94,13 @@ const AdminPlayerAttendance = () => {
     const [practiceDates, setPracticeDates] = useState<string[]>([]);
     const [loadingPlayers, setLoadingPlayers] = useState(false);
     const [markingByAdmin, setMarkingByAdmin] = useState(false);
+    const [adminGeoEnabled, setAdminGeoEnabled] = useState(getAdminAttendanceGeoEnabled);
     const [markDate, setMarkDate] = useState(new Date().toISOString().split("T")[0]);
     const [markStatus, setMarkStatus] = useState<"present" | "absent">("present");
     const [adminNote, setAdminNote] = useState("");
 
     const token = localStorage.getItem("adminToken");
+    const isSuperAdmin = useMemo(() => isCurrentAdminSuperAdmin(), []);
 
     const attendanceForCalendar: AttendanceEntry[] = useMemo(
         () => attendance.map((item) => ({ date: item.date, status: item.status })),
@@ -179,19 +165,7 @@ const AdminPlayerAttendance = () => {
 
         setMarkingByAdmin(true);
         try {
-            const position = await getLiveLocation();
-            const locationAccuracy = Number(position.coords.accuracy);
-
-            if (!hasValidCoordinates(position.coords.latitude, position.coords.longitude)) {
-                throw new Error("Valid latitude and longitude are required to mark attendance.");
-            }
-
-            if (!Number.isFinite(locationAccuracy) || locationAccuracy > MAX_ALLOWED_ACCURACY_METERS) {
-                throw new Error(
-                    `Location is not precise enough (${Math.round(locationAccuracy)}m). Enable precise location and retry.`
-                );
-            }
-
+            const locationPayload = adminGeoEnabled ? await getRequiredAdminLocationPayload() : null;
             const response = await fetch(`${API_ENDPOINTS.ADMIN_ATTENDANCE}/${selectedPlayer._id}/mark`, {
                 method: "POST",
                 headers: {
@@ -202,10 +176,7 @@ const AdminPlayerAttendance = () => {
                     date: markDate,
                     status: markStatus,
                     note: adminNote.trim() || undefined,
-                    address: "Marked by admin with live location",
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: locationAccuracy,
+                    ...(locationPayload || {}),
                 }),
             });
 
@@ -281,8 +252,8 @@ const AdminPlayerAttendance = () => {
     }, [selectedPlayer, month]);
 
     return (
-        <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="min-h-screen w-full bg-slate-50 p-4 md:p-8">
+            <div className="mx-auto min-h-[calc(100vh-2rem)] w-full max-w-7xl space-y-6 md:min-h-[calc(100vh-4rem)]">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Player Attendance & Login</h1>
@@ -294,7 +265,7 @@ const AdminPlayerAttendance = () => {
                     </Button>
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+                <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
                     <Card>
                         <CardHeader>
                             <CardTitle>Players</CardTitle>
@@ -380,10 +351,31 @@ const AdminPlayerAttendance = () => {
                                     Admin Attendance Marking
                                 </CardTitle>
                                 <CardDescription>
-                                    If a player faces issues, admin can mark or update attendance with admin audit trail. Live location is required.
+                                    If a player faces issues, admin can mark or update attendance with full admin audit trail.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                {isSuperAdmin && (
+                                    <div className="flex items-center justify-between rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2">
+                                        <div>
+                                            <p className="text-sm font-medium text-cyan-900">Admin Geolocation</p>
+                                            <p className="text-xs text-cyan-800">
+                                                {adminGeoEnabled
+                                                    ? "ON: Live location is required for admin attendance marking."
+                                                    : "OFF: Admin can mark attendance from anywhere without location."}
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={adminGeoEnabled}
+                                            onCheckedChange={(checked) => {
+                                                setAdminGeoEnabled(checked);
+                                                setAdminAttendanceGeoEnabled(checked);
+                                            }}
+                                            aria-label="Toggle admin geolocation requirement"
+                                        />
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label htmlFor="adminMarkDate">Date</Label>

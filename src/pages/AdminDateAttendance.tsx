@@ -9,6 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+    getAdminAttendanceGeoEnabled,
+    getRequiredAdminLocationPayload,
+    isCurrentAdminSuperAdmin,
+    setAdminAttendanceGeoEnabled,
+} from "@/utils/adminAttendanceGeo";
 
 interface AttendanceItem {
     date: string;
@@ -24,29 +30,6 @@ interface PlayerItem {
     idCardNumber?: string;
     attendance?: AttendanceItem[];
 }
-
-const MAX_ALLOWED_ACCURACY_METERS = 100;
-
-const getLiveLocation = () => {
-    return new Promise<GeolocationPosition>((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error("Geolocation is not supported by your browser"));
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 0,
-        });
-    });
-};
-
-const hasValidCoordinates = (latitude: number, longitude: number) => {
-    const validRange = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
-    const notZeroPair = !(Math.abs(latitude) < 0.000001 && Math.abs(longitude) < 0.000001);
-    return validRange && notZeroPair;
-};
 
 const getToday = () => {
     const now = new Date();
@@ -81,11 +64,13 @@ const AdminDateAttendance = () => {
     const [search, setSearch] = useState("");
     const [ageGroup, setAgeGroup] = useState("all");
     const [gender, setGender] = useState("all");
+    const [adminGeoEnabled, setAdminGeoEnabled] = useState(getAdminAttendanceGeoEnabled);
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [savingPlayerId, setSavingPlayerId] = useState<string | null>(null);
 
     const token = localStorage.getItem("adminToken");
+    const isSuperAdmin = useMemo(() => isCurrentAdminSuperAdmin(), []);
 
     const loadPlayers = async () => {
         if (!token) return;
@@ -121,19 +106,7 @@ const AdminDateAttendance = () => {
 
         setSavingPlayerId(playerId);
         try {
-            const position = await getLiveLocation();
-            const locationAccuracy = Number(position.coords.accuracy);
-
-            if (!hasValidCoordinates(position.coords.latitude, position.coords.longitude)) {
-                throw new Error("Valid latitude and longitude are required to mark attendance.");
-            }
-
-            if (!Number.isFinite(locationAccuracy) || locationAccuracy > MAX_ALLOWED_ACCURACY_METERS) {
-                throw new Error(
-                    `Location is not precise enough (${Math.round(locationAccuracy)}m). Enable precise location and retry.`
-                );
-            }
-
+            const locationPayload = adminGeoEnabled ? await getRequiredAdminLocationPayload() : null;
             const response = await fetch(`${API_ENDPOINTS.ADMIN_ATTENDANCE}/${playerId}/mark`, {
                 method: "POST",
                 headers: {
@@ -144,10 +117,7 @@ const AdminDateAttendance = () => {
                     date,
                     status: checked ? "present" : "absent",
                     note: "Updated from Admin Date Attendance page",
-                    address: "Marked by admin from date-wise toggle with live location",
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: locationAccuracy,
+                    ...(locationPayload || {}),
                 }),
             });
 
@@ -230,8 +200,8 @@ const AdminDateAttendance = () => {
     const isPracticeDone = presentCount > 0;
 
     return (
-        <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-            <div className="mx-auto max-w-7xl space-y-6">
+        <div className="min-h-screen w-full bg-slate-50 p-4 md:p-8">
+            <div className="mx-auto min-h-[calc(100vh-2rem)] w-full max-w-7xl space-y-6 md:min-h-[calc(100vh-4rem)]">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">Attendance by Date</h1>
@@ -251,6 +221,27 @@ const AdminDateAttendance = () => {
 
                 <Card>
                     <CardContent className="pt-6">
+                        {isSuperAdmin && (
+                            <div className="mb-4 flex items-center justify-between rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2">
+                                <div>
+                                    <p className="text-sm font-medium text-cyan-900">Admin Geolocation</p>
+                                    <p className="text-xs text-cyan-800">
+                                        {adminGeoEnabled
+                                            ? "ON: Live location is required before each attendance update."
+                                            : "OFF: Admin can update attendance from anywhere without location."}
+                                    </p>
+                                </div>
+                                <Switch
+                                    checked={adminGeoEnabled}
+                                    onCheckedChange={(checked) => {
+                                        setAdminGeoEnabled(checked);
+                                        setAdminAttendanceGeoEnabled(checked);
+                                    }}
+                                    aria-label="Toggle admin geolocation requirement"
+                                />
+                            </div>
+                        )}
+
                         <div className="grid gap-3 md:grid-cols-[260px_1fr]">
                             <div className="space-y-2">
                                 <Label htmlFor="attendance-date" className="flex items-center gap-2">
@@ -326,7 +317,7 @@ const AdminDateAttendance = () => {
                 <Card>
                     <CardHeader>
                         <CardTitle>Players ({filteredPlayers.length})</CardTitle>
-                        <CardDescription>Toggle ON = Present, OFF = Absent for selected date. Live location is required for every update.</CardDescription>
+                        <CardDescription>Toggle ON = Present, OFF = Absent for selected date.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div className="hidden overflow-x-auto rounded-md border md:block">
