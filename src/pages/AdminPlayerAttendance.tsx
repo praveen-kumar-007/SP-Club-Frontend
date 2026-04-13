@@ -101,6 +101,8 @@ const AdminPlayerAttendance = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [search, setSearch] = useState("");
+    const [ageGroup, setAgeGroup] = useState("all");
+    const [gender, setGender] = useState("all");
     const [month, setMonth] = useState(currentMonth());
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerItem | null>(null);
@@ -124,7 +126,8 @@ const AdminPlayerAttendance = () => {
         setLoadingPlayers(true);
 
         try {
-            const response = await fetch(API_ENDPOINTS.ADMIN_PLAYERS, {
+            const url = `${API_ENDPOINTS.ADMIN_PLAYERS}?all=true&ageGroup=${encodeURIComponent(ageGroup)}&gender=${encodeURIComponent(gender)}`;
+            const response = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -259,7 +262,7 @@ const AdminPlayerAttendance = () => {
     useEffect(() => {
         if (!token) return;
         loadPlayers();
-    }, [token]);
+    }, [token, ageGroup, gender]);
 
     useEffect(() => {
         if (!selectedPlayer) {
@@ -296,14 +299,34 @@ const AdminPlayerAttendance = () => {
                         <CardHeader>
                             <CardTitle>Players</CardTitle>
                             <CardDescription>All approved players</CardDescription>
-                            <div className="relative">
-                                <Search size={16} className="absolute left-3 top-3 text-slate-400" />
-                                <Input
-                                    className="pl-9"
-                                    placeholder="Search player"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
+                            <div className="space-y-3">
+                                <div className="relative mt-2">
+                                    <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+                                    <Input
+                                        className="pl-9"
+                                        placeholder="Search player"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex gap-2 flex-wrap">
+                                        <Button size="sm" variant={ageGroup === 'all' ? 'default' : 'outline'} onClick={() => setAgeGroup('all')}>All Ages</Button>
+                                        <Button size="sm" variant={ageGroup === 'Under 10' ? 'default' : 'outline'} onClick={() => setAgeGroup('Under 10')}>Under 10</Button>
+                                        <Button size="sm" variant={ageGroup === '10-14' ? 'default' : 'outline'} onClick={() => setAgeGroup('10-14')}>10-14</Button>
+                                        <Button size="sm" variant={ageGroup === '14-16' ? 'default' : 'outline'} onClick={() => setAgeGroup('14-16')}>14-16</Button>
+                                    </div>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <Button size="sm" variant={ageGroup === '16-19' ? 'default' : 'outline'} onClick={() => setAgeGroup('16-19')}>16-19</Button>
+                                        <Button size="sm" variant={ageGroup === '19-25' ? 'default' : 'outline'} onClick={() => setAgeGroup('19-25')}>19-25</Button>
+                                        <Button size="sm" variant={ageGroup === 'Over 25' ? 'default' : 'outline'} onClick={() => setAgeGroup('Over 25')}>Over 25</Button>
+                                    </div>
+                                    <div className="flex gap-2 flex-wrap pt-1">
+                                        <Button size="sm" variant={gender === 'all' ? 'default' : 'outline'} onClick={() => setGender('all')}>All Genders</Button>
+                                        <Button size="sm" variant={gender === "Boy's" ? 'default' : 'outline'} onClick={() => setGender("Boy's")}>Boy's</Button>
+                                        <Button size="sm" variant={gender === "Girl's" ? 'default' : 'outline'} onClick={() => setGender("Girl's")}>Girl's</Button>
+                                    </div>
+                                </div>
                             </div>
                             <p className="text-xs text-slate-500">
                                 {loadingPlayers ? "Searching players..." : `${filteredPlayers.length} matching player(s)`}

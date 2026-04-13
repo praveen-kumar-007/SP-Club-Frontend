@@ -86,6 +86,7 @@ const AdminDashboard = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentStatus, setCurrentStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('approved');
   const [currentAgeGroup, setCurrentAgeGroup] = useState<string>('all');
+  const [currentGender, setCurrentGender] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [adminUser, setAdminUser] = useState<{ username: string; role: string } | null>(null);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
@@ -192,11 +193,12 @@ const AdminDashboard = () => {
 
   // Fetch registrations with React Query
   const { data: registrationsData, isLoading, error: registrationsError } = useQuery({
-    queryKey: ['admin-registrations', currentStatus, currentAgeGroup, page, debouncedSearch, token],
+    queryKey: ['admin-registrations', currentStatus, currentAgeGroup, currentGender, page, debouncedSearch, token],
     queryFn: async () => {
       const query = new URLSearchParams({
         status: currentStatus,
         ageGroup: currentAgeGroup,
+        gender: currentGender,
         page: page.toString(),
         limit: "10",
         search: debouncedSearch,
@@ -833,6 +835,43 @@ const AdminDashboard = () => {
                     }}
                   >
                     Over 25
+                  </Button>
+                </div>
+
+                {/* Gender Filter */}
+                <div className="mb-4 flex gap-2 flex-wrap">
+                  <Button
+                    size="sm"
+                    variant={currentGender === 'all' ? 'default' : 'outline'}
+                    className={currentGender !== 'all' ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
+                    onClick={() => {
+                      setCurrentGender('all');
+                      setPage(1);
+                    }}
+                  >
+                    All Genders
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentGender === "Boy's" ? 'default' : 'outline'}
+                    className={currentGender !== "Boy's" ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
+                    onClick={() => {
+                      setCurrentGender("Boy's");
+                      setPage(1);
+                    }}
+                  >
+                    Boy's
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={currentGender === "Girl's" ? 'default' : 'outline'}
+                    className={currentGender !== "Girl's" ? 'bg-slate-100 hover:bg-slate-200 border-slate-400 text-slate-700 font-semibold' : 'font-semibold'}
+                    onClick={() => {
+                      setCurrentGender("Girl's");
+                      setPage(1);
+                    }}
+                  >
+                    Girl's
                   </Button>
                 </div>
 

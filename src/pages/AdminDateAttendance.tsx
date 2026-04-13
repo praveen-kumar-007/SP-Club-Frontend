@@ -79,6 +79,8 @@ const AdminDateAttendance = () => {
 
     const [date, setDate] = useState(getToday());
     const [search, setSearch] = useState("");
+    const [ageGroup, setAgeGroup] = useState("all");
+    const [gender, setGender] = useState("all");
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [savingPlayerId, setSavingPlayerId] = useState<string | null>(null);
@@ -90,7 +92,8 @@ const AdminDateAttendance = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(API_ENDPOINTS.ADMIN_PLAYERS, {
+            const url = `${API_ENDPOINTS.ADMIN_PLAYERS}?all=true&ageGroup=${encodeURIComponent(ageGroup)}&gender=${encodeURIComponent(gender)}`;
+            const response = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -196,8 +199,12 @@ const AdminDateAttendance = () => {
         }
 
         localStorage.setItem("adminSeenAttendanceAt", String(Date.now()));
+    }, [token, navigate]);
+
+    useEffect(() => {
+        if (!token) return;
         loadPlayers();
-    }, [token]);
+    }, [token, ageGroup, gender]);
 
     const filteredPlayers = useMemo(() => {
         const withStatus = players.map((player) => {
@@ -271,6 +278,24 @@ const AdminDateAttendance = () => {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Age Group Filter */}
+                        <div className="mt-4 mb-2 flex gap-2 flex-wrap">
+                            <Button size="sm" variant={ageGroup === 'all' ? 'default' : 'outline'} onClick={() => setAgeGroup('all')}>All Ages</Button>
+                            <Button size="sm" variant={ageGroup === 'Under 10' ? 'default' : 'outline'} onClick={() => setAgeGroup('Under 10')}>Under 10</Button>
+                            <Button size="sm" variant={ageGroup === '10-14' ? 'default' : 'outline'} onClick={() => setAgeGroup('10-14')}>10-14</Button>
+                            <Button size="sm" variant={ageGroup === '14-16' ? 'default' : 'outline'} onClick={() => setAgeGroup('14-16')}>14-16</Button>
+                            <Button size="sm" variant={ageGroup === '16-19' ? 'default' : 'outline'} onClick={() => setAgeGroup('16-19')}>16-19</Button>
+                            <Button size="sm" variant={ageGroup === '19-25' ? 'default' : 'outline'} onClick={() => setAgeGroup('19-25')}>19-25</Button>
+                            <Button size="sm" variant={ageGroup === 'Over 25' ? 'default' : 'outline'} onClick={() => setAgeGroup('Over 25')}>Over 25</Button>
+                        </div>
+
+                        {/* Gender Filter */}
+                        <div className="mb-2 flex gap-2 flex-wrap">
+                            <Button size="sm" variant={gender === 'all' ? 'default' : 'outline'} onClick={() => setGender('all')}>All Genders</Button>
+                            <Button size="sm" variant={gender === "Boy's" ? 'default' : 'outline'} onClick={() => setGender("Boy's")}>Boy's</Button>
+                            <Button size="sm" variant={gender === "Girl's" ? 'default' : 'outline'} onClick={() => setGender("Girl's")}>Girl's</Button>
                         </div>
                     </CardContent>
                 </Card>
