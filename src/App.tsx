@@ -95,6 +95,34 @@ const App = () => {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
+  useEffect(() => {
+    const splash = document.getElementById("app-splash");
+    const splashVideo = document.getElementById("app-splash-video") as HTMLVideoElement | null;
+
+    if (!splash) {
+      return;
+    }
+
+    const hideSplash = () => {
+      if (!splash.classList.contains("app-splash-hidden")) {
+        splash.classList.add("app-splash-hidden");
+        if (splashVideo) {
+          splashVideo.pause();
+        }
+        window.setTimeout(() => splash.remove(), 400);
+      }
+    };
+
+    const timer = window.setTimeout(hideSplash, 8000);
+    splashVideo?.addEventListener("ended", hideSplash);
+    hideSplash();
+
+    return () => {
+      window.clearTimeout(timer);
+      splashVideo?.removeEventListener("ended", hideSplash);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
