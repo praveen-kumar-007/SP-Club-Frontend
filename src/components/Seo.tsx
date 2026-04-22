@@ -16,6 +16,20 @@ const DEFAULT_IMAGE = `${SITE_URL}/Logo.png`;
 const DEFAULT_DESCRIPTION =
   "SP Kabaddi Group Dhanbad — premier sports club in Dhanbad offering coaching, events, and championship training.";
 
+const normalizeAbsoluteUrl = (value?: string): string => {
+  if (!value) {
+    return "";
+  }
+
+  const trimmed = value.trim();
+
+  if (/^(?:https?:)?\/\//i.test(trimmed)) {
+    return trimmed.startsWith("//") ? `https:${trimmed}` : trimmed;
+  }
+
+  return `${SITE_URL}${trimmed.startsWith("/") ? trimmed : `/${trimmed}`}`;
+};
+
 const Seo: React.FC<SeoProps> = ({
   title,
   description,
@@ -25,8 +39,8 @@ const Seo: React.FC<SeoProps> = ({
   canonical,
 }) => {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - Premier Sports Club`;
-  const metaUrl = url || SITE_URL;
-  const metaImage = image || DEFAULT_IMAGE;
+  const metaUrl = normalizeAbsoluteUrl(url) || SITE_URL;
+  const metaImage = normalizeAbsoluteUrl(image) || DEFAULT_IMAGE;
   const metaDescription = description || DEFAULT_DESCRIPTION;
 
   return (
@@ -34,7 +48,7 @@ const Seo: React.FC<SeoProps> = ({
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
       {keywords && <meta name="keywords" content={keywords} />}
-      <link rel="canonical" href={canonical || metaUrl} />
+      <link rel="canonical" href={normalizeAbsoluteUrl(canonical) || metaUrl} />
 
       {/* Open Graph */}
       <meta property="og:site_name" content={SITE_NAME} />
