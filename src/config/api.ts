@@ -62,7 +62,34 @@ export const API_ENDPOINTS = {
   PLAYER_FEES: `${API_BASE_URL}/api/player/fees`,
 };
 
+const normalizeFrontendBaseUrl = (value?: string): string => {
+  const fallback = "https://spkabaddi.me";
+  const raw = value?.trim();
+
+  if (raw) {
+    const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    try {
+      return new URL(withProtocol).origin;
+    } catch {
+      // Fall through to fallback
+    }
+  }
+
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+
+  return fallback;
+};
+
+export const FRONTEND_BASE_URL = normalizeFrontendBaseUrl(import.meta.env.VITE_FRONTEND_URL);
+
+export const getFrontendUrl = (path: string): string => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${FRONTEND_BASE_URL}${normalized}`;
+};
+
 export const getNewsShareUrl = (newsId: string): string =>
-  `${API_ENDPOINTS.NEWS}/share/${encodeURIComponent(newsId)}`;
+  getFrontendUrl(`/news/${encodeURIComponent(newsId)}`);
 
 export default API_BASE_URL;
