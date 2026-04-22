@@ -82,7 +82,9 @@ const normalizeFrontendBaseUrl = (value?: string): string => {
   return fallback;
 };
 
-export const FRONTEND_BASE_URL = normalizeFrontendBaseUrl(import.meta.env.VITE_FRONTEND_URL);
+export const FRONTEND_BASE_URL = normalizeFrontendBaseUrl(
+  import.meta.env.VITE_FRONTEND_URL,
+);
 
 export const getFrontendUrl = (path: string): string => {
   const normalized = path.startsWith("/") ? path : `/${path}`;

@@ -24,6 +24,7 @@ interface NewsArticle {
 const News = () => {
   const { toast } = useToast();
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+  const [shareImage, setShareImage] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +45,9 @@ const News = () => {
 
       const data = await response.json();
       setNewsArticles(data);
+      if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0]?.images) && data[0].images.length > 0) {
+        setShareImage(data[0].images[0]);
+      }
     } catch (err) {
       setError('Failed to load news articles. Please try again later.');
       console.error('Error fetching news:', err);
@@ -92,6 +96,8 @@ const News = () => {
       <Seo
         title="News & Updates - SP Kabaddi Club"
         description="Stay updated with the latest news, announcements, and updates from SP Kabaddi Club."
+        url="https://spkabaddi.me/news"
+        image={shareImage}
         keywords="SP Kabaddi, news, updates, announcements, sports news"
       />
 

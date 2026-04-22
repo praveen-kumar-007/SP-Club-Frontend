@@ -214,6 +214,7 @@ const Gallery = () => {
         title="Gallery"
         description="Gallery — Photos from SP Kabaddi Group Dhanbad showcasing training, matches, championships, and events."
         url="https://spkabaddi.me/gallery"
+        image={galleryItems[0]?.image}
         keywords="SP Kabaddi Group Dhanbad gallery, spkg gallery"
       />
       {/* Hero Section */}
