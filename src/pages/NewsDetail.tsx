@@ -171,6 +171,7 @@ const NewsDetail = () => {
         description={article.content.substring(0, 160)}
         keywords={`SP Kabaddi, news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
         url={`https://spkabaddi.me/news/${article._id}`}
+        canonical={`https://spkabaddi.me/news/${article._id}`}
         image={article.images && article.images.length > 0 ? article.images[0] : undefined}
       />
 

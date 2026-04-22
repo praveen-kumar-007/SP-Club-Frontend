@@ -76,17 +76,17 @@ const News = () => {
     if (navigator.share) {
       navigator.share({
         title: text,
+        text: `${text}\nRead more on SP Kabaddi Club`,
         url: url,
       }).catch((error) => {
-        // User cancelled or error occurred
         console.log('Error sharing:', error);
       });
     } else {
-      // Fallback: copy link to clipboard
-      navigator.clipboard.writeText(url);
+      // Fallback: copy link and heading to clipboard
+      navigator.clipboard.writeText(`${text}\n${url}`);
       toast({
         title: "Link Copied!",
-        description: "Article link copied to clipboard",
+        description: "Article title and link copied to clipboard",
       });
     }
   };
@@ -97,6 +97,7 @@ const News = () => {
         title="News & Updates - SP Kabaddi Club"
         description="Stay updated with the latest news, announcements, and updates from SP Kabaddi Club."
         url="https://spkabaddi.me/news"
+        canonical="https://spkabaddi.me/news"
         image={shareImage}
         keywords="SP Kabaddi, news, updates, announcements, sports news"
       />
