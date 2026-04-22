@@ -285,8 +285,8 @@ const NewsDetail = () => {
                             key={idx}
                             onClick={() => setCurrentImageIndex(idx)}
                             className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${idx === currentImageIndex
-                                ? 'border-red-500 scale-105'
-                                : 'border-gray-600 hover:border-gray-400'
+                              ? 'border-red-500 scale-105'
+                              : 'border-gray-600 hover:border-gray-400'
                               }`}
                           >
                             <img
