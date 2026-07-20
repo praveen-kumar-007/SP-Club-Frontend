@@ -142,6 +142,14 @@
     @apply bg-card rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-border backdrop-blur-sm;
   }
 
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
   .card-champion {
     @apply bg-gradient-to-br from-card to-accent/5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-accent/20;
   }
