@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Seo from "@/components/Seo";
 import OptimizedImage from "@/components/OptimizedImage";
@@ -23,6 +23,103 @@ const CATEGORIES = [
   { id: "Matches", name: "Matches" },
   { id: "Others", name: "Others" },
 ];
+
+const AutoScrollCategories = ({ activeCategory, setActiveCategory }: { activeCategory: string, setActiveCategory: (c: string) => void }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const direction = useRef<1 | -1>(1); // 1 = right, -1 = left
+  
+  // Create 12 copies to ensure plenty of scroll space for the dial
+  const multiCategories = Array(12).fill(CATEGORIES).flat();
+
+  useEffect(() => {
+    let animationId: number;
+    let lastTime = performance.now();
+    const speed = 1.0; // pixels per frame
+
+    if (scrollRef.current) {
+      // Start near the middle
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth / 2;
+    }
+
+    const scroll = (time: number) => {
+      const container = scrollRef.current;
+      if (container) {
+        const maxScroll = container.scrollWidth;
+        const segment = maxScroll / 12;
+        
+        // Re-center silently if we drift too close to the edges
+        if (container.scrollLeft >= segment * 9) {
+          container.scrollLeft -= segment * 4;
+        } else if (container.scrollLeft <= segment * 3) {
+          container.scrollLeft += segment * 4;
+        }
+
+        if (!isInteracting) {
+          const dt = time - lastTime;
+          const move = (speed * dt) / 16;
+          container.scrollLeft += move * direction.current;
+        }
+      }
+      lastTime = time;
+      animationId = requestAnimationFrame(scroll);
+    };
+
+    animationId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationId);
+  }, [isInteracting]);
+
+  let lastScrollX = useRef(0);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const currentScrollX = e.currentTarget.scrollLeft;
+    if (isInteracting) {
+       const delta = currentScrollX - lastScrollX.current;
+       if (Math.abs(delta) > 2) {
+          direction.current = delta > 0 ? 1 : -1;
+       }
+    }
+    lastScrollX.current = currentScrollX;
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.deltaX !== 0 || e.deltaY !== 0) {
+       direction.current = (e.deltaX > 0 || e.deltaY > 0) ? 1 : -1;
+    }
+  };
+
+  return (
+    <section className="relative z-20 -mt-12 px-4 md:px-8 max-w-[1400px] mx-auto overflow-hidden group">
+      {/* Edge Gradients for Dial Effect */}
+      <div className="absolute left-4 md:left-8 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none rounded-l-2xl"></div>
+      <div className="absolute right-4 md:right-8 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none rounded-r-2xl"></div>
+
+      <div 
+        ref={scrollRef}
+        onMouseEnter={() => setIsInteracting(true)}
+        onMouseLeave={() => setIsInteracting(false)}
+        onTouchStart={() => setIsInteracting(true)}
+        onTouchEnd={() => setIsInteracting(false)}
+        onScroll={handleScroll}
+        onWheel={handleWheel}
+        className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-2 md:p-3 rounded-2xl shadow-2xl flex overflow-x-auto hide-scrollbar gap-2 lg:gap-3 items-center cursor-grab active:cursor-grabbing"
+        style={{ scrollBehavior: 'auto', WebkitOverflowScrolling: 'touch' }}
+      >
+        {multiCategories.map((cat, index) => (
+          <button
+            key={`${cat.id}-${index}`}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`whitespace-nowrap px-6 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 transform flex-shrink-0
+              ${activeCategory === cat.id 
+                ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-slate-900 shadow-lg shadow-amber-500/30 scale-105' 
+                : 'bg-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const ITEMS_PER_PAGE = 12;
 
@@ -112,23 +209,8 @@ const Gallery = () => {
         </div>
       </section>
 
-      {/* Category Filter - Premium scrollable pills */}
-      <section className="relative z-20 -mt-12 px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-2 md:p-3 rounded-2xl shadow-2xl flex overflow-x-auto hide-scrollbar gap-2 justify-start lg:justify-center items-center">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`whitespace-nowrap px-5 py-2.5 text-sm md:text-base font-bold rounded-xl transition-all duration-300 transform
-                ${activeCategory === cat.id 
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-slate-900 shadow-lg shadow-amber-500/30 scale-105' 
-                  : 'bg-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* Category Filter - Premium auto-scroll dial */}
+      <AutoScrollCategories activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
 
       {/* Gallery Content */}
       <section className="pt-16 pb-20 px-4 md:px-8 max-w-[1400px] mx-auto">
