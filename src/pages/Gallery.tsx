@@ -88,34 +88,40 @@ const AutoScrollCategories = ({ activeCategory, setActiveCategory }: { activeCat
   };
 
   return (
-    <section className="relative z-20 -mt-12 px-4 md:px-8 max-w-[1400px] mx-auto overflow-hidden group">
-      {/* Edge Gradients for Dial Effect */}
-      <div className="absolute left-4 md:left-8 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none rounded-l-2xl"></div>
-      <div className="absolute right-4 md:right-8 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none rounded-r-2xl"></div>
+    <section className="relative z-20 w-full bg-white shadow-sm py-4 border-b border-slate-200">
+      <div className="relative max-w-[1400px] mx-auto overflow-hidden group px-4 md:px-8">
+        {/* Edge Gradients for Dial Effect (Light theme) */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-12 md:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-      <div 
-        ref={scrollRef}
-        onMouseEnter={() => setIsInteracting(true)}
-        onMouseLeave={() => setIsInteracting(false)}
-        onTouchStart={() => setIsInteracting(true)}
-        onTouchEnd={() => setIsInteracting(false)}
-        onScroll={handleScroll}
-        onWheel={handleWheel}
-        className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-2 md:p-3 rounded-2xl shadow-2xl flex overflow-x-auto hide-scrollbar gap-2 lg:gap-3 items-center cursor-grab active:cursor-grabbing"
-        style={{ scrollBehavior: 'auto', WebkitOverflowScrolling: 'touch' }}
-      >
-        {multiCategories.map((cat, index) => (
-          <button
-            key={`${cat.id}-${index}`}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`whitespace-nowrap px-6 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 transform flex-shrink-0
-              ${activeCategory === cat.id 
-                ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-slate-900 shadow-lg shadow-amber-500/30 scale-105' 
-                : 'bg-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`}
-          >
-            {cat.name}
-          </button>
-        ))}
+        <div 
+          ref={scrollRef}
+          onMouseEnter={() => setIsInteracting(true)}
+          onMouseLeave={() => setIsInteracting(false)}
+          onTouchStart={() => setIsInteracting(true)}
+          onTouchEnd={() => setIsInteracting(false)}
+          onScroll={handleScroll}
+          onWheel={handleWheel}
+          className="flex overflow-x-auto hide-scrollbar gap-2 md:gap-3 items-center cursor-grab active:cursor-grabbing"
+          style={{ scrollBehavior: 'auto', WebkitOverflowScrolling: 'touch' }}
+        >
+          {multiCategories.map((cat, index) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={`${cat.id}-${index}`}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`whitespace-nowrap px-4 py-1.5 md:px-5 md:py-2 text-xs md:text-sm font-semibold rounded-full transition-all duration-300 transform flex-shrink-0 border flex items-center gap-1.5
+                  ${isActive 
+                    ? 'border-slate-800 text-slate-900 bg-white shadow-sm' 
+                    : 'border-slate-200 text-slate-500 bg-white hover:border-slate-300 hover:text-slate-700'}`}
+              >
+                {isActive && <span className="text-[10px] leading-none mb-0.5">●</span>}
+                {cat.name}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
