@@ -89,7 +89,7 @@ const AdminDateAttendance = () => {
                 throw new Error(data.message || "Failed to fetch players");
             }
 
-            setPlayers(Array.isArray(data.players) ? data.players : []);
+            setPlayers(Array.isArray(data.players) ? data.players.filter((p: { status: string }) => p.status === 'approved') : []);
         } catch (error) {
             toast({
                 title: "Error",

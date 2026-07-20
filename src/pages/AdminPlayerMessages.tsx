@@ -65,7 +65,7 @@ const AdminPlayerMessages = () => {
             throw new Error(data.message || "Failed to fetch players");
         }
 
-        setPlayers(data.players || []);
+        setPlayers(data.players ? data.players.filter((p: { status: string }) => p.status === 'approved') : []);
     };
 
     const fetchMessages = async () => {

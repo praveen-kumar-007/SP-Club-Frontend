@@ -63,7 +63,7 @@ const AdminPlayers = () => {
         if (!response.ok) {
           throw new Error(data.message || "Failed to load players");
         }
-        setPlayers(Array.isArray(data.players) ? data.players : []);
+        setPlayers(Array.isArray(data.players) ? data.players.filter((p: { status: string }) => p.status === 'approved') : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load players");
       } finally {

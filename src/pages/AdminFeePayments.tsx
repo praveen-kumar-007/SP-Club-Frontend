@@ -62,6 +62,7 @@ const AdminFeePayments = () => {
   const [isPlayerListOpen, setIsPlayerListOpen] = useState(false);
   const [loadingMonthStatuses, setLoadingMonthStatuses] = useState(false);
   const [monthStatusByPlayer, setMonthStatusByPlayer] = useState<Record<string, boolean>>({});
+  const [selectedMonthPaid, setSelectedMonthPaid] = useState(false);
 
   const token = localStorage.getItem("adminToken");
 
@@ -96,7 +97,7 @@ const AdminFeePayments = () => {
         throw new Error(data.message || "Failed to fetch payment players");
       }
 
-      const nextPlayers: FeePlayer[] = Array.isArray(data.players) ? data.players : [];
+      const nextPlayers: FeePlayer[] = Array.isArray(data.players) ? data.players.filter((p: { status: string }) => p.status === 'approved') : [];
       setPlayers(nextPlayers);
 
       setSelectedPlayer((prev) => {
@@ -327,6 +328,7 @@ const AdminFeePayments = () => {
     }
 
     loadPlayers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, navigate]);
 
   useEffect(() => {
@@ -378,6 +380,7 @@ const AdminFeePayments = () => {
     if (!historyPlayer.feeAccessEnabled) return;
 
     loadFeeHistory(historyPlayer._id, month);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyPlayer, month]);
 
   return (

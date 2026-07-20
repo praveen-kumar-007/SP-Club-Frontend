@@ -124,7 +124,7 @@ const AdminPlayerAttendance = () => {
                 throw new Error(data.message || "Failed to fetch players");
             }
 
-            const nextPlayers: PlayerItem[] = data.players || [];
+            const nextPlayers: PlayerItem[] = (data.players || []).filter((p: { status: string }) => p.status === 'approved');
             setPlayers(nextPlayers);
             setSelectedPlayer((prev) => {
                 if (!nextPlayers.length) return null;

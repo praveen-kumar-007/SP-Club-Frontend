@@ -112,7 +112,7 @@ const AdminLoginHistory = () => {
             }
 
             setAdmins(Array.isArray(data.admins) ? data.admins : []);
-            setPlayers(Array.isArray(data.players) ? data.players : []);
+            setPlayers(Array.isArray(data.players) ? data.players.filter((p: { status: string }) => p.status === 'approved') : []);
         } catch (error) {
             toast({
                 title: "Error",

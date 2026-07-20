@@ -118,7 +118,7 @@ const Home = () => {
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               poster="/home_assets/poster.jpg"
             >
               <source src={heroVideoUrl} type="video/mp4" />
