@@ -1,225 +1,107 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, ArrowLeft, ArrowRight, Camera } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Seo from "@/components/Seo";
 import OptimizedImage from "@/components/OptimizedImage";
+import { API_ENDPOINTS } from "@/config/api";
 
-// --- DUMMY DATA ---
-// In a real-world app, you'd fetch this from a CMS or API.
-// Images are from Pexels.com
+interface GalleryImage {
+  _id: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  createdAt: string;
+}
 
-
-
-const galleryItems = [
-  // Championships (grouped)
-  {
-    id: 1,
-    title: "State Championship Victory",
-    category: "championships",
-    description: "Celebrating success! Our girls' Kabaddi team after winning the State Championship.",
-    image: "/home_assets/girls_state2nd.jpg",
-    thumbnail: "/home_assets/girls_state2nd.jpg"
-  },
-  {
-    id: 2,
-    title: "Champion Boys Team",
-    category: "championships",
-    description: "Proud champions! Our boys' Kabaddi team celebrating their Tournaments.",
-    image: "/home_assets/win_bihar_state.jpg",
-    thumbnail: "/home_assets/win_bihar_state.jpg"
-  },
-  {
-    id: 3,
-    title: "Winning 1st SP Kabaddi Group Dhanbad Kabaddi Team ",
-    category: "championships",
-    description: "Victory pose! Our Kabaddi team after clinching the championship title.",
-    image: "/home_assets/win_holi.jpg",
-    thumbnail: "/home_assets/win_holi.jpg"
-  },
-
-  // Training
-  {
-    id: 4,
-    title: "Training Session",
-    category: "training",
-    description: "Lion Jump Drills in action. Our athletes pushing their limits during an intense training session.",
-    image: "/home_assets/jump_lion.jpg",
-    thumbnail: "/home_assets/jump_lion.jpg"
-  },
-  {
-    id: 5,
-    title: "Hard Practice of Kabaddi by Junior Team",
-    category: "training",
-    description: "Focused and determined. Our junior Kabaddi team honing their skills during a rigorous practice session.",
-    image: "/home_assets/practice_session.jpg",
-    thumbnail: "/home_assets/practice_session.jpg"
-  },
-  {
-    id: 6,
-    title: "Senior Kabaddi Boys Team",
-    category: "training",
-    description: "Our senior Kabaddi team heading to the Jharkhand Senior State Championship.",
-    image: "/home_assets/boys_senior.jpg",
-    thumbnail: "/home_assets/boys_senior.jpg"
-  },
-  {
-    id: 7,
-    title: "Senior Kabaddi Girls Team",
-    category: "training",
-    description: "Our senior Kabaddi girls team heading to the Jharkhand Senior State Championship.",
-    image: "/home_assets/girls_senior.jpg",
-    thumbnail: "/home_assets/girls_senior.jpg"
-  },
-
-  // Matches
-  {
-    id: 8,
-    title: "Dhanbad Districs Kabaddi Trial Final",
-    category: "matches",
-    description: "Intense moments from the Dhanbad Districts Kabaddi Trial Final, showcasing skill and determination on the field.",
-    image: "/home_assets/trial.jpg",
-    thumbnail: "/home_assets/trial.jpg"
-  },
-  {
-    id: 9,
-    title: "Kabaddi is Going to be played",
-    category: "matches",
-    description: "Exciting moment as the Kabaddi match is about to begin, with players ready to showcase their skills and agility.",
-    image: "/home_assets/team_stand_g.jpg",
-    thumbnail: "/home_assets/team_stand_g.jpg"
-  },
-
-  // Events
-  {
-    id: 10,
-    title: "Diwali Sports Festival",
-    category: "events",
-    description: "Celebrating Diwali with sports and camaraderie. Our club members enjoying various games and activities during the festival.",
-    image: "/home_assets/diwali.jpg",
-    thumbnail: "/home_assets/diwali.jpg"
-  },
-  {
-    id: 11,
-    title: "Holi Sports Event",
-    category: "events",
-    description: "Colorful moments from our Holi Sports Event, where fun and fitness come together in a vibrant celebration.",
-    image: "/home_assets/win_holi.jpg",
-    thumbnail: "/home_assets/win_holi.jpg"
-  },
-  {
-    id: 12,
-    title: "Worship of Kabaddi Court",
-    category: "events",
-    description: "Blessings for the game! Our club members performing a traditional worship ceremony for the Kabaddi court before the season begins.",
-    image: "/home_assets/worship_court.jpg",
-    thumbnail: "/home_assets/worship_court.jpg"
-  }
+const CATEGORIES = [
+  { id: "All", name: "All" },
+  { id: "Tournaments", name: "Tournaments" },
+  { id: "Rewards", name: "Rewards" },
+  { id: "News", name: "News" },
+  { id: "Training", name: "Training" },
+  { id: "Events", name: "Events" },
+  { id: "Matches", name: "Matches" },
+  { id: "Others", name: "Others" },
 ];
 
-const categories = [
-  { id: "all", name: "All Photos" }, { id: "matches", name: "Matches" },
-  { id: "training", name: "Training" }, { id: "events", name: "Events" },
-  { id: "championships", name: "Championships" },
-];
+const ITEMS_PER_PAGE = 12;
 
-const ITEMS_PER_PAGE = 9;
-
-// --- Lightbox Component ---
-const Lightbox = ({ item, onClose, onNext, onPrev }: { item: { id: number; image: string; title: string; description: string }; onClose: () => void; onNext: () => void; onPrev: () => void }) => {
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') onNext();
-      if (e.key === 'ArrowLeft') onPrev();
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onNext, onPrev, onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center animate-fade-in" onClick={onClose}>
-      <div className="relative w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
-        {/* Close Button */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-white hover:text-amber-400 z-50 transition-colors">
-          <X size={32} />
-        </button>
-        {/* Previous Button */}
-        <button onClick={onPrev} className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/30 p-2 rounded-full hover:bg-amber-500/50 z-50 transition-colors">
-          <ArrowLeft size={28} />
-        </button>
-        {/* Next Button */}
-        <button onClick={onNext} className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/30 p-2 rounded-full hover:bg-amber-500/50 z-50 transition-colors">
-          <ArrowRight size={28} />
-        </button>
-
-        {/* Image and Content */}
-        <div className="relative max-w-5xl max-h-[90vh] flex flex-col items-center animate-scale-in">
-          <OptimizedImage src={item.image} alt={item.title} className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
-          <div className="text-center text-white mt-4 p-4 bg-black/50 rounded-b-lg">
-            <h3 className="text-2xl font-bold">{item.title}</h3>
-            <p className="text-slate-300 mt-1 max-w-2xl">{item.description}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-// --- Main Gallery Page Component ---
 const Gallery = () => {
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [galleryItems, setGalleryItems] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredItems = activeCategory === "all"
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.GALLERY);
+        if (response.ok) {
+          const data = await response.json();
+          setGalleryItems(data);
+        }
+      } catch (error) {
+        console.error("Failed to load gallery items", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
+
+  const filteredItems = activeCategory === "All"
     ? galleryItems
     : galleryItems.filter(item => item.category === activeCategory);
 
   const itemsToShow = filteredItems.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredItems.length;
 
-  const handleLoadMore = () => {
-    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
-  };
+  const loadMore = () => setVisibleCount(prev => prev + ITEMS_PER_PAGE);
 
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index);
-  };
+  const openLightbox = (index: number) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
 
-  const closeLightbox = () => {
-    setLightboxIndex(null);
-  };
-
-  const handleNext = useCallback(() => {
+  const showNext = useCallback(() => {
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex + 1) % filteredItems.length);
     }
   }, [lightboxIndex, filteredItems.length]);
 
-  const handlePrev = useCallback(() => {
+  const showPrev = useCallback(() => {
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex - 1 + filteredItems.length) % filteredItems.length);
     }
   }, [lightboxIndex, filteredItems.length]);
 
-  // Reset visible count when category changes
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
   }, [activeCategory]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") showNext();
+      if (e.key === "ArrowLeft") showPrev();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxIndex, showNext, showPrev]);
 
   return (
-    <div className="bg-slate-900 min-h-screen text-white">
+    <div className="bg-slate-900 min-h-screen text-white pb-20">
       <Seo
         title="Gallery"
         description="Gallery — Photos from SP Kabaddi Group Dhanbad showcasing training, matches, championships, and events."
         url="https://spkabaddi.me/gallery"
-        image={galleryItems[0]?.image}
+        image={galleryItems[0]?.imageUrl}
         keywords="SP Kabaddi Group Dhanbad gallery, spkg gallery"
       />
+      
       {/* Hero Section */}
-      <section className="relative py-32 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('https://images.pexels.com/photos/220201/pexels-photo-220201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')" }}>
-        <div className="absolute inset-0 bg-black/60"></div>
+      <section className="relative py-32 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/home_assets/hero-bg.jpg')" }}>
+        <div className="absolute inset-0 bg-black/70"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight">
             Our <span className="text-amber-400">Gallery</span>
@@ -230,86 +112,140 @@ const Gallery = () => {
         </div>
       </section>
 
-      {/* Gallery Content */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-16">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-colors duration-300
-                  ${activeCategory === cat.id ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Gallery Masonry Grid */}
-          <div className="masonry-grid">
-            {itemsToShow.map((item, index) => (
-              <div
-                key={item.id}
-                className="masonry-item group relative overflow-hidden rounded-lg cursor-pointer shadow-lg"
-                onClick={() => openLightbox(index)}
-                style={{ animationDelay: `${(index % ITEMS_PER_PAGE) * 100}ms` }}
-              >
-                <OptimizedImage src={item.thumbnail} alt={item.title} className="w-full h-auto block transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <h3 className="font-bold text-white">{item.title}</h3>
-                    <p className="text-xs text-amber-300">{categories.find(c => c.id === item.category)?.name}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Load More Button */}
-          {visibleCount < filteredItems.length && (
-            <div className="text-center mt-16">
-              <button onClick={handleLoadMore} className="bg-amber-500 text-slate-900 font-bold px-8 py-3 rounded-full hover:bg-amber-400 transition-all duration-300 hover:scale-105">
-                Load More Photos
-              </button>
-            </div>
-          )}
+      {/* Category Filter - Premium scrollable pills */}
+      <section className="relative z-20 -mt-12 px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-2 md:p-3 rounded-2xl shadow-2xl flex overflow-x-auto hide-scrollbar gap-2 justify-start lg:justify-center items-center">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`whitespace-nowrap px-5 py-2.5 text-sm md:text-base font-bold rounded-xl transition-all duration-300 transform
+                ${activeCategory === cat.id 
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-slate-900 shadow-lg shadow-amber-500/30 scale-105' 
+                  : 'bg-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
       </section>
 
-      {lightboxIndex !== null && (
-        <Lightbox
-          item={filteredItems[lightboxIndex]}
-          onClose={closeLightbox}
-          onNext={handleNext}
-          onPrev={handlePrev}
-        />
-      )}
+      {/* Gallery Content */}
+      <section className="pt-16 pb-20 px-4 md:px-8 max-w-[1400px] mx-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-32">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-slate-700"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin"></div>
+            </div>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-32 text-slate-400 bg-slate-800/30 rounded-3xl border border-slate-700/50 backdrop-blur-sm">
+            <div className="w-24 h-24 mx-auto mb-6 opacity-50 bg-slate-700 rounded-full flex items-center justify-center">
+               <svg className="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+               </svg>
+            </div>
+            <p className="text-2xl font-light text-slate-300">No images found in this category.</p>
+          </div>
+        ) : (
+          <>
+            {/* Grid Layout - 1 col on mobile, 2 on sm/md, 3 on lg, 4 on xl */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+              {itemsToShow.map((item, index) => (
+                <div
+                  key={item._id}
+                  className="group relative overflow-hidden rounded-2xl cursor-pointer shadow-xl bg-slate-800 border border-slate-700/60 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/20 aspect-[4/5]"
+                  onClick={() => openLightbox(index)}
+                >
+                  <OptimizedImage 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+                  
+                  <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <span className="inline-block px-3 py-1 bg-amber-500/90 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-lg w-max mb-3 backdrop-blur-md shadow-sm">
+                      {item.category}
+                    </span>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight drop-shadow-md">
+                      {item.title}
+                    </h3>
+                    {item.description && (
+                      <p className="text-sm text-slate-300 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 font-light">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-      {/* CSS for Masonry Grid and Animations */}
-      <style>{`
-        @keyframes fadeInScaleUp {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .masonry-grid {
-          column-count: 1;
-          column-gap: 1.5rem;
-        }
-        @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
-        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
-        .masonry-item {
-          display: inline-block;
-          width: 100%;
-          margin-bottom: 1.5rem;
-          animation: fadeInScaleUp 0.6s both;
-        }
-        @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
-        @keyframes scale-in { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .animate-fade-in { animation: fade-in 0.3s ease-out; }
-        .animate-scale-in { animation: scale-in 0.3s ease-out; }
-      `}</style>
+            {hasMore && (
+              <div className="flex justify-center mt-16">
+                <button
+                  onClick={loadMore}
+                  className="group relative px-8 py-3.5 bg-slate-800 text-white font-bold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-slate-700/50"
+                >
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+                  <span className="relative flex items-center gap-2">
+                    Load More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* Lightbox - Premium Modal */}
+      {lightboxIndex !== null && (
+        <div className="fixed inset-0 z-[100] bg-slate-950/95 flex items-center justify-center p-4 backdrop-blur-xl transition-opacity duration-300">
+          <button 
+            onClick={closeLightbox} 
+            className="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white transition-all z-[110] bg-white/5 hover:bg-white/20 p-3 rounded-full hover:scale-110 hover:rotate-90"
+          >
+            <X size={24} />
+          </button>
+          
+          <button 
+            onClick={(e) => { e.stopPropagation(); showPrev(); }} 
+            className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/20 p-3 md:p-4 rounded-full z-[110] hover:scale-110 hover:-translate-x-1"
+          >
+            <ArrowLeft className="w-6 h-6 md:w-8 md:h-8" />
+          </button>
+          
+          <button 
+            onClick={(e) => { e.stopPropagation(); showNext(); }} 
+            className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/20 p-3 md:p-4 rounded-full z-[110] hover:scale-110 hover:translate-x-1"
+          >
+            <ArrowRight className="w-6 h-6 md:w-8 md:h-8" />
+          </button>
+          
+          <div className="max-w-6xl w-full max-h-[90vh] relative flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full flex justify-center items-center overflow-hidden rounded-2xl shadow-2xl border border-slate-800/50 bg-slate-900/50">
+              <img
+                src={filteredItems[lightboxIndex].imageUrl}
+                alt={filteredItems[lightboxIndex].title}
+                className="max-w-full max-h-[70vh] object-contain rounded-2xl drop-shadow-2xl"
+              />
+            </div>
+            
+            <div className="w-full text-center mt-6 md:mt-8 px-4">
+              <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-400 text-slate-900 text-xs font-black uppercase tracking-widest rounded-full mb-4 shadow-lg shadow-amber-500/20">
+                {filteredItems[lightboxIndex].category}
+              </span>
+              <h3 className="text-2xl md:text-4xl font-extrabold text-white mb-3 drop-shadow-md">{filteredItems[lightboxIndex].title}</h3>
+              {filteredItems[lightboxIndex].description && (
+                <p className="text-slate-300 max-w-3xl mx-auto text-sm md:text-base lg:text-lg font-light leading-relaxed">
+                  {filteredItems[lightboxIndex].description}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

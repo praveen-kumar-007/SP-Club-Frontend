@@ -36,6 +36,7 @@ export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/api/register`,
   CONTACT: `${API_BASE_URL}/api/contact`,
   NEWS: `${API_BASE_URL}/api/news`,
+  GALLERY: `${API_BASE_URL}/api/gallery`,
   ADMIN_LOGIN: `${API_BASE_URL}/api/admin/login`,
   ADMIN_REGISTER: `${API_BASE_URL}/api/admin/register`,
   ADMIN_PLAYERS: `${API_BASE_URL}/api/admin/players`,

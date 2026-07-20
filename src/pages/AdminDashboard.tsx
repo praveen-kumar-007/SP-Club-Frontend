@@ -603,6 +603,14 @@ const AdminDashboard = () => {
               📰
               <span className="ml-2">Manage News</span>
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/gallery")}
+              className="bg-purple-50 hover:bg-purple-100 border-purple-300 text-purple-700 font-semibold"
+            >
+              🖼️
+              <span className="ml-2">Gallery Manager</span>
+            </Button>
             <Button variant="destructive" onClick={handleLogout} className="font-semibold">
               <LogOut size={18} className="mr-2" />
               Logout
