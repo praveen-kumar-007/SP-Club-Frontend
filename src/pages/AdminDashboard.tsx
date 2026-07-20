@@ -692,6 +692,12 @@ const AdminDashboard = () => {
             >
               <span>📰 News</span>
             </Button>
+            <Button
+              onClick={() => navigate("/admin/gallery")}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 h-auto"
+            >
+              <span>🖼️ Gallery Manager</span>
+            </Button>
           </div>
         </div>
       </div>
