@@ -66,7 +66,7 @@ const About = () => {
   const teamMembers = [
     {
       name: "Pappu Kumar Yadav",
-      role: "Founder & Head Coach",
+      role: "President",
       bio: "With over 15 years of experience, Pappu founded SP Kabaddi Group Dhanbad to create a new generation of champions.",
       image: "/pappu_yadav.png",
       social: {
@@ -76,7 +76,7 @@ const About = () => {
     },
     {
       name: "Sunny Ray",
-      role: "Treasurer & Operations Manager",
+      role: "Secretary",
       bio: "Sunny ensures the smooth operation of SP Kabaddi Group Dhanbad, managing finances and logistics with precision.",
       image: "/about_assets/sunny.jpg.jpg",
       social: {
@@ -86,7 +86,7 @@ const About = () => {
     },
     {
       name: "Deepak Kumar",
-      role: "Senior Player & Mentor",
+      role: "Coach",
       bio: "A seasoned athlete, Deepak mentors our young talents, sharing his wealth of experience.",
       image: "/about_assets/deepak.jpg.jpg",
       social: {
@@ -96,7 +96,7 @@ const About = () => {
     },
     {
       name: "Praveen Kumar",
-      role: "Senior Player & Digital Architect",
+      role: "Treasurer & IT Head",
       bio: "Praveen leads on the mat as a senior player and off it as the digital architect behind this platform.",
       image: "/about_assets/praveen.png",
       social: {
