@@ -81,9 +81,9 @@ const Contact = () => {
     <div className="min-h-screen bg-[#0a192f] text-white">
       <Seo
         title="Contact"
-        description="Contact SP Kabaddi Group Dhanbad — get in touch to join, enquire about coaching, events, or membership."
+        description="Contact SP Sports Academy — get in touch to join, enquire about coaching, events, or membership."
         url="https://spkabaddi.me/contact"
-        keywords="contact SP Kabaddi Group Dhanbad, spkg contact"
+        keywords="contact SP Sports Academy, sp sports academy contact"
       />
       {/* Hero Section */}
       <div className="relative">
@@ -103,7 +103,7 @@ const Contact = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-                Contact <span className="text-[#facc15]">SP Kabaddi Group Dhanbad</span>
+                Contact <span className="text-[#facc15]">SP Sports Academy</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 animate-fade-in-up">
                 Get in touch with us - we're here to help you succeed
@@ -310,7 +310,7 @@ const Contact = () => {
                   <div className="overflow-hidden rounded-lg border border-gray-600 bg-[#0a192f]">
                     <div className="aspect-video">
                       <iframe
-                        title="SP Kabaddi Group Dhanbad Map"
+                        title="SP Sports Academy Map"
                         src={GOOGLE_MAPS_EMBED_URL}
                         className="h-full w-full"
                         loading="lazy"
@@ -342,7 +342,7 @@ const Contact = () => {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
             <p className="text-xl text-gray-400">
-              Quick answers to common questions about SP Kabaddi Group Dhanbad
+              Quick answers to common questions about SP Sports Academy
             </p>
           </div>
 

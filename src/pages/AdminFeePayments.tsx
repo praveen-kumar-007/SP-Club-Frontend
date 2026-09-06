@@ -389,7 +389,7 @@ const AdminFeePayments = () => {
         title="Admin Fee Payments"
         description="Admin panel for fee participant access and month-wise paid or pending updates."
         url="https://spkabaddi.me/admin/fees"
-        keywords="admin fee management, payment status, SP Kabaddi"
+        keywords="admin fee management, payment status, SP Sports Academy"
       />
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

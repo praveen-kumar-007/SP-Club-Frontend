@@ -135,7 +135,7 @@ const NewsDetail = () => {
     return (
       <>
         <Seo
-          title="Article Not Found - SP Kabaddi Club"
+          title="Article Not Found - SP Sports Academy"
           description="The requested news article could not be found."
         />
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -167,9 +167,9 @@ const NewsDetail = () => {
   return (
     <>
       <Seo
-        title={`${article.title} - SP Kabaddi Club`}
+        title={`${article.title} - SP Sports Academy`}
         description={article.content.substring(0, 160)}
-        keywords={`SP Kabaddi, news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
+        keywords={`SP Sports Academy, sports news, ${article.lang === 'hindi' ? 'hindi news' : 'english news'}`}
         url={`https://spkabaddi.me/news/${article._id}`}
         canonical={`https://spkabaddi.me/news/${article._id}`}
         image={article.images && article.images.length > 0 ? article.images[0] : undefined}

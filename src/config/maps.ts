@@ -1,12 +1,14 @@
 export const SP_KABADDI_LOCATION = {
-  name: "SP Kabaddi Group Dhanbad",
+  name: "SP Sports Academy",
   address:
-    "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
+    "SP Sports Academy, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
   query:
-    "SP Kabaddi Group Dhanbad, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
+    "SP Sports Academy, Shakti Mandir Path, Dhanbad, Jharkhand 826007",
   latitude: 23.7811364,
   longitude: 86.4234188,
 };
+
+export const SP_SPORTS_ACADEMY_LOCATION = SP_KABADDI_LOCATION;
 
 const parseAttendanceRadiusMeters = (value?: string): number => {
   const fallback = 250;

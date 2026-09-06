@@ -76,7 +76,7 @@ const News = () => {
     if (navigator.share) {
       navigator.share({
         title: text,
-        text: `${text}\nRead more on SP Kabaddi Club`,
+        text: `${text}\nRead more on SP Sports Academy`,
         url: url,
       }).catch((error) => {
         console.log('Error sharing:', error);
@@ -94,12 +94,12 @@ const News = () => {
   return (
     <>
       <Seo
-        title="News & Updates - SP Kabaddi Club"
-        description="Stay updated with the latest news, announcements, and updates from SP Kabaddi Club."
+        title="News & Updates - SP Sports Academy"
+        description="Stay updated with the latest news, announcements, and updates from SP Sports Academy."
         url="https://spkabaddi.me/news"
         canonical="https://spkabaddi.me/news"
         image={shareImage}
-        keywords="SP Kabaddi, news, updates, announcements, sports news"
+        keywords="SP Sports Academy, sports news, updates, announcements"
       />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -139,7 +139,7 @@ const News = () => {
                 </h1>
               </div>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 font-light leading-relaxed max-w-3xl">
-                Stay informed with the latest news, achievements, and announcements from SP Kabaddi Club
+                Stay informed with the latest news, achievements, and announcements from SP Sports Academy
               </p>
             </div>
           </div>

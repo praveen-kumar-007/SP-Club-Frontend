@@ -481,7 +481,7 @@ const PlayerDashboard = () => {
                 title="Player Dashboard"
                 description="Player dashboard for attendance, fee status, profile, and admin communication."
                 url="https://spkabaddi.me/player/dashboard"
-                keywords="player dashboard, attendance, fee status, SP Kabaddi"
+                keywords="player dashboard, attendance, fee status, SP Sports Academy"
             />
             <div className="max-w-6xl mx-auto space-y-6">
                 <Card className="border-blue-200 shadow-sm">

@@ -190,10 +190,10 @@ const Gallery = () => {
     <div className="bg-slate-900 min-h-screen text-white pb-20">
       <Seo
         title="Gallery"
-        description="Gallery — Photos from SP Kabaddi Group Dhanbad showcasing training, matches, championships, and events."
+        description="Gallery — Photos from SP Sports Academy showcasing training, matches, championships, and events."
         url="https://spkabaddi.me/gallery"
         image={galleryItems[0]?.imageUrl}
-        keywords="SP Kabaddi Group Dhanbad gallery, spkg gallery"
+        keywords="SP Sports Academy gallery, sp sports academy gallery, sports gallery"
       />
       
       {/* Hero Section */}

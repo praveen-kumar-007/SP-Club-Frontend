@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
             </span>
           </h1>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            SP Kabaddi Club is committed to protecting your personal information and privacy
+            SP Sports Academy is committed to protecting your personal information and privacy
           </p>
           <p className="text-sm text-slate-500 mt-4">Last Updated: December 8, 2025</p>
         </div>
@@ -25,10 +25,10 @@ const PrivacyPolicy = () => {
         <div className="mb-12 bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-xl p-8">
           <div className="text-slate-300 space-y-4">
             <p className="text-lg leading-relaxed">
-              This Privacy Policy describes how SP Kabaddi Club ("we", "us", or "our") collects, uses, stores, and protects your personal information when you register as a member, use our facilities, or interact with our services.
+              This Privacy Policy describes how SP Sports Academy ("we", "us", or "our") collects, uses, stores, and protects your personal information when you register as a member, use our facilities, or interact with our services.
             </p>
             <p className="leading-relaxed">
-              By registering with SP Kabaddi Club, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy. If you do not agree with any part of this policy, please do not register or use our services.
+              By registering with SP Sports Academy, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy. If you do not agree with any part of this policy, please do not register or use our services.
             </p>
           </div>
         </div>
@@ -315,7 +315,7 @@ const PrivacyPolicy = () => {
           <div className="space-y-4 text-slate-300">
             <p>For questions, concerns, or requests regarding this Privacy Policy or your personal information:</p>
             <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">SP Kabaddi Club - Privacy Officer</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">SP Sports Academy - Privacy Officer</h3>
               <div className="space-y-2">
                 <p><strong>Email:</strong> spkabaddigroupdhanbad@gmail.com</p>
                 <p><strong>Phone:</strong> [Club Contact Number]</p>
@@ -333,7 +333,7 @@ const PrivacyPolicy = () => {
             <div>
               <h3 className="text-2xl font-bold text-white mb-3">Your Privacy Matters</h3>
               <p className="text-slate-300 leading-relaxed mb-4">
-                By registering with SP Kabaddi Club, you acknowledge that you have read, understood, and agree to this Privacy Policy. We are committed to protecting your personal information and maintaining your trust.
+                By registering with SP Sports Academy, you acknowledge that you have read, understood, and agree to this Privacy Policy. We are committed to protecting your personal information and maintaining your trust.
               </p>
               <p className="text-slate-300 leading-relaxed mb-6">
                 If you have any questions or concerns about how we handle your data, please don't hesitate to contact us.
@@ -359,7 +359,7 @@ const PrivacyPolicy = () => {
         {/* Legal Disclaimer */}
         <div className="mt-8 text-center text-sm text-slate-500">
           <p>This Privacy Policy is governed by the laws of India and complies with the Information Technology Act, 2000 and rules thereunder.</p>
-          <p className="mt-2">© 2025 SP Kabaddi Club. All rights reserved.</p>
+          <p className="mt-2">© 2025 SP Sports Academy. All rights reserved.</p>
         </div>
       </div>
     </div>

@@ -168,7 +168,7 @@ const Register = () => {
       if (response.ok) {
         toast({
           title: "Registration Successful! 🎉",
-          description: result.message || "Welcome to SP Kabaddi Group Dhanbad! We'll contact you within 24 hours.",
+          description: result.message || "Welcome to SP Sports Academy! We'll contact you within 24 hours.",
           variant: "default",
         });
         form.reset();
@@ -294,15 +294,15 @@ const Register = () => {
     <div className="min-h-screen bg-slate-950 text-white">
       <Seo
         title="Register"
-        description="Register with SP Kabaddi Group Dhanbad to join training, events, and community programs."
+        description="Register with SP Sports Academy to join training, events, and community programs."
         url="https://spkabaddi.me/register"
-        keywords="register SP Kabaddi Group Dhanbad, spkg register"
+        keywords="register SP Sports Academy, sp sports academy register"
       />
 
       <header className="bg-[radial-gradient(circle_at_top,_rgba(250,204,21,0.15),_transparent_35%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-6xl text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-yellow-300">Register for SP Kabaddi Group</p>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Join SP Kabaddi Group Dhanbad today</h1>
+          <p className="text-sm uppercase tracking-[0.3em] text-yellow-300">Register for SP Sports Academy</p>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Join SP Sports Academy today</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">Fill out your application to get approval, receive updates, and access the player dashboard once verified.</p>
         </div>
       </header>
@@ -312,7 +312,7 @@ const Register = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Registration Form</h2>
             <p className="text-lg text-gray-400">
-              Fill out the form below to register with SP Kabaddi Group Dhanbad. Fields marked with <span className="text-red-500">*</span> are required.
+              Fill out the form below to register with SP Sports Academy. Fields marked with <span className="text-red-500">*</span> are required.
             </p>
           </div>
 
@@ -323,7 +323,7 @@ const Register = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl text-white flex items-center">
                     <UserPlus className="w-8 h-8 mr-3 text-[#facc15]" />
-                    Join SP Kabaddi Group Dhanbad
+                    Join SP Sports Academy
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -648,7 +648,7 @@ const Register = () => {
                         name="clubDetails"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Why do you want to join SP Kabaddi Group Dhanbad? <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel className="text-gray-300">Why do you want to join SP Sports Academy? <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                               <Textarea
                                 placeholder="Share your motivation, goals, or what you hope to achieve by joining our club..."
@@ -1200,7 +1200,7 @@ const Register = () => {
                 <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "SP Kabaddi Group Dhanbad has transformed my kabaddi skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
+                      "SP Sports Academy has transformed my athletic skills completely. The coaching from Pappu and Deepak is world-class. I've grown as both a player and a person here."
                     </p>
                     <div className="text-xs">
                       <p className="font-semibold text-white">Vikram Singh</p>
@@ -1212,7 +1212,7 @@ const Register = () => {
                 <Card className="bg-[#1e3a5f] border-gray-700 text-white hover:border-yellow-400 transition-colors duration-300">
                   <CardContent className="p-4">
                     <p className="text-sm italic mb-3 text-gray-300">
-                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Kabaddi Group Dhanbad's championship run in 2024 was the highlight of my sports career."
+                      "The facilities here are top-notch, and the team spirit is unmatched. Being part of SP Sports Academy's championship run in 2024 was the highlight of my sports career."
                     </p>
                     <div className="text-xs">
                       <p className="font-semibold text-white">Aditya Kumar</p>

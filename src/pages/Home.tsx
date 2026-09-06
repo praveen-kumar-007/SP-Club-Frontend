@@ -90,7 +90,7 @@ const Home = () => {
     {
       id: 3,
       src: "/home_assets/win_holi.jpg",
-      alt: "The First Team of SP Kabaddi Group Dhanbad.",
+      alt: "The First Team of SP Sports Academy.",
     },
     {
       id: 4,
@@ -103,9 +103,9 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       <Seo
         title="Home"
-        description="SP Kabaddi Group Dhanbad — training champions since 2010. Join our programs, events, and community."
+        description="SP Sports Academy — training champions since 2010. Join our programs, events, and community."
         url="https://spkabaddi.me/"
-        keywords="SP Kabaddi Group Dhanbad, kabaddi Dhanbad, sports club Dhanbad, spkg"
+        keywords="SP Sports Academy, sports academy Dhanbad, athletics training, sp sports academy"
       />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-white overflow-hidden">
@@ -128,14 +128,14 @@ const Home = () => {
             <img
               className="absolute top-0 left-0 w-full h-full object-cover"
               src="/home_assets/poster.jpg"
-              alt="SP Kabaddi Group Dhanbad hero"
+              alt="SP Sports Academy hero"
             />
           )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight animate-fade-in-up shadow-text">
-            Welcome to <span className="text-amber-400">SP Kabaddi Group Dhanbad</span>
+            Welcome to <span className="text-amber-400">SP Sports Academy</span>
           </h1>
           <p className="text-xl md:text-2xl mb-10 text-gray-200 animate-fade-in-up delay-200 max-w-3xl mx-auto">
             Where Champions Are Forged and Legacies Are Built
@@ -162,7 +162,7 @@ const Home = () => {
             <div className="max-w-xl">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-slate-800 leading-tight">Our Championship Journey</h2>
               <p className="text-lg text-gray-600 mb-8">
-                Discover the passion, dedication, and triumphs that have defined SP Kabaddi Group Dhanbad as a powerhouse in Indian sports.
+                Discover the passion, dedication, and triumphs that have defined SP Sports Academy as a powerhouse in Indian sports.
               </p>
               <Button variant="link" className="text-amber-600 font-bold text-lg p-0 hover:text-amber-700 transition-colors">
                 Explore Our History <ArrowRight className="ml-2 h-5 w-5" />
@@ -175,7 +175,7 @@ const Home = () => {
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={embedStoryUrl}
-                  title="SP Kabaddi Group Dhanbad Story"
+                  title="SP Sports Academy Story"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -192,7 +192,7 @@ const Home = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Hall of Fame</h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Celebrating the moments and the members who make SP Kabaddi Group Dhanbad exceptional.
+              Celebrating the moments and the members who make SP Sports Academy exceptional.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -217,7 +217,7 @@ const Home = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-800">Why Choose SP Kabaddi Group Dhanbad?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-800">Why Choose SP Sports Academy?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Join India's most ambitious sports community and unlock your true potential.
             </p>
@@ -268,7 +268,7 @@ const Home = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Join the Elite?</h2>
           <p className="text-xl mb-10 max-w-3xl mx-auto text-slate-300">
-            Take the first step towards achieving your sporting dreams with SP Kabaddi Group Dhanbad.
+            Take the first step towards achieving your sporting dreams with SP Sports Academy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register">

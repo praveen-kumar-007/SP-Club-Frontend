@@ -113,7 +113,7 @@ const Footer = () => {
         <div className="mb-12 flex flex-col items-start justify-between gap-6 rounded-3xl border border-amber-500/20 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl md:flex-row md:items-center md:p-12">
           <div>
             <h3 className="mb-3 text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">Stay Ahead of the Game</h3>
-            <p className="max-w-xl text-slate-300">Subscribe to our newsletter for the latest updates, news, and offers from SP Kabaddi Group Dhanbad.</p>
+            <p className="max-w-xl text-slate-300">Subscribe to our newsletter for the latest updates, news, and offers from SP Sports Academy.</p>
           </div>
           <div className="flex w-full max-w-lg flex-col gap-3 rounded-2xl bg-slate-950/90 p-4 shadow-inner shadow-slate-900/40 sm:flex-row sm:items-center">
             <Input
@@ -141,12 +141,12 @@ const Footer = () => {
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
                 <img
                   src="/Logo.png"
-                  alt="SP Kabaddi Group Dhanbad Logo"
+                  alt="SP Sports Academy Logo"
                   className="h-20 w-20 rounded-full border-2 border-amber-300/30 object-cover shadow-lg transition-transform duration-300 hover:scale-105 sm:h-24 sm:w-24"
                   draggable={false}
                 />
                 <div className="min-w-0">
-                  <h3 className="text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">SP Kabaddi Group Dhanbad</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-amber-300 sm:text-4xl">SP Sports Academy</h3>
                   <p className="text-sm uppercase tracking-[0.35em] text-slate-400">Team spirit. Pride. Passion.</p>
                 </div>
               </div>
@@ -228,7 +228,7 @@ const Footer = () => {
             <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
               <div className="aspect-video">
                 <iframe
-                  title="SP Kabaddi Group Dhanbad Location"
+                  title="SP Sports Academy Location"
                   src={GOOGLE_MAPS_EMBED_URL}
                   className="w-full h-full"
                   loading="lazy"
@@ -253,7 +253,7 @@ const Footer = () => {
 
         <div className="border-t border-slate-700/50 mt-10 pt-8 text-center">
           <p className="text-slate-400">
-            © {new Date().getFullYear()} SP Kabaddi Group Dhanbad. All rights reserved. Built with passion for sports.
+            © {new Date().getFullYear()} SP Sports Academy. All rights reserved. Built with passion for sports.
           </p>
           <p className="mt-2 text-sm text-slate-500">Experience stronger branding with bold visuals and polished footer layout.</p>
         </div>

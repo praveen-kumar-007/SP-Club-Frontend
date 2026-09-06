@@ -10,11 +10,11 @@ type SeoProps = {
   canonical?: string;
 };
 
-const SITE_NAME = "SP Kabaddi Group Dhanbad";
+const SITE_NAME = "SP Sports Academy";
 const SITE_URL = "https://spkabaddi.me";
 const DEFAULT_IMAGE = `${SITE_URL}/Logo.png`;
 const DEFAULT_DESCRIPTION =
-  "SP Kabaddi Group Dhanbad — premier sports club in Dhanbad offering coaching, events, and championship training.";
+  "SP Sports Academy — premier sports academy in Dhanbad offering coaching, events, and championship training.";
 
 const normalizeAbsoluteUrl = (value?: string): string => {
   if (!value) {
@@ -38,7 +38,7 @@ const Seo: React.FC<SeoProps> = ({
   keywords,
   canonical,
 }) => {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - Premier Sports Club`;
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - Premier Sports Academy`;
   const metaUrl = normalizeAbsoluteUrl(url) || SITE_URL;
   const metaImage = normalizeAbsoluteUrl(image) || DEFAULT_IMAGE;
   const metaDescription = description || DEFAULT_DESCRIPTION;

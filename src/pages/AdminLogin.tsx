@@ -117,14 +117,14 @@ const AdminLogin = () => {
             <div className="h-16 w-16 rounded-xl overflow-hidden border border-blue-200 bg-white shadow-sm">
               <img
                 src="/Logo.png"
-                alt="SP Kabaddi Group Dhanbad"
+                alt="SP Sports Academy"
                 className="h-full w-full object-cover"
               />
             </div>
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Access the SP Kabaddi Group Dhanbad management panel
+            Access the SP Sports Academy management panel
           </CardDescription>
         </CardHeader>
         <CardContent>

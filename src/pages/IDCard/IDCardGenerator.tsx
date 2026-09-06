@@ -91,9 +91,9 @@ const IDCardGenerator = () => {
     <div style={{ fontFamily: "'Poppins', sans-serif", backgroundColor: "#e0e0e0", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "20px 10px" }}>
       <Seo
         title="ID Card Generator"
-        description="SP Kabaddi Group Dhanbad Member ID Card"
+        description="SP Sports Academy Member ID Card"
         url="https://spkabaddi.me/id-card"
-        keywords="SP Kabaddi Group Dhanbad ID card, member card"
+        keywords="SP Sports Academy ID card, member card"
       />
       
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>
@@ -133,7 +133,7 @@ const IDCardGenerator = () => {
               color: "#FFFFFF",
               margin: 0,
               lineHeight: 1.2
-            }}>SP Kabaddi Group</h1>
+            }}>SP Sports Academy</h1>
           </div>
 
           {/* Card Photo Section */}
@@ -247,7 +247,7 @@ const IDCardGenerator = () => {
               fontSize: "11.5px",
               fontWeight: 600,
               marginBottom: "1px"
-            }}>SP Kabaddi Group</h3>
+            }}>SP Sports Academy</h3>
             <p style={{
               fontSize: "8px",
               fontWeight: 400,
@@ -271,14 +271,14 @@ const IDCardGenerator = () => {
               color: "#003366",
               marginBottom: "3.5px",
               textAlign: "center"
-            }}>About the Club</h4>
+            }}>About the Academy</h4>
             <p style={{
               textAlign: "center",
               marginBottom: "7px",
               fontSize: "8px",
               lineHeight: 1.2,
               color: "#444"
-            }}>Dedicated to fostering Kabaddi talent. We emphasize skill, fitness, strategy, and sportsmanship.</p>
+            }}>Dedicated to fostering sports talent. We emphasize skill, fitness, strategy, and sportsmanship.</p>
 
             {/* QR Section - Only appearing here now */}
             <div style={{

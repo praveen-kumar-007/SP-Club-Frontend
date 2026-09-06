@@ -76,7 +76,7 @@ const PlayerLogin = () => {
                     <div className="mx-auto mb-3 h-16 w-16 rounded-xl overflow-hidden border border-blue-200 bg-white shadow-sm">
                         <img
                             src="/Logo.png"
-                            alt="SP Kabaddi Group Dhanbad"
+                            alt="SP Sports Academy"
                             className="h-full w-full object-cover"
                         />
                     </div>

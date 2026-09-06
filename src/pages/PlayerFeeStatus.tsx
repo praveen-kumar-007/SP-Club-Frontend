@@ -103,7 +103,7 @@ const PlayerFeeStatus = () => {
         title="Player Fee Status"
         description="View monthly fee payment status and history for your account."
         url="https://spkabaddi.me/player/fees"
-        keywords="player fee status, monthly payment, SP Kabaddi"
+        keywords="player fee status, monthly payment, SP Sports Academy"
       />
       <div className="mx-auto max-w-4xl space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

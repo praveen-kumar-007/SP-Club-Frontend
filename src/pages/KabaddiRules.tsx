@@ -12,11 +12,11 @@ const KabaddiRules = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
-              SP Kabaddi Group Dhanbad Kabaddi Rules
+              SP Sports Academy Kabaddi Rules
             </span>
           </h1>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            Official kabaddi rules and regulations followed by SP Kabaddi Club, in compliance with AKFI standards
+            Official kabaddi rules and regulations followed by SP Sports Academy, in compliance with AKFI standards
           </p>
           <p className="text-sm text-slate-500 mt-4">Based on Amateur Kabaddi Federation of India (AKFI) Regulations</p>
         </div>
@@ -31,7 +31,7 @@ const KabaddiRules = () => {
                 Kabaddi is a contact team sport that originated in ancient India. It combines elements of wrestling, tag, and requires both offensive and defensive skills. The game is played between two teams of seven players each, with the objective of scoring points by raiding the opponent's half and touching as many defenders as possible without getting caught.
               </p>
               <p className="text-slate-300 leading-relaxed">
-                SP Kabaddi Club follows all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI) to ensure fair play, sportsmanship, and standardized competition across all levels.
+                SP Sports Academy follows all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI) to ensure fair play, sportsmanship, and standardized competition across all levels.
               </p>
             </div>
           </div>
@@ -555,24 +555,24 @@ const KabaddiRules = () => {
           </div>
         </div>
 
-        {/* SP Kabaddi Group Dhanbad Compliance */}
+        {/* SP Sports Academy Compliance */}
         <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 border border-amber-500/30 rounded-xl p-8">
           <div className="flex items-start gap-4">
             <Trophy className="w-8 h-8 text-amber-400 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-2xl font-bold text-white mb-3">SP Kabaddi Group Dhanbad Commitment</h3>
+              <h3 className="text-2xl font-bold text-white mb-3">SP Sports Academy Commitment</h3>
               <p className="text-slate-300 leading-relaxed mb-4">
-                SP Kabaddi Group Dhanbad strictly adheres to all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). We ensure that all our members, coaches, and officials are well-versed in these rules to maintain the highest standards of fair play and sportsmanship.
+                SP Sports Academy strictly adheres to all rules and regulations established by the Amateur Kabaddi Federation of India (AKFI). We ensure that all our members, coaches, and officials are well-versed in these rules to maintain the highest standards of fair play and sportsmanship.
               </p>
               <p className="text-slate-300 leading-relaxed mb-4">
-                All training sessions, practice matches, and tournaments organized by SP Kabaddi Group Dhanbad follow AKFI guidelines. We believe in developing players who not only excel in skills but also understand and respect the spirit of the game.
+                All training sessions, practice matches, and tournaments organized by SP Sports Academy follow AKFI guidelines. We believe in developing players who not only excel in skills but also understand and respect the spirit of the game.
               </p>
               <div className="flex flex-wrap gap-4 mt-6">
                 <Link 
                   to="/register" 
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
                 >
-                  Join SP Kabaddi Group Dhanbad
+                  Join SP Sports Academy
                 </Link>
                 <Link 
                   to="/terms-conditions" 
@@ -589,7 +589,7 @@ const KabaddiRules = () => {
         <div className="mt-8 text-center text-sm text-slate-500">
           <p>These rules are based on AKFI (Amateur Kabaddi Federation of India) regulations.</p>
           <p className="mt-2">For official AKFI documentation and updates, please visit the AKFI official website.</p>
-          <p className="mt-2">© 2025 SP Kabaddi Club. All rights reserved.</p>
+          <p className="mt-2">© 2025 SP Sports Academy. All rights reserved.</p>
         </div>
       </div>
     </div>

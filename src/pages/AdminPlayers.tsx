@@ -133,7 +133,7 @@ const AdminPlayers = () => {
         title="Admin Players"
         description="View and manage all approved player data including kit and jersey assignments."
         url="https://spkabaddi.me/admin/players"
-        keywords="admin players, SP Kabaddi, jersey search, player directory"
+        keywords="admin players, SP Sports Academy, jersey search, player directory"
       />
       <div className="max-w-7xl mx-auto space-y-6">
         <Card>
