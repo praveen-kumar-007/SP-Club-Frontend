@@ -12,7 +12,7 @@ type SeoProps = {
 
 const SITE_NAME = "SP Sports Academy";
 const SITE_URL = "https://spkabaddi.me";
-const DEFAULT_IMAGE = `${SITE_URL}/Logo.png`;
+const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg?v=2`;
 const DEFAULT_DESCRIPTION =
   "SP Sports Academy — premier sports academy in Dhanbad offering coaching, events, and championship training.";
 
@@ -65,6 +65,7 @@ const Seo: React.FC<SeoProps> = ({
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@SPClub_Dhanbad" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
       <meta name="twitter:image" content={metaImage} />
