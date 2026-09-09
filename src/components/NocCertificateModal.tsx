@@ -75,258 +75,325 @@ const maskAadhaar = (num?: string) => {
 };
 
 // =========================================================================
-// PRESTIGIOUS, ATTRACTIVE, PROFESSIONAL 1-PAGE A4 NOC LETTERHEAD CERTIFICATE
+// OFFICIAL INSTITUTIONAL LETTERHEAD NOC (ISM / PREMIER INSTITUTION STYLE)
 // =========================================================================
 export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCertificateData }>(
   ({ data }, ref) => {
     const player = data.player;
     const cert = data.certificate || {};
-    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPKA/NOC/2026/001";
+    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPKA/NOC/2026/001-9185";
     const generatedAt = cert.generatedAt || player.noc?.generatedAt || new Date();
     const signatureHash =
       cert.digitalSignatureHash ||
       player.noc?.digitalSignatureHash ||
-      "9f8a2b3c4d5e6f7a8b9c0d1e2f3a4b5c";
+      "6b51c5a8c266cd156b9105f7a8b9c0d1";
+
+    const academyUnit =
+      player.clubDetails &&
+      player.clubDetails.trim().length > 3 &&
+      player.clubDetails.toLowerCase().includes("academy")
+        ? player.clubDetails
+        : "SP Sports Academy Main Center, Dhanbad";
 
     return (
       <div
         ref={ref}
         id="noc-certificate-document"
-        className="w-[800px] min-w-[800px] max-w-[800px] h-[1060px] min-h-[1060px] max-h-[1060px] bg-white text-slate-900 shadow-xl relative overflow-hidden box-border"
+        className="w-[800px] min-w-[800px] max-w-[800px] bg-white text-slate-900 shadow-lg relative overflow-hidden box-border border border-slate-200"
         style={{
           boxSizing: "border-box",
-          padding: "26px 32px 24px 32px",
+          padding: "36px 44px 32px 44px",
           backgroundColor: "#ffffff",
-          fontFamily: "'Segoe UI', Arial, 'Helvetica Neue', sans-serif",
-          color: "#0f172a",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          fontFamily: "'Times New Roman', Times, Georgia, serif",
+          color: "#111827",
         }}
       >
-        {/* Formal Ornamental Certificate Frame */}
-        <div className="absolute inset-2.5 border-2 border-slate-900 pointer-events-none z-20">
-          <div className="absolute inset-[3px] border border-amber-600/70 pointer-events-none">
-            {/* Corner Rosettes */}
-            <div className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-amber-600 rounded-xs" />
-            <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-amber-600 rounded-xs" />
-            <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-amber-600 rounded-xs" />
-            <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-amber-600 rounded-xs" />
-          </div>
-        </div>
-
-        {/* Subtle Academy Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">
+        {/* Subtle Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] z-0">
           <img
             src="/Logo.png"
-            alt="Watermark"
-            className="w-[360px] h-[360px] object-contain"
+            alt="SP Sports Academy Watermark"
+            className="w-[320px] h-[320px] object-contain"
           />
         </div>
 
-        <div className="relative z-10 flex flex-col justify-between h-full">
-          {/* TOP SECTION: Letterhead & Reference */}
-          <div>
-            {/* 1. Official Institutional Letterhead */}
-            <div className="text-center pt-1 pb-2 relative">
-              <div className="flex items-center justify-between px-3 mb-2">
-                <img
-                  src="/Logo.png"
-                  alt="SP Sports Academy"
-                  className="w-16 h-16 object-contain shrink-0"
-                />
-                <div className="text-center flex-1 px-3">
-                  <h1 className="text-2xl font-black tracking-wider text-slate-950 uppercase font-serif leading-tight">
-                    SP SPORTS ACADEMY
-                  </h1>
-                  <p className="text-[10.5px] font-bold text-amber-700 tracking-widest uppercase mt-0.5">
-                    PREMIER SPORTS TRAINING INSTITUTION & ATHLETE REGISTRY
-                  </p>
-                  <p className="text-[9.5px] font-semibold text-slate-600 mt-0.5">
-                    Affiliated & Recognized Training Centre • Dhanbad, Jharkhand, India
-                  </p>
-                  <p className="text-[9px] text-slate-500 mt-0.5">
-                    Secretariat: Shakti Mandir Path, Dhanbad – 826007 • Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me
-                  </p>
-                </div>
-                {/* Official Accreditation Emblem */}
-                <div className="w-16 h-16 flex flex-col items-center justify-center rounded-full border border-amber-600/60 bg-amber-50/60 p-1 shrink-0 text-center">
-                  <span className="text-[7.5px] font-bold text-amber-900 uppercase leading-none">OFFICIAL</span>
-                  <span className="text-[11px] text-amber-600 my-0.5">★</span>
-                  <span className="text-[7px] font-extrabold text-slate-800 uppercase tracking-tight">ISSUED</span>
-                </div>
-              </div>
-              {/* Dual Accent Lines */}
-              <div className="h-[2px] bg-gradient-to-r from-amber-600 via-slate-900 to-amber-600 w-full" />
-            </div>
-
-            {/* 2. Reference & Date Bar */}
-            <div className="flex items-center justify-between text-xs text-slate-800 px-3 py-1.5 bg-slate-50/80 border-b border-slate-200 mt-1">
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-700 uppercase text-[10.5px]">Certificate Ref:</span>
-                <span className="font-mono font-bold text-slate-950 bg-white px-2 py-0.5 rounded border border-slate-300 text-xs shadow-2xs">
-                  {nocNumber}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-700 uppercase text-[10.5px]">Date of Issue:</span>
-                <span className="font-semibold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300 text-xs shadow-2xs">
-                  {formatDate(generatedAt)}
-                </span>
-              </div>
-            </div>
-
-            {/* 3. Certificate Title Banner */}
-            <div className="text-center my-3">
-              <div className="inline-block relative">
-                <div className="px-8 py-1.5 bg-slate-900 text-white rounded-xs shadow-sm">
-                  <h2 className="text-xl font-bold tracking-widest uppercase font-serif">
-                    NO OBJECTION CERTIFICATE
-                  </h2>
-                </div>
-                <div className="text-[10px] font-bold text-amber-800 uppercase tracking-widest mt-1">
-                  ◆ OFFICIAL ATHLETE CLEARANCE & TRANSFER ENDORSEMENT ◆
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Body Content */}
-            <div className="space-y-3 px-3 text-[12.5px] leading-relaxed text-slate-800 text-justify">
-              <div className="font-bold text-slate-950 text-xs tracking-wider uppercase border-b border-slate-300 pb-1">
-                TO WHOMSOEVER IT MAY CONCERN
-              </div>
-
-              <p>
-                This is to certify that <strong>{player.name}</strong>, Son/Daughter of <strong>{player.fathersName || "the parent/guardian"}</strong>, bearing Academy Registration ID <strong>{player.idCardNumber || "SPKA-ATHLETE"}</strong>, has been an enrolled trainee athlete with <strong>SP Sports Academy, Dhanbad</strong>.
-              </p>
-
-              {/* 5. Athlete Profile & Credentials Matrix */}
-              <div className="my-2.5 border border-slate-300 rounded overflow-hidden shadow-2xs bg-white">
-                <div className="bg-slate-900 text-white px-3 py-1 text-[10.5px] font-bold uppercase tracking-wider flex items-center justify-between">
-                  <span>Verified Athlete Credentials</span>
-                  <span className="text-amber-400 font-mono text-[10px]">Registry Status: Active Clearance</span>
-                </div>
-                <div className="flex p-2.5 gap-3 items-center">
-                  {player.photo && (
-                    <div className="w-20 h-24 shrink-0 rounded border border-slate-300 overflow-hidden shadow-2xs bg-slate-100">
-                      <img
-                        src={player.photo}
-                        alt={player.name}
-                        className="w-full h-full object-cover object-top"
-                      />
-                    </div>
-                  )}
-                  <table className="w-full text-xs">
-                    <tbody>
-                      <tr className="border-b border-slate-200">
-                        <td className="py-1 px-2 font-semibold text-slate-600 w-1/4">Athlete Name:</td>
-                        <td className="py-1 px-2 font-bold text-slate-950 w-1/4">{player.name}</td>
-                        <td className="py-1 px-2 font-semibold text-slate-600 w-1/4">Registration ID:</td>
-                        <td className="py-1 px-2 font-mono font-bold text-slate-900 w-1/4">{player.idCardNumber || "SPKA-ATHLETE"}</td>
-                      </tr>
-                      <tr className="border-b border-slate-200">
-                        <td className="py-1 px-2 font-semibold text-slate-600">Father&apos;s Name:</td>
-                        <td className="py-1 px-2 text-slate-900">{player.fathersName || "N/A"}</td>
-                        <td className="py-1 px-2 font-semibold text-slate-600">Date of Birth:</td>
-                        <td className="py-1 px-2 text-slate-900">{formatDate(player.dob)}</td>
-                      </tr>
-                      <tr className="border-b border-slate-200">
-                        <td className="py-1 px-2 font-semibold text-slate-600">Sport / Role:</td>
-                        <td className="py-1 px-2 text-slate-900 capitalize">{player.role || "Athlete"}</td>
-                        <td className="py-1 px-2 font-semibold text-slate-600">Gender / Blood:</td>
-                        <td className="py-1 px-2 text-slate-900 capitalize">{player.gender || "N/A"} / {player.bloodGroup || "N/A"}</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1 px-2 font-semibold text-slate-600">Academy Unit:</td>
-                        <td className="py-1 px-2 text-slate-900">{player.clubDetails || "SP Sports Academy, Dhanbad"}</td>
-                        <td className="py-1 px-2 font-semibold text-slate-600">Aadhaar (ID):</td>
-                        <td className="py-1 px-2 font-mono text-slate-900">{maskAadhaar(player.aadharNumber)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <p>
-                The management and technical committee of <strong>SP Sports Academy has NO OBJECTION</strong> to <strong>{player.name}</strong> participating in open, invitational, district, state, or national championships and tournaments, or seeking admission, registration, or institutional transfer to any other recognized sports academy, club, school, university, or sports federation.
-              </p>
-
-              <p>
-                It is further certified that the athlete has fulfilled all institutional commitments, returned all academy kits and training equipment, and settled all outstanding dues. There are <strong>no disciplinary proceedings, contractual claims, or financial liabilities</strong> pending against the athlete with this academy.
-              </p>
-
-              {player.noc?.destinationClub && (
-                <p className="text-[11.5px] text-slate-800 font-medium italic bg-amber-50/80 border-l-2 border-amber-600 px-2 py-1">
-                  * Specific Transfer Clearance Endorsed For: <strong>{player.noc.destinationClub}</strong>
+        <div className="relative z-10 space-y-4">
+          {/* 1. Official Institutional Letterhead */}
+          <div className="pb-3 border-b-2 border-slate-900">
+            <div className="flex items-center gap-4">
+              <img
+                src="/Logo.png"
+                alt="SP Sports Academy"
+                className="w-18 h-18 object-contain shrink-0"
+              />
+              <div className="flex-1">
+                <h1
+                  className="text-2xl font-bold tracking-tight text-slate-950 uppercase leading-none"
+                  style={{ letterSpacing: "0.5px" }}
+                >
+                  SP SPORTS ACADEMY
+                </h1>
+                <p
+                  className="text-xs font-semibold text-slate-700 mt-1 uppercase"
+                  style={{ fontFamily: "Arial, sans-serif" }}
+                >
+                  Department of Athletics & Player Development • Dhanbad, Jharkhand
                 </p>
-              )}
-
-              <p>
-                During their association with SP Sports Academy, the athlete maintained high personal discipline, sportsman spirit, and exemplary conduct. We wish <strong>{player.name}</strong> every success in all future athletic, competitive, and academic pursuits.
-              </p>
+                <p
+                  className="text-[11px] text-slate-600 mt-0.5"
+                  style={{ fontFamily: "Arial, sans-serif" }}
+                >
+                  Shakti Mandir Path, Dhanbad – 826007, Jharkhand (India)
+                </p>
+                <p
+                  className="text-[10.5px] text-slate-500 mt-0.5"
+                  style={{ fontFamily: "Arial, sans-serif" }}
+                >
+                  Email: spkabaddigroupdhanbad@gmail.com • Website: https://spkabaddi.me
+                </p>
+              </div>
+              <div
+                className="text-right border-l border-slate-300 pl-4 shrink-0"
+                style={{ fontFamily: "Arial, sans-serif" }}
+              >
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                  Official Dispatch
+                </span>
+                <span className="text-xs font-semibold text-slate-800 font-mono">
+                  REG/NOC-SEC
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* BOTTOM SECTION: Signatures & Footer */}
-          <div>
-            {/* 6. Signatures & Digital Seal Block */}
-            <div className="pt-3 pb-2 px-3 border-t border-slate-300">
-              <div className="flex items-end justify-between">
-                {/* Left: Digital Verification Seal */}
+          {/* 2. Dispatch Reference & Date */}
+          <div className="flex items-center justify-between text-[13px] border-b border-slate-200 pb-2 pt-1 font-serif">
+            <div>
+              <span className="font-bold text-slate-800">Ref. No.: </span>
+              <span className="font-mono font-bold text-slate-950">{nocNumber}</span>
+            </div>
+            <div>
+              <span className="font-bold text-slate-800">Date: </span>
+              <span className="font-semibold text-slate-950">{formatDate(generatedAt)}</span>
+            </div>
+          </div>
+
+          {/* 3. Certificate Title & Subject Line */}
+          <div className="text-center pt-1 pb-1">
+            <h2 className="text-lg font-bold text-slate-950 tracking-wider uppercase underline underline-offset-4">
+              NO OBJECTION CERTIFICATE
+            </h2>
+            <p className="text-xs font-bold text-slate-700 tracking-wide uppercase mt-1">
+              (TO WHOMSOEVER IT MAY CONCERN)
+            </p>
+          </div>
+
+          {/* Subject Line */}
+          <div
+            className="text-xs text-slate-800 bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-xs"
+            style={{ fontFamily: "Arial, sans-serif" }}
+          >
+            <span className="font-bold text-slate-900">Sub: </span>
+            <span>
+              Issuance of No Objection Certificate (NOC) in respect of{" "}
+              <strong>{player.name}</strong> (Registration ID:{" "}
+              <strong>{player.idCardNumber || "SPKA-ATHLETE"}</strong>) – Regarding.
+            </span>
+          </div>
+
+          {/* 4. Formal Letter Content */}
+          <div className="space-y-3 text-[13px] leading-relaxed text-slate-900 text-justify font-serif">
+            <p>
+              This is to certify that <strong>Mr./Ms. {player.name}</strong>, Son/Daughter of{" "}
+              <strong>{player.fathersName || "the parent/guardian"}</strong>, bearing Academy
+              Registration ID <strong>{player.idCardNumber || "SPKA-ATHLETE"}</strong>, is a
+              registered athlete trainee of <strong>SP Sports Academy, Dhanbad</strong>.
+            </p>
+
+            {/* 5. Trainee Particulars Table */}
+            <div
+              className="my-2 border border-slate-300 rounded-xs overflow-hidden"
+              style={{ fontFamily: "Arial, sans-serif" }}
+            >
+              <table className="w-full text-xs">
+                <tbody>
+                  <tr className="border-b border-slate-200 bg-slate-50/80">
+                    <td className="py-1.5 px-3 font-semibold text-slate-700 w-1/4">
+                      Athlete Name:
+                    </td>
+                    <td className="py-1.5 px-3 font-bold text-slate-950 w-1/4">
+                      {player.name}
+                    </td>
+                    <td className="py-1.5 px-3 font-semibold text-slate-700 w-1/4">
+                      Registration ID:
+                    </td>
+                    <td className="py-1.5 px-3 font-mono font-bold text-slate-900 w-1/4">
+                      {player.idCardNumber || "SPKA-ATHLETE"}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-slate-200">
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Father&apos;s Name:
+                    </td>
+                    <td className="py-1.5 px-3 text-slate-900">
+                      {player.fathersName || "N/A"}
+                    </td>
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Date of Birth:
+                    </td>
+                    <td className="py-1.5 px-3 text-slate-900">{formatDate(player.dob)}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200 bg-slate-50/80">
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Discipline / Role:
+                    </td>
+                    <td className="py-1.5 px-3 text-slate-900 capitalize">
+                      {player.role || "Athlete"}
+                    </td>
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Gender / Blood:
+                    </td>
+                    <td className="py-1.5 px-3 text-slate-900 capitalize">
+                      {player.gender || "N/A"} / {player.bloodGroup || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Aadhaar (Verified):
+                    </td>
+                    <td className="py-1.5 px-3 font-mono text-slate-900">
+                      {maskAadhaar(player.aadharNumber)}
+                    </td>
+                    <td className="py-1.5 px-3 font-semibold text-slate-700">
+                      Academy Unit:
+                    </td>
+                    <td className="py-1.5 px-3 text-slate-900">{academyUnit}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The management of <strong>SP Sports Academy has NO OBJECTION</strong> to the
+              above-named trainee participating in open, invitational, district, state, or
+              national championships and tournaments, or seeking admission, registration, or
+              transfer to any other recognized sports academy, club, school, university, or sports
+              federation.
+            </p>
+
+            <p>
+              It is further certified that the trainee has fulfilled all institutional
+              commitments, surrendered all academy training kits and equipment, and cleared all
+              dues. There are{" "}
+              <strong>no disciplinary proceedings, contractual claims, or financial liabilities</strong>{" "}
+              pending against the trainee with this institution.
+            </p>
+
+            {player.noc?.destinationClub && (
+              <p
+                className="text-xs text-slate-800 italic bg-slate-50 border-l-2 border-slate-600 px-3 py-1"
+                style={{ fontFamily: "Arial, sans-serif" }}
+              >
+                * Clearance specifically endorsed for joining:{" "}
+                <strong>{player.noc.destinationClub}</strong>
+              </p>
+            )}
+
+            <p>
+              During their tenure with SP Sports Academy, the trainee exhibited exemplary
+              discipline and sportsman spirit. The Academy wishes <strong>{player.name}</strong>{" "}
+              all success in future athletic and personal endeavors.
+            </p>
+          </div>
+
+          {/* 6. Official Signatures & Seal Section */}
+          <div className="pt-4 border-t border-slate-300">
+            <div className="flex items-end justify-between">
+              {/* Left: Round Institutional Stamp & Hash */}
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-3">
-                  <div className="relative w-18 h-18 rounded-full border-2 border-amber-600 bg-amber-50/70 flex flex-col items-center justify-center p-1 shadow-2xs shrink-0 text-center">
-                    <div className="absolute inset-1 rounded-full border border-dashed border-amber-700/60 pointer-events-none" />
-                    <span className="text-[7.5px] font-bold tracking-wider text-amber-900 uppercase leading-none">SP ACADEMY</span>
-                    <span className="text-amber-700 text-[10px] my-0.5">★</span>
-                    <span className="text-[7px] font-extrabold text-emerald-800 uppercase tracking-tight bg-emerald-100 px-1 py-0.2 rounded border border-emerald-300">VERIFIED</span>
-                    <span className="text-[6.5px] font-semibold text-slate-600 mt-0.5">DHANBAD</span>
+                  {/* Circular Official Seal */}
+                  <div
+                    className="w-16 h-16 rounded-full border-2 border-blue-900/80 flex flex-col items-center justify-center p-1 text-center shrink-0"
+                    style={{ fontFamily: "Arial, sans-serif" }}
+                  >
+                    <span className="text-[6.5px] font-bold text-blue-950 uppercase leading-none tracking-tight">
+                      SP SPORTS ACADEMY
+                    </span>
+                    <span className="text-blue-900 text-[9px] my-0.5">★</span>
+                    <span className="text-[6.5px] font-bold text-blue-950 uppercase leading-none">
+                      DHANBAD
+                    </span>
                   </div>
-                  <div className="text-left space-y-0.5 max-w-[220px]">
-                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-[9.5px] font-bold text-emerald-800">
-                      <span>DIGITALLY CERTIFIED</span>
+                  <div className="space-y-0.5 text-left" style={{ fontFamily: "Arial, sans-serif" }}>
+                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 text-[10px] font-bold text-slate-800">
+                      <span>OFFICIAL ELECTRONIC RECORD</span>
                       <span>✓</span>
                     </div>
-                    <p className="text-[8.5px] font-mono text-slate-500 break-all leading-tight">
-                      Hash: {signatureHash.slice(0, 24)}...
+                    <p className="text-[9px] font-mono text-slate-500 max-w-[210px] truncate">
+                      Ref Hash: {signatureHash.slice(0, 24)}...
                     </p>
-                    <p className="text-[8.5px] text-slate-600 font-medium">
+                    <p className="text-[9px] text-slate-600">
                       Central Registry • SP Sports Academy
                     </p>
                   </div>
                 </div>
+              </div>
 
-                {/* Right: Institutional Signature */}
-                <div className="text-right">
-                  <div className="h-8 flex items-end justify-end mb-1">
-                    <span
-                      className="italic text-slate-900 text-lg font-bold tracking-wide"
-                      style={{ fontFamily: "'Brush Script MT', 'Dancing Script', 'Great Vibes', cursive, 'Georgia', serif" }}
-                    >
-                      S. P. Sharma
-                    </span>
-                  </div>
-                  <div className="w-48 h-[1px] bg-slate-500 ml-auto mb-1" />
-                  <p className="text-xs font-bold text-slate-950 uppercase tracking-wider">
-                    GENERAL SECRETARY / DIRECTOR
-                  </p>
-                  <p className="text-[11px] font-semibold text-slate-700">
-                    SP Sports Academy, Dhanbad
-                  </p>
-                  <p className="text-[8.5px] text-slate-500 italic mt-0.5">
-                    (Official computer-generated electronic record — valid without physical signature)
-                  </p>
+              {/* Right: Authorized Signatory */}
+              <div
+                className="text-right space-y-0.5"
+                style={{ fontFamily: "Arial, sans-serif" }}
+              >
+                <p className="text-xs text-slate-700 font-serif italic mb-2">
+                  Yours faithfully,
+                </p>
+                <div className="h-7 flex items-end justify-end mb-1">
+                  <span
+                    className="italic text-slate-900 text-lg font-bold"
+                    style={{
+                      fontFamily:
+                        "'Brush Script MT', 'Dancing Script', cursive, 'Times New Roman', serif",
+                    }}
+                  >
+                    S. P. Sharma
+                  </span>
                 </div>
+                <div className="w-44 h-[1px] bg-slate-400 ml-auto mb-1" />
+                <p className="text-xs font-bold text-slate-950 uppercase tracking-wide">
+                  (Authorized Signatory)
+                </p>
+                <p className="text-xs font-semibold text-slate-800">
+                  General Secretary / Director
+                </p>
+                <p className="text-[11px] text-slate-600">
+                  SP Sports Academy, Dhanbad
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* 7. Bottom Footnote & Security Strip */}
-            <div className="pt-2 px-3 border-t-2 border-slate-900 text-center">
-              <div className="flex items-center justify-between text-[8.5px] text-slate-600">
-                <span>Official Electronic Record under Information Technology Act, 2000</span>
-                <span>SP Sports Academy Dhanbad • Valid Across India</span>
-                <span>Portal: https://spkabaddi.me</span>
-              </div>
-            </div>
+          {/* 7. Official Routing (Copy To) */}
+          <div
+            className="pt-2 border-t border-slate-200 text-[10.5px] text-slate-600"
+            style={{ fontFamily: "Arial, sans-serif" }}
+          >
+            <p className="font-bold text-slate-700">Copy to:</p>
+            <ol className="list-decimal list-inside pl-1 text-[10px] space-y-0.5 text-slate-600">
+              <li>Trainee Athlete Concerned ({player.name})</li>
+              <li>Registry & Player Verification Cell, SP Sports Academy</li>
+              <li>Office Record / Guard File</li>
+            </ol>
+          </div>
+
+          {/* 8. Institutional Footer */}
+          <div
+            className="pt-2 border-t-2 border-slate-900 text-center text-[9px] text-slate-500"
+            style={{ fontFamily: "Arial, sans-serif" }}
+          >
+            Shakti Mandir Path, Dhanbad – 826007, Jharkhand • Email: spkabaddigroupdhanbad@gmail.com • Portal: https://spkabaddi.me
+            <br />
+            (Computer-generated official document under Information Technology Act, 2000. Valid without physical ink signature.)
           </div>
         </div>
       </div>
