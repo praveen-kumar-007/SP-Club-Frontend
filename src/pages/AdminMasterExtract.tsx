@@ -305,7 +305,8 @@ const AdminMasterExtract = () => {
                 ? `SP_Sports_Academy_Dossier_${selectedPlayer.name.replace(/[^a-zA-Z0-9]/g, "_")}_${selectedPlayer.idCardNumber || selectedPlayer._id.slice(-6)}.pdf`
                 : `SP_Sports_Academy_Master_Extraction_${new Date().toISOString().split("T")[0]}.pdf`;
 
-            const opt = {
+            const orientation: "portrait" | "landscape" = viewMode === "single" ? "portrait" : "landscape";
+            const opt: html2pdf.Options = {
                 margin: [6, 6, 6, 6],
                 filename,
                 image: { type: "jpeg", quality: 0.98 },
@@ -321,7 +322,7 @@ const AdminMasterExtract = () => {
                 jsPDF: {
                     unit: "mm",
                     format: "a4",
-                    orientation: viewMode === "single" ? "portrait" : "landscape",
+                    orientation,
                 },
                 pagebreak: { mode: ["avoid-all", "css", "legacy"] },
             };
