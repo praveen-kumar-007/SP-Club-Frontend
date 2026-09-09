@@ -81,18 +81,14 @@ const App = () => {
       ].forEach((page) => page.preload?.());
     };
 
-    interface WindowWithIdleCallback extends Window {
+    const win = window as unknown as {
       requestIdleCallback?: (cb: () => void) => number;
       cancelIdleCallback?: (id: number) => void;
-    }
+    };
 
-    const win = window as unknown as WindowWithIdleCallback;
-    const idleCallback = win.requestIdleCallback;
-    const cancelIdleCallback = win.cancelIdleCallback;
-
-    if (idleCallback) {
-      const id = idleCallback(preloadRoutes);
-      return () => cancelIdleCallback?.(id);
+    if (typeof win.requestIdleCallback === "function") {
+      const id = win.requestIdleCallback(preloadRoutes);
+      return () => win.cancelIdleCallback?.(id);
     }
 
     const timeoutId = window.setTimeout(preloadRoutes, 1200);
