@@ -223,6 +223,18 @@
   object-position: center center;
 }
 
+.pdf-card {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+.pdf-card-row,
+.pdf-card tr,
+tr.pdf-card-row {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
 @media print {
   header,
   footer,
@@ -236,5 +248,17 @@
     background: #ffffff !important;
     padding: 0 !important;
     margin: 0 !important;
+  }
+
+  .pdf-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .pdf-card-row,
+  .pdf-card tr,
+  tr.pdf-card-row {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
