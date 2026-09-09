@@ -81,12 +81,8 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
   ({ data }, ref) => {
     const player = data.player;
     const cert = data.certificate || {};
-    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPKA/NOC/2026/001-9185";
+    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPA-NOC-2026-0001-9185";
     const generatedAt = cert.generatedAt || player.noc?.generatedAt || new Date();
-    const signatureHash =
-      cert.digitalSignatureHash ||
-      player.noc?.digitalSignatureHash ||
-      "6b51c5a8c266cd156b9105f7a8b9c0d1";
 
     const academyUnit =
       player.clubDetails &&
@@ -102,9 +98,9 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
         className="w-[800px] min-w-[800px] max-w-[800px] bg-white text-slate-900 shadow-md relative overflow-hidden box-border border border-slate-200"
         style={{
           boxSizing: "border-box",
-          padding: "28px 40px 24px 40px",
+          padding: "26px 40px 22px 40px",
           backgroundColor: "#ffffff",
-          fontFamily: "'Times New Roman', Times, Georgia, serif",
+          fontFamily: "'Times New Roman', Times, 'Cambria', serif",
           color: "#111827",
         }}
       >
@@ -118,50 +114,39 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           />
         </div>
 
-        <div className="relative z-10 space-y-3.5">
+        <div className="relative z-10 space-y-3">
           {/* 1. Official Institutional Letterhead */}
           <div className="pb-2.5 border-b-2 border-slate-900">
-            <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-4">
+              {/* Logo resized to 1.5x (78px) */}
               <img
                 src="/Logo.png"
                 alt="SP Sports Academy"
                 className="object-contain shrink-0"
-                style={{ width: "52px", height: "52px", maxWidth: "52px", maxHeight: "52px" }}
+                style={{ width: "78px", height: "78px", maxWidth: "78px", maxHeight: "78px" }}
               />
               <div className="flex-1">
                 <h1
-                  className="text-xl font-bold tracking-tight text-slate-950 uppercase leading-none"
+                  className="text-2xl font-bold tracking-tight text-slate-950 uppercase leading-none"
                   style={{ letterSpacing: "0.5px" }}
                 >
                   SP SPORTS ACADEMY
                 </h1>
-                <p
-                  className="text-[11px] font-semibold text-slate-700 mt-1 uppercase"
-                  style={{ fontFamily: "Arial, sans-serif" }}
-                >
+                <p className="text-xs font-bold text-slate-700 mt-1 uppercase tracking-wide">
                   Department of Athletics & Player Development • Dhanbad, Jharkhand
                 </p>
-                <p
-                  className="text-[10px] text-slate-600 mt-0.5"
-                  style={{ fontFamily: "Arial, sans-serif" }}
-                >
+                <p className="text-[11px] text-slate-600 mt-0.5">
                   Shakti Mandir Path, Dhanbad – 826007, Jharkhand (India)
                 </p>
-                <p
-                  className="text-[9.5px] text-slate-500 mt-0.5"
-                  style={{ fontFamily: "Arial, sans-serif" }}
-                >
+                <p className="text-[10px] text-slate-500 mt-0.5">
                   Email: spkabaddigroupdhanbad@gmail.com • Website: https://spkabaddi.me
                 </p>
               </div>
-              <div
-                className="text-right border-l border-slate-300 pl-3 shrink-0"
-                style={{ fontFamily: "Arial, sans-serif" }}
-              >
-                <span className="text-[9.5px] font-bold text-slate-500 uppercase block">
+              <div className="text-right border-l border-slate-300 pl-3.5 shrink-0">
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">
                   Official Dispatch
                 </span>
-                <span className="text-xs font-semibold text-slate-800 font-mono">
+                <span className="text-xs font-bold text-slate-800 font-mono">
                   REG/NOC-SEC
                 </span>
               </div>
@@ -169,10 +154,10 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           </div>
 
           {/* 2. Dispatch Reference & Date */}
-          <div className="flex items-center justify-between text-xs border-b border-slate-200 pb-1.5 font-serif">
+          <div className="flex items-center justify-between text-xs border-b border-slate-200 pb-1.5">
             <div>
               <span className="font-bold text-slate-800">Ref. No.: </span>
-              <span className="font-mono font-bold text-slate-950">{nocNumber}</span>
+              <span className="font-bold text-slate-950 font-mono">{nocNumber}</span>
             </div>
             <div>
               <span className="font-bold text-slate-800">Date: </span>
@@ -191,10 +176,7 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           </div>
 
           {/* Subject Line */}
-          <div
-            className="text-[11px] text-slate-800 bg-slate-50 px-2.5 py-1 border border-slate-200 rounded-xs"
-            style={{ fontFamily: "Arial, sans-serif" }}
-          >
+          <div className="text-xs text-slate-800 bg-slate-50 px-2.5 py-1 border border-slate-200 rounded-xs">
             <span className="font-bold text-slate-900">Sub: </span>
             <span>
               Issuance of No Objection Certificate (NOC) in respect of{" "}
@@ -204,7 +186,7 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           </div>
 
           {/* 4. Formal Letter Content */}
-          <div className="space-y-2.5 text-[12px] leading-relaxed text-slate-900 text-justify font-serif">
+          <div className="space-y-2.5 text-[12px] leading-relaxed text-slate-900 text-justify">
             <p>
               This is to certify that <strong>Mr./Ms. {player.name}</strong>, Son/Daughter of{" "}
               <strong>{player.fathersName || "the parent/guardian"}</strong>, bearing Academy
@@ -213,46 +195,43 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
             </p>
 
             {/* 5. Trainee Particulars Table */}
-            <div
-              className="my-1.5 border border-slate-300 rounded-xs overflow-hidden"
-              style={{ fontFamily: "Arial, sans-serif" }}
-            >
-              <table className="w-full text-[11px]">
+            <div className="my-1.5 border border-slate-300 rounded-xs overflow-hidden">
+              <table className="w-full text-xs">
                 <tbody>
                   <tr className="border-b border-slate-200 bg-slate-50/80">
-                    <td className="py-1 px-2.5 font-semibold text-slate-700 w-1/4">
+                    <td className="py-1 px-2.5 font-bold text-slate-700 w-1/4">
                       Athlete Name:
                     </td>
                     <td className="py-1 px-2.5 font-bold text-slate-950 w-1/4">
                       {player.name}
                     </td>
-                    <td className="py-1 px-2.5 font-semibold text-slate-700 w-1/4">
+                    <td className="py-1 px-2.5 font-bold text-slate-700 w-1/4">
                       Registration ID:
                     </td>
-                    <td className="py-1 px-2.5 font-mono font-bold text-slate-900 w-1/4">
+                    <td className="py-1 px-2.5 font-bold text-slate-900 w-1/4 font-mono">
                       {player.idCardNumber || "SPKA-ATHLETE"}
                     </td>
                   </tr>
                   <tr className="border-b border-slate-200">
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Father&apos;s Name:
                     </td>
                     <td className="py-1 px-2.5 text-slate-900">
                       {player.fathersName || "N/A"}
                     </td>
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Date of Birth:
                     </td>
                     <td className="py-1 px-2.5 text-slate-900">{formatDate(player.dob)}</td>
                   </tr>
                   <tr className="border-b border-slate-200 bg-slate-50/80">
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Discipline / Role:
                     </td>
                     <td className="py-1 px-2.5 text-slate-900 capitalize">
                       {player.role || "Athlete"}
                     </td>
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Gender / Blood:
                     </td>
                     <td className="py-1 px-2.5 text-slate-900 capitalize">
@@ -260,13 +239,13 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Aadhaar (Verified):
                     </td>
                     <td className="py-1 px-2.5 font-mono text-slate-900">
                       {maskAadhaar(player.aadharNumber)}
                     </td>
-                    <td className="py-1 px-2.5 font-semibold text-slate-700">
+                    <td className="py-1 px-2.5 font-bold text-slate-700">
                       Academy Unit:
                     </td>
                     <td className="py-1 px-2.5 text-slate-900">{academyUnit}</td>
@@ -291,15 +270,13 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
               pending against the trainee with this institution.
             </p>
 
-            {player.noc?.destinationClub && (
-              <p
-                className="text-[11px] text-slate-800 italic bg-slate-50 border-l-2 border-slate-600 px-2.5 py-1"
-                style={{ fontFamily: "Arial, sans-serif" }}
-              >
-                * Clearance specifically endorsed for joining:{" "}
-                <strong>{player.noc.destinationClub}</strong>
-              </p>
-            )}
+            {player.noc?.destinationClub &&
+              !player.noc.destinationClub.toLowerCase().includes("sp sports") && (
+                <p className="text-[11px] text-slate-800 italic bg-slate-50 border-l-2 border-slate-600 px-2.5 py-1">
+                  * Clearance specifically endorsed for joining:{" "}
+                  <strong>{player.noc.destinationClub}</strong>
+                </p>
+              )}
 
             <p>
               During their tenure with SP Sports Academy, the trainee exhibited exemplary
@@ -308,41 +285,35 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
             </p>
           </div>
 
-          {/* 6. Digitally Signed & System Generated Authorization Block */}
+          {/* 6. Clean Institutional Digitally Signed Block (No Raw Hashes) */}
           <div className="pt-2 border-t border-slate-300">
             <div className="flex items-center justify-between gap-4">
               {/* Left: Official Digital Certification Notice */}
-              <div
-                className="flex-1 border border-slate-300 rounded p-2.5 bg-slate-50/60"
-                style={{ fontFamily: "Arial, sans-serif" }}
-              >
-                <div className="flex items-center gap-1.5 text-slate-900 text-[11px] font-bold">
+              <div className="flex-1 border border-slate-300 rounded p-2 bg-slate-50/70">
+                <div className="flex items-center gap-1.5 text-slate-900 text-xs font-bold">
                   <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
                   <span>SYSTEM GENERATED NOC — DIGITALLY SIGNED</span>
                 </div>
-                <p className="text-[10px] text-slate-600 mt-1 leading-snug">
-                  This document is a verified electronic record issued under the Information Technology Act, 2000.
-                  Being a computer-generated official clearance, no physical ink signature or manual rubber stamp is required.
+                <p className="text-[10px] text-slate-700 mt-1 leading-snug">
+                  This document is an authenticated electronic record issued under the Information Technology Act, 2000.
+                  Being an official computer-generated clearance, no physical ink signature or manual rubber stamp is required.
                 </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[9px] text-slate-500 font-mono mt-1.5 pt-1 border-t border-slate-200">
-                  <span>Sign Ref: {signatureHash.slice(0, 20)}...</span>
-                  <span>Issued: {formatDate(generatedAt)}</span>
-                  <span>Auth: Central Registry, SP Sports Academy</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-[9.5px] text-slate-600 mt-1 pt-1 border-t border-slate-200">
+                  <span>Document Ref: <strong>{nocNumber}</strong></span>
+                  <span>Issuance: <strong>{formatDate(generatedAt)}</strong></span>
+                  <span>Central Registry, SP Sports Academy</span>
                 </div>
               </div>
 
               {/* Right: Digital Signatory Authority */}
-              <div
-                className="text-right shrink-0 border border-slate-300 rounded p-2.5 bg-slate-50/60 min-w-[210px]"
-                style={{ fontFamily: "Arial, sans-serif" }}
-              >
+              <div className="text-right shrink-0 border border-slate-300 rounded p-2 bg-slate-50/70 min-w-[210px]">
                 <p className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
-                  ✓ DIGITALLY SIGNED
+                  ✓ DIGITALLY SIGNED & VERIFIED
                 </p>
                 <p className="text-xs font-bold text-slate-950 uppercase mt-0.5">
                   General Secretary / Director
                 </p>
-                <p className="text-[10px] font-semibold text-slate-700">
+                <p className="text-[10.5px] font-semibold text-slate-700">
                   SP Sports Academy, Dhanbad
                 </p>
                 <p className="text-[8.5px] text-slate-500 italic mt-0.5">
@@ -353,11 +324,8 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           </div>
 
           {/* 7. Official Routing (Copy To) */}
-          <div
-            className="pt-1.5 border-t border-slate-200 text-[10px] text-slate-600"
-            style={{ fontFamily: "Arial, sans-serif" }}
-          >
-            <p className="font-bold text-slate-700">Copy to:</p>
+          <div className="pt-1 border-t border-slate-200 text-[10px] text-slate-600">
+            <p className="font-bold text-slate-700">Copy forwarded for information and record to:</p>
             <ol className="list-decimal list-inside pl-1 text-[9.5px] space-y-0.5 text-slate-600">
               <li>Trainee Athlete Concerned ({player.name})</li>
               <li>Registry & Player Verification Cell, SP Sports Academy</li>
@@ -366,10 +334,7 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
           </div>
 
           {/* 8. Institutional Footer */}
-          <div
-            className="pt-1.5 border-t-2 border-slate-900 text-center text-[8.5px] text-slate-500"
-            style={{ fontFamily: "Arial, sans-serif" }}
-          >
+          <div className="pt-1 border-t-2 border-slate-900 text-center text-[8.5px] text-slate-500">
             Shakti Mandir Path, Dhanbad – 826007, Jharkhand • Email: spkabaddigroupdhanbad@gmail.com • Portal: https://spkabaddi.me
             <br />
             (Computer-generated official document under Information Technology Act, 2000. Digitally signed — valid without physical signature or stamp.)
