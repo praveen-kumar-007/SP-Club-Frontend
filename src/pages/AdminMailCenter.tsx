@@ -37,6 +37,8 @@ const AdminMailCenter = () => {
     const [debouncedPlayerSearch, setDebouncedPlayerSearch] = useState("");
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
+    const [cc, setCc] = useState("");
+    const [bcc, setBcc] = useState("");
 
     useEffect(() => {
         const adminToken = localStorage.getItem("adminToken");
@@ -203,6 +205,38 @@ const AdminMailCenter = () => {
             return;
         }
 
+        const validateEmailString = (text: string, label: string) => {
+            if (!text.trim()) return { valid: true, error: "" };
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const items = text.split(/[,;\n\r]+/).map((s) => s.trim()).filter(Boolean);
+            for (const item of items) {
+                if (!emailRegex.test(item)) {
+                    return { valid: false, error: `Invalid ${label} email address: "${item}"` };
+                }
+            }
+            return { valid: true, error: "" };
+        };
+
+        const ccValidation = validateEmailString(cc, "CC");
+        if (!ccValidation.valid) {
+            toast({
+                title: "Invalid CC Email",
+                description: ccValidation.error,
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const bccValidation = validateEmailString(bcc, "BCC");
+        if (!bccValidation.valid) {
+            toast({
+                title: "Invalid BCC Email",
+                description: bccValidation.error,
+                variant: "destructive",
+            });
+            return;
+        }
+
         setSending(true);
         try {
             const response = await fetch(API_ENDPOINTS.ADMIN_MAIL_SEND, {
@@ -214,6 +248,8 @@ const AdminMailCenter = () => {
                 body: JSON.stringify({
                     mode,
                     playerIds: mode === "selected" ? selectedIds : undefined,
+                    cc: cc.trim() ? cc.trim() : undefined,
+                    bcc: bcc.trim() ? bcc.trim() : undefined,
                     subject: subject.trim(),
                     message: message.trim(),
                 }),
@@ -231,6 +267,8 @@ const AdminMailCenter = () => {
 
             setSubject("");
             setMessage("");
+            setCc("");
+            setBcc("");
             if (mode === "selected") {
                 setSelectedIds([]);
             }
@@ -361,6 +399,47 @@ const AdminMailCenter = () => {
                                 </div>
                             </div>
                         )}
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="cc" className="font-semibold text-slate-700">
+                                        CC (Carbon Copy)
+                                    </Label>
+                                    <Badge variant="outline" className="text-xs font-normal text-slate-500">
+                                        Optional
+                                    </Badge>
+                                </div>
+                                <Input
+                                    id="cc"
+                                    placeholder="coach@spclub.com, info@spclub.com"
+                                    value={cc}
+                                    onChange={(e) => setCc(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-500">
+                                    Separate multiple emails with commas
+                                </p>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="bcc" className="font-semibold text-slate-700">
+                                        BCC (Blind Carbon Copy)
+                                    </Label>
+                                    <Badge variant="outline" className="text-xs font-normal text-slate-500">
+                                        Optional
+                                    </Badge>
+                                </div>
+                                <Input
+                                    id="bcc"
+                                    placeholder="director@spclub.com, admin@spclub.com"
+                                    value={bcc}
+                                    onChange={(e) => setBcc(e.target.value)}
+                                />
+                                <p className="text-xs text-slate-500">
+                                    Separate multiple emails with commas
+                                </p>
+                            </div>
+                        </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="subject">Subject</Label>
