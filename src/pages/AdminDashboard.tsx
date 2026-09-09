@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays, Wallet } from "lucide-react";
+import { Clock, LogOut, Search, Eye, Trash2, Mail, MessageSquare, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, XCircle, UserRoundCheck, Send, History, CalendarDays, Wallet, FileSpreadsheet } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import {
@@ -623,6 +623,15 @@ const AdminDashboard = () => {
               <span className="mr-1.5">🖼️</span>
               <span>Gallery Manager</span>
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/admin/extract")}
+              className="bg-amber-50/90 hover:bg-amber-100 border-amber-300 text-amber-900 font-semibold text-xs lg:text-sm h-9 shadow-sm"
+            >
+              <FileSpreadsheet size={16} className="mr-1.5 text-amber-600" />
+              <span>Master Extract</span>
+            </Button>
           </div>
 
           {/* Mobile buttons row */}
@@ -705,6 +714,13 @@ const AdminDashboard = () => {
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 h-auto"
             >
               <span>🖼️ Gallery Manager</span>
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/extract")}
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 h-auto col-span-2"
+            >
+              <FileSpreadsheet size={18} className="mr-2" />
+              <span>Master Extract & Dossier</span>
             </Button>
           </div>
         </div>

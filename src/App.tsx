@@ -45,6 +45,7 @@ const AdminMailCenter = lazyWithPreload(() => import("./pages/AdminMailCenter"))
 const AdminLoginHistory = lazyWithPreload(() => import("./pages/AdminLoginHistory"));
 const AdminFeePayments = lazyWithPreload(() => import("./pages/AdminFeePayments"));
 const AdminGallery = lazyWithPreload(() => import("./pages/AdminGallery"));
+const AdminMasterExtract = lazyWithPreload(() => import("./pages/AdminMasterExtract"));
 const PlayerLogin = lazyWithPreload(() => import("./pages/PlayerLogin"));
 const PlayerDashboard = lazyWithPreload(() => import("./pages/PlayerDashboard"));
 const PlayerAttendance = lazyWithPreload(() => import("./pages/PlayerAttendance"));
@@ -163,6 +164,7 @@ const App = () => {
                   <Route path="/admin/inquiries" element={<AdminInquiries />} />
                   <Route path="/admin/news" element={<AdminNews />} />
                   <Route path="/admin/gallery" element={<AdminGallery />} />
+                  <Route path="/admin/extract" element={<AdminMasterExtract />} />
                   <Route path="/player/login" element={<PlayerLogin />} />
                   <Route path="/player/forgot-password" element={<PlayerForgotPassword />} />
                   <Route path="/player/dashboard" element={<PlayerDashboard />} />
