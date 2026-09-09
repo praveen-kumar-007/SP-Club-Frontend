@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,25 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import {
     ArrowLeft,
     CheckCircle2,
-    Clock,
     Database,
     Download,
     FileSpreadsheet,
-    FileText,
     History,
-    Mail,
-    MapPin,
     MessageSquare,
-    Phone,
     Printer,
     Search,
     Shield,
-    UserCheck,
-    UserX,
     Wallet,
-    XCircle,
 } from "lucide-react";
-import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
+import { API_ENDPOINTS } from "@/config/api";
 import Seo from "@/components/Seo";
 import html2pdf from "html2pdf.js";
 
@@ -164,7 +156,7 @@ const AdminMasterExtract = () => {
     }, [navigate]);
 
     // Fetch all players for master view & selector
-    const fetchMasterData = async (adminToken: string) => {
+    const fetchMasterData = useCallback(async (adminToken: string) => {
         setLoading(true);
         try {
             const url = new URL(API_ENDPOINTS.ADMIN_MASTER_EXTRACT, window.location.origin);
@@ -196,10 +188,10 @@ const AdminMasterExtract = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [statusFilter, searchQuery, selectedPlayerId, toast]);
 
     // Fetch single player full dossier
-    const fetchSinglePlayerDossier = async (adminToken: string, playerId: string) => {
+    const fetchSinglePlayerDossier = useCallback(async (adminToken: string, playerId: string) => {
         if (!playerId) return;
         setLoading(true);
         try {
@@ -227,19 +219,19 @@ const AdminMasterExtract = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     useEffect(() => {
         if (token) {
             fetchMasterData(token);
         }
-    }, [token, statusFilter]);
+    }, [token, fetchMasterData]);
 
     useEffect(() => {
         if (token && selectedPlayerId && viewMode === "single") {
             fetchSinglePlayerDossier(token, selectedPlayerId);
         }
-    }, [token, selectedPlayerId, viewMode]);
+    }, [token, selectedPlayerId, viewMode, fetchSinglePlayerDossier]);
 
     const filteredPlayers = useMemo(() => {
         if (!searchQuery.trim()) return playersList;
