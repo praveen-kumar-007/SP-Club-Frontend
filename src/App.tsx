@@ -9,7 +9,7 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import NotFound from "./pages/NotFound";
 
-const lazyWithPreload = <T extends React.ComponentType<any>>(
+const lazyWithPreload = <P extends object, T extends React.ComponentType<P>>(
   importer: () => Promise<{ default: T }>
 ) => {
   const Component = lazy(importer) as React.LazyExoticComponent<T> & {
@@ -81,12 +81,14 @@ const App = () => {
       ].forEach((page) => page.preload?.());
     };
 
-    const idleCallback = (window as any).requestIdleCallback as
-      | ((cb: () => void) => number)
-      | undefined;
-    const cancelIdleCallback = (window as any).cancelIdleCallback as
-      | ((id: number) => void)
-      | undefined;
+    interface WindowWithIdleCallback extends Window {
+      requestIdleCallback?: (cb: () => void) => number;
+      cancelIdleCallback?: (id: number) => void;
+    }
+
+    const win = window as unknown as WindowWithIdleCallback;
+    const idleCallback = win.requestIdleCallback;
+    const cancelIdleCallback = win.cancelIdleCallback;
 
     if (idleCallback) {
       const id = idleCallback(preloadRoutes);
@@ -133,9 +135,7 @@ const App = () => {
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
           <div className="min-h-screen flex flex-col">
-            <div className="print:hidden">
-              <Header />
-            </div>
+            <Header />
             <main className="flex-1">
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
@@ -179,9 +179,7 @@ const App = () => {
                 </Routes>
               </Suspense>
             </main>
-            <div className="print:hidden">
-              <Footer />
-            </div>
+            <Footer />
           </div>
         </BrowserRouter>
       </TooltipProvider>
