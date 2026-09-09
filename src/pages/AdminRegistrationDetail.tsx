@@ -11,7 +11,7 @@ import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
 import NocCountdownBanner from "@/components/NocCountdownBanner";
-import NocCertificateModal, { NocCertificateData } from "@/components/NocCertificateModal";
+import NocCertificateModal, { NocCertificateData, downloadNocPdfFromData } from "@/components/NocCertificateModal";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -313,6 +313,45 @@ const RegistrationDetail = () => {
       });
     } finally {
       setIsCancellingNoc(false);
+    }
+  };
+
+  const handleDirectDownloadNoc = async () => {
+    if (!token || !id) return;
+    setIsLoadingNocCert(true);
+    toast({
+      title: "Preparing Official NOC",
+      description: "Compiling 1-page institutional letterhead certificate...",
+    });
+    try {
+      let certData = nocCertData;
+      if (!certData) {
+        const response = await fetch(API_ENDPOINTS.ADMIN_NOC_CERTIFICATE(id), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch NOC certificate");
+        }
+        certData = data;
+        setNocCertData(data);
+      }
+      await downloadNocPdfFromData(certData);
+      await fetchRegistration();
+      toast({
+        title: "Download Complete",
+        description: "Official 1-page NOC certificate downloaded successfully.",
+      });
+    } catch (err: unknown) {
+      toast({
+        title: "Download Error",
+        description: err instanceof Error ? err.message : "Failed to generate certificate",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingNocCert(false);
     }
   };
 
@@ -1718,11 +1757,11 @@ const RegistrationDetail = () => {
                         </div>
                         <Button
                           className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
-                          onClick={handleViewNocCertificate}
+                          onClick={handleDirectDownloadNoc}
                           disabled={isLoadingNocCert}
                         >
                           <Download className="w-4 h-4 mr-2" />
-                          {isLoadingNocCert ? "Loading Certificate..." : "View & Download NOC Certificate"}
+                          {isLoadingNocCert ? "Downloading 1-Page NOC..." : "Download Official NOC (PDF)"}
                         </Button>
                       </div>
                     )}

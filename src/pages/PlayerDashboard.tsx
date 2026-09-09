@@ -11,7 +11,7 @@ import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager"
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange, getKitSizeRange } from "@/utils/kitSizes";
 import { AlertTriangle, Award, Bell, CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, Clock, CreditCard, Download, FileCheck, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2, Wallet } from "lucide-react";
 import NocCountdownBanner from "@/components/NocCountdownBanner";
-import NocCertificateModal, { NocCertificateData } from "@/components/NocCertificateModal";
+import NocCertificateModal, { NocCertificateData, downloadNocPdfFromData } from "@/components/NocCertificateModal";
 
 export interface NocInfo {
     status?: "none" | "applied" | "approved" | "relieved";
@@ -152,6 +152,45 @@ const PlayerDashboard = () => {
     })();
     const playerId = parsedPlayer?.id as string | undefined;
     const playerToken = localStorage.getItem("playerToken") || undefined;
+
+    const handleDirectDownloadNoc = async () => {
+        if (!playerToken) return;
+        setLoadingNocCert(true);
+        toast({
+            title: "Preparing Official NOC",
+            description: "Compiling 1-page institutional letterhead certificate...",
+        });
+        try {
+            let certData = nocCertificateData;
+            if (!certData) {
+                const res = await fetch(API_ENDPOINTS.PLAYER_NOC_CERTIFICATE, {
+                    headers: {
+                        Authorization: `Bearer ${playerToken}`,
+                    },
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to load NOC Certificate");
+                }
+                certData = data;
+                setNocCertificateData(data);
+            }
+            await downloadNocPdfFromData(certData);
+            await handleNocDownloaded();
+            toast({
+                title: "Download Complete",
+                description: "Official 1-page NOC certificate downloaded successfully.",
+            });
+        } catch (err: unknown) {
+            toast({
+                title: "Could not download NOC",
+                description: err instanceof Error ? err.message : "Failed to generate certificate PDF.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoadingNocCert(false);
+        }
+    };
 
     const handleOpenNocCertificate = async () => {
         if (!playerToken) return;
@@ -618,7 +657,7 @@ const PlayerDashboard = () => {
                                     </div>
                                 </div>
                                 <Button
-                                    onClick={handleOpenNocCertificate}
+                                    onClick={handleDirectDownloadNoc}
                                     disabled={loadingNocCert}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold shadow-lg transition-all w-full sm:w-auto"
                                 >
@@ -627,7 +666,7 @@ const PlayerDashboard = () => {
                                     ) : (
                                         <Download className="w-4 h-4 mr-2" />
                                     )}
-                                    View & Download NOC Certificate
+                                    {loadingNocCert ? "Downloading 1-Page NOC..." : "Download Official NOC (PDF)"}
                                 </Button>
                             </div>
                         </CardHeader>
