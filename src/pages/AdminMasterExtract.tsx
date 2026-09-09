@@ -27,6 +27,7 @@ import {
     XCircle,
 } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
+import Seo from "@/components/Seo";
 import html2pdf from "html2pdf.js";
 
 interface AttendanceRecord {
@@ -166,7 +167,7 @@ const AdminMasterExtract = () => {
     const fetchMasterData = async (adminToken: string) => {
         setLoading(true);
         try {
-            const url = new URL(API_ENDPOINTS.ADMIN_MASTER_EXTRACT);
+            const url = new URL(API_ENDPOINTS.ADMIN_MASTER_EXTRACT, window.location.origin);
             if (statusFilter !== "all") url.searchParams.set("status", statusFilter);
             if (searchQuery.trim()) url.searchParams.set("search", searchQuery.trim());
 
@@ -202,7 +203,7 @@ const AdminMasterExtract = () => {
         if (!playerId) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_ENDPOINTS.ADMIN_MASTER_EXTRACT}?playerId=${playerId}`, {
+            const res = await fetch(`${API_ENDPOINTS.ADMIN_MASTER_EXTRACT}?playerId=${encodeURIComponent(playerId)}`, {
                 headers: { Authorization: `Bearer ${adminToken}` },
             });
 
@@ -253,16 +254,23 @@ const AdminMasterExtract = () => {
     }, [playersList, searchQuery]);
 
     const selectedPlayer = useMemo(() => {
-        return singlePlayerData?.player || playersList.find((p) => p._id === selectedPlayerId);
+        if (singlePlayerData?.player && singlePlayerData.player._id === selectedPlayerId) {
+            return singlePlayerData.player;
+        }
+        return playersList.find((p) => p._id === selectedPlayerId);
     }, [singlePlayerData, playersList, selectedPlayerId]);
 
     const calculateAge = (dobString?: string) => {
         if (!dobString) return "N/A";
         const dob = new Date(dobString);
         if (isNaN(dob.getTime())) return "N/A";
-        const diff = Date.now() - dob.getTime();
-        const ageDate = new Date(diff);
-        return Math.abs(ageDate.getUTCFullYear() - 1970);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        return age >= 0 ? `${age} Yrs` : "N/A";
     };
 
     const formatDate = (val?: string) => {
@@ -306,14 +314,17 @@ const AdminMasterExtract = () => {
                 : `SP_Sports_Academy_Master_Extraction_${new Date().toISOString().split("T")[0]}.pdf`;
 
             const opt = {
-                margin: [8, 8, 8, 8],
+                margin: [6, 6, 6, 6],
                 filename,
                 image: { type: "jpeg", quality: 0.98 },
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
+                    allowTaint: true,
                     letterRendering: true,
                     logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
                 },
                 jsPDF: {
                     unit: "mm",
@@ -357,6 +368,10 @@ const AdminMasterExtract = () => {
 
     return (
         <div className="min-h-screen bg-slate-100/90 text-slate-900 py-6 px-3 sm:px-6">
+            <Seo
+                title="Master Record Extraction & Dossier | SP Sports Academy"
+                description="Comprehensive player dossier and master records extraction center for SP Sports Academy."
+            />
             {/* Screen Controls Toolbar (Hidden in Print & PDF) */}
             <div className="max-w-[1200px] mx-auto mb-6 space-y-4 print:hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -554,6 +569,10 @@ const AdminMasterExtract = () => {
                                     <img
                                         src={selectedPlayer.photo}
                                         alt={selectedPlayer.name}
+                                        crossOrigin="anonymous"
+                                        onError={(e) => {
+                                            (e.currentTarget as HTMLElement).style.display = "none";
+                                        }}
                                         className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-lg border-2 border-slate-300 shadow-sm"
                                     />
                                 ) : (
@@ -597,7 +616,7 @@ const AdminMasterExtract = () => {
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Date of Birth / Age</span>
                                     <span className="font-medium text-slate-800">
-                                        {formatDate(selectedPlayer.dob)} ({calculateAge(selectedPlayer.dob)} Yrs)
+                                        {formatDate(selectedPlayer.dob)} ({calculateAge(selectedPlayer.dob)})
                                     </span>
                                 </div>
                                 <div>
@@ -619,6 +638,20 @@ const AdminMasterExtract = () => {
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Aadhar Number</span>
                                     <span className="font-medium font-mono text-slate-800">{selectedPlayer.aadharNumber || "N/A"}</span>
+                                    {(selectedPlayer.aadharFront || selectedPlayer.aadharBack) && (
+                                        <div className="flex items-center gap-2 mt-1">
+                                            {selectedPlayer.aadharFront && (
+                                                <a href={selectedPlayer.aadharFront} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline">
+                                                    [Aadhar Front]
+                                                </a>
+                                            )}
+                                            {selectedPlayer.aadharBack && (
+                                                <a href={selectedPlayer.aadharBack} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline">
+                                                    [Aadhar Back]
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="sm:col-span-2">
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Residential Address</span>
@@ -992,7 +1025,7 @@ const AdminMasterExtract = () => {
                             </div>
                             <div className="text-right">
                                 <span className="font-bold block text-slate-900">Authorized Signatory</span>
-                                <span className="text-[11px] text-slate-500">Official Club Seal Affixed</span>
+                                <span className="text-[11px] text-slate-500">Official Academy Seal Affixed</span>
                             </div>
                         </div>
                     </div>
