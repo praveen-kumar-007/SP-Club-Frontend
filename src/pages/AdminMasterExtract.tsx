@@ -357,7 +357,14 @@ const AdminMasterExtract = () => {
                 pagebreak: { mode: ["avoid-all", "css", "legacy"] },
             };
 
-            await html2pdf().set(opt).from(element).save();
+            const worker = html2pdf() as unknown as {
+                set: (options: unknown) => {
+                    from: (el: HTMLElement) => {
+                        save: () => Promise<void>;
+                    };
+                };
+            };
+            await worker.set(opt).from(element).save();
 
             toast({
                 title: "Download Complete",
