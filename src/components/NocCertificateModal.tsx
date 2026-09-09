@@ -1,8 +1,8 @@
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Download, CheckCircle2, ShieldCheck, FileCheck, Loader2 } from "lucide-react";
+import { Download, FileCheck, Loader2 } from "lucide-react";
 import html2pdf from "html2pdf.js";
 
 export interface NocCertificateData {
@@ -60,324 +60,201 @@ const formatDate = (val?: string | Date) => {
   if (isNaN(d.getTime())) return "N/A";
   return d.toLocaleDateString("en-IN", {
     day: "2-digit",
-    month: "short",
+    month: "long",
     year: "numeric",
   });
 };
 
-const calculateAge = (dobString?: string) => {
-  if (!dobString) return "N/A";
-  const dob = new Date(dobString);
-  if (isNaN(dob.getTime())) return "N/A";
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-    age--;
+const maskAadhaar = (num?: string) => {
+  if (!num) return "Verified";
+  const clean = num.replace(/\s+/g, "");
+  if (clean.length >= 8) {
+    return `XXXX-XXXX-${clean.slice(-4)}`;
   }
-  return age >= 0 ? `${age} Yrs` : "N/A";
+  return num;
 };
 
 // =========================================================================
-// 1-PAGE A4 NOC CERTIFICATE DOCUMENT (No Phone, Exact 1-Page Layout)
+// CLEAN, FORMAL, PROFESSIONAL 1-PAGE A4 NOC LETTERHEAD CERTIFICATE
 // =========================================================================
 export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCertificateData }>(
   ({ data }, ref) => {
     const player = data.player;
     const cert = data.certificate || {};
-    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPKA-NOC-OFFICIAL";
+    const nocNumber = cert.nocNumber || player.noc?.nocNumber || "SPKA/NOC/2026/001";
     const generatedAt = cert.generatedAt || player.noc?.generatedAt || new Date();
-    const expiresAt = cert.expiresAt || player.noc?.expiresAt;
     const signatureHash =
       cert.digitalSignatureHash ||
       player.noc?.digitalSignatureHash ||
-      "8f4b2e9c1d3a7e5f6b0c2d4e8a1b3c5d7e9f";
+      "9f8a2b3c4d5e6f7a8b9c0d1e2f3a4b5c";
 
     return (
       <div
         ref={ref}
         id="noc-certificate-document"
-        className="w-[800px] min-w-[800px] max-w-[800px] bg-white text-slate-900 font-sans shadow-md border-4 border-slate-900 rounded-lg relative overflow-hidden box-border"
+        className="w-[800px] min-w-[800px] max-w-[800px] bg-white text-slate-900 shadow-sm relative overflow-hidden box-border border border-slate-200"
         style={{
           boxSizing: "border-box",
-          padding: "26px 30px",
+          padding: "36px 48px 32px 48px",
           backgroundColor: "#ffffff",
+          fontFamily: "'Segoe UI', Arial, 'Helvetica Neue', sans-serif",
+          color: "#0f172a",
         }}
       >
-        {/* Subtle Watermark Logo in Background */}
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] z-0"
-          style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "28px 28px" }}
-        >
+        {/* Subtle Academy Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">
           <img
             src="/Logo.png"
-            alt="SP Sports Academy Watermark"
-            className="w-[380px] h-[380px] object-contain"
+            alt="Watermark"
+            className="w-[300px] h-[300px] object-contain"
           />
         </div>
 
-        {/* Document Foreground Content */}
-        <div className="relative z-10 space-y-4">
-          {/* 1. Official Academy Letterhead (NO PHONE NUMBERS) */}
-          <div className="border-b-2 border-slate-900 pb-3">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <img
-                  src="/Logo.png"
-                  alt="SP Sports Academy"
-                  className="object-contain rounded-lg p-1 border border-slate-300 shadow-xs"
-                  style={{ width: "68px", height: "68px" }}
-                />
-                <div>
-                  <h1 className="text-2xl font-black tracking-wider text-slate-950 uppercase leading-none">
-                    SP SPORTS ACADEMY
-                  </h1>
-                  <p className="text-[11px] font-bold tracking-wide text-blue-900 uppercase mt-1">
-                    Official Institutional Clearance & Transfer Authority
-                  </p>
-                  <p className="text-[10px] text-slate-600 mt-0.5">
-                    Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Compliant with AKFI Guidelines
-                  </p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
-                    Email: spkabaddigroupdhanbad@gmail.com • Official Web Portal: https://spkabaddi.me
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-right flex flex-col items-end shrink-0">
-                <div className="border-2 border-slate-900 rounded-md px-2.5 py-1 bg-slate-50 text-[11px] font-mono font-bold">
-                  <span className="text-slate-500 font-normal">REF:</span> {nocNumber}
-                </div>
-                <span className="text-[10px] text-slate-600 mt-1">
-                  Issue Date: <strong>{formatDate(generatedAt)}</strong>
-                </span>
-                {expiresAt && (
-                  <span className="text-[9px] text-amber-800 font-semibold mt-0.5">
-                    Retention Deadline: {formatDate(expiresAt)}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* 2. Certificate Title Header */}
-          <div className="text-center py-1.5 border-y border-slate-200 bg-slate-50/80 rounded-md">
-            <h2 className="text-lg font-black text-slate-950 uppercase tracking-widest leading-none">
-              NO OBJECTION CERTIFICATE (NOC)
-            </h2>
-            <p className="text-[10px] font-bold text-blue-900 tracking-wider uppercase mt-1">
-              Institutional Transfer & Competitive Participation Clearance
-            </p>
-          </div>
-
-          {/* 3. Member Identification Block (NO PHONE NUMBERS) */}
-          <div className="pdf-card flex gap-3.5 p-3 rounded-lg bg-slate-50 border border-slate-200">
-            {/* Athlete Photo */}
-            <div className="w-24 shrink-0 flex flex-col items-center justify-center border-r border-slate-200 pr-3">
-              {player.photo ? (
-                <img
-                  src={player.photo}
-                  alt={player.name}
-                  crossOrigin="anonymous"
-                  className="w-20 h-20 object-cover rounded-lg border border-slate-300 shadow-xs"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 font-semibold text-[9px]">
-                  Verified Athlete
-                </div>
-              )}
-              <span className="mt-1 text-[9px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded text-center">
-                VERIFIED ATHLETE
-              </span>
-            </div>
-
-            {/* Attributes Grid */}
-            <div className="flex-1 grid grid-cols-3 gap-x-3 gap-y-1.5 text-xs">
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Athlete Name</span>
-                <span className="font-bold text-slate-900 text-xs">{player.name}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Father's Name</span>
-                <span className="font-medium text-slate-800 text-xs">{player.fathersName || "N/A"}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Academy ID Card No.</span>
-                <span className="font-bold text-blue-800 font-mono text-xs">{player.idCardNumber || "ISSUED"}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Date of Birth / Age</span>
-                <span className="font-medium text-slate-800 text-xs">
-                  {formatDate(player.dob)} ({calculateAge(player.dob)})
-                </span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Gender & Blood Group</span>
-                <span className="font-medium text-slate-800 text-xs capitalize">
-                  {player.gender} • <strong className="text-red-700">{player.bloodGroup || "N/A"}</strong>
-                </span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Playing Role</span>
-                <span className="font-semibold text-slate-900 text-xs capitalize">{player.role}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Aadhaar Identification</span>
-                <span className="font-mono text-slate-800 text-xs">{player.aadharNumber || "Verified"}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-[9px] font-semibold text-slate-500 uppercase block">Affiliated Unit</span>
-                <span className="font-medium text-slate-800 text-xs">{player.clubDetails || "SP Sports Academy Main Unit"}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 4. Formal Legal & Institutional Declarations */}
-          <div className="pdf-card space-y-2.5 text-[11px] text-slate-800 leading-relaxed text-justify px-0.5">
-            <p className="font-semibold text-slate-900">
-              TO WHOM IT MAY CONCERN,
-            </p>
-
-            <p>
-              This is to officially certify that <strong>{player.name}</strong>, son/daughter of <strong>{player.fathersName || "the parent/guardian"}</strong>, bearing Institutional ID Card Number <strong>{player.idCardNumber || "N/A"}</strong>, has been a bonafide registered athlete with <strong>SP Sports Academy, Dhanbad, Jharkhand</strong>.
-            </p>
-
-            <p>
-              The administration and management of SP Sports Academy hereby formally confirms and certifies that:
-            </p>
-
-            <div className="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[10px]">
-              <div className="flex items-start gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Financial Clearance:</strong> All membership, tournament, and training dues stand settled with zero financial liabilities pending.
-                </span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Kit & Asset Surrender:</strong> All official sports equipment, jerseys, and academy property have been duly surrendered.
-                </span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Disciplinary Record:</strong> Maintained exemplary sporting conduct, adhering strictly to Amateur Kabaddi Federation of India (AKFI) norms.
-                </span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Notice & Cooling Period:</strong> The mandatory institutional clearance and cooling notice period has been duly completed.
-                </span>
-              </div>
-            </div>
-
-            <div className="p-2.5 bg-emerald-50 border border-emerald-600 rounded-lg text-emerald-950">
-              <p className="font-bold text-xs uppercase text-emerald-900">
-                CLEARANCE STATEMENT:
-              </p>
-              <p className="mt-0.5 text-[11px] leading-relaxed">
-                Accordingly, <strong>SP Sports Academy has NO OBJECTION</strong> whatsoever to <strong>{player.name}</strong> seeking registration, institutional transfer, or competitive participation with any other sports club, district/state association, university, or national sporting tournament. The athlete is fully cleared to participate without any contractual reservation or encumbrance.
-              </p>
-              {player.noc?.destinationClub && (
-                <p className="text-[10px] text-emerald-800 font-semibold mt-1">
-                  * Specific Transfer Clearance Designated For: {player.noc.destinationClub}
+        <div className="relative z-10">
+          {/* 1. Official Institutional Letterhead */}
+          <div className="text-center pb-3 border-b-2 border-slate-900">
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <img
+                src="/Logo.png"
+                alt="SP Sports Academy"
+                className="w-14 h-14 object-contain shrink-0"
+              />
+              <div className="text-center">
+                <h1 className="text-2xl font-bold tracking-wider text-slate-950 uppercase leading-none font-serif">
+                  SP SPORTS ACADEMY
+                </h1>
+                <p className="text-[11px] font-semibold text-slate-700 tracking-wide mt-1 uppercase">
+                  Recognized Sports Training Centre & Athlete Development Registry
                 </p>
-              )}
+              </div>
+            </div>
+            <p className="text-[10.5px] text-slate-600">
+              Shakti Mandir Path, Dhanbad – 826007, Jharkhand • Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me
+            </p>
+          </div>
+
+          {/* Double rule accent line */}
+          <div className="h-[1px] bg-slate-400 mt-[2px] mb-4" />
+
+          {/* 2. Reference & Date Bar */}
+          <div className="flex items-center justify-between text-xs text-slate-800 pb-2 mb-3 border-b border-slate-200">
+            <div>
+              <span className="font-semibold text-slate-600">Ref. No.: </span>
+              <span className="font-mono font-bold text-slate-950">{nocNumber}</span>
+            </div>
+            <div>
+              <span className="font-semibold text-slate-600">Date of Issue: </span>
+              <span className="font-medium text-slate-900">{formatDate(generatedAt)}</span>
             </div>
           </div>
 
-          {/* 5. Dual Digital Authorization & Signatures */}
-          <div className="pdf-card border-t-2 border-slate-900 pt-3 space-y-2.5">
-            <div className="grid grid-cols-2 gap-3">
-              {/* Box 1: Digitally Verified */}
-              <div className="border border-emerald-600 bg-emerald-50/40 rounded-lg p-2.5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-800 block leading-none">
-                        System Registry
-                      </span>
-                      <h4 className="text-xs font-black text-emerald-950 uppercase mt-0.5">
-                        Digitally Verified
-                      </h4>
-                    </div>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    AUTHENTIC ✓
-                  </span>
-                </div>
+          {/* 3. Certificate Title */}
+          <div className="text-center my-3">
+            <h2 className="text-lg font-bold text-slate-950 tracking-widest uppercase font-serif inline-block border-b border-slate-800 pb-0.5">
+              NO OBJECTION CERTIFICATE
+            </h2>
+            <p className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider mt-1">
+              TO WHOMSOEVER IT MAY CONCERN
+            </p>
+          </div>
 
-                <div className="mt-2 space-y-0.5 text-[10px] text-slate-700 border-t border-emerald-200 pt-1.5 font-mono">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Registry:</span>
-                    <span className="font-semibold text-slate-900">SP Central Sports Database</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Hash:</span>
-                    <span className="text-[9px] text-slate-600 truncate max-w-[180px]">
-                      SHA256:{signatureHash.slice(0, 20)}...
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Clearance:</span>
-                    <span className="font-bold text-emerald-700">UNCONDITIONAL NOC</span>
-                  </div>
+          {/* 4. Body Content */}
+          <div className="space-y-3.5 text-[12px] leading-relaxed text-slate-800 text-justify">
+            <p>
+              This is to certify that <strong>{player.name}</strong>, Son/Daughter of <strong>{player.fathersName || "the parent/guardian"}</strong>, bearing Academy Registration ID <strong>{player.idCardNumber || "SPKA-ATHLETE"}</strong>, is a registered athlete with <strong>SP Sports Academy, Dhanbad</strong>.
+            </p>
+
+            {/* 5. Clean, Refined Particulars Box */}
+            <div className="my-2.5 border border-slate-300 rounded bg-slate-50/40 p-2.5">
+              <table className="w-full text-xs">
+                <tbody>
+                  <tr className="border-b border-slate-200/80">
+                    <td className="py-1 px-2 font-semibold text-slate-600 w-1/4">Athlete Name:</td>
+                    <td className="py-1 px-2 font-bold text-slate-950 w-1/4">{player.name}</td>
+                    <td className="py-1 px-2 font-semibold text-slate-600 w-1/4">Registration ID:</td>
+                    <td className="py-1 px-2 font-mono font-bold text-slate-900 w-1/4">{player.idCardNumber || "SPKA-ATHLETE"}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200/80">
+                    <td className="py-1 px-2 font-semibold text-slate-600">Father&apos;s Name:</td>
+                    <td className="py-1 px-2 text-slate-900">{player.fathersName || "N/A"}</td>
+                    <td className="py-1 px-2 font-semibold text-slate-600">Date of Birth:</td>
+                    <td className="py-1 px-2 text-slate-900">{formatDate(player.dob)}</td>
+                  </tr>
+                  <tr className="border-b border-slate-200/80">
+                    <td className="py-1 px-2 font-semibold text-slate-600">Sport / Discipline:</td>
+                    <td className="py-1 px-2 text-slate-900 capitalize">{player.role || "Athlete"}</td>
+                    <td className="py-1 px-2 font-semibold text-slate-600">Gender / Blood:</td>
+                    <td className="py-1 px-2 text-slate-900 capitalize">{player.gender || "N/A"} / {player.bloodGroup || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 px-2 font-semibold text-slate-600">Academy Unit:</td>
+                    <td className="py-1 px-2 text-slate-900">{player.clubDetails || "SP Sports Academy, Dhanbad"}</td>
+                    <td className="py-1 px-2 font-semibold text-slate-600">Aadhaar (ID):</td>
+                    <td className="py-1 px-2 font-mono text-slate-900">{maskAadhaar(player.aadharNumber)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The management of <strong>SP Sports Academy has NO OBJECTION</strong> to <strong>{player.name}</strong> participating in open, district, state, or national level championships and tournaments, or seeking admission, registration, or transfer to any other sports academy, club, school, university, or sports federation.
+            </p>
+
+            <p>
+              It is further certified that the athlete has fulfilled all institutional commitments, returned all academy kits and equipment, and cleared all training dues. There are no disciplinary proceedings or financial liabilities pending against the athlete with this academy.
+            </p>
+
+            {player.noc?.destinationClub && (
+              <p className="text-[11px] text-slate-700 font-medium italic">
+                * Specific Clearance Issued For: <strong>{player.noc.destinationClub}</strong>
+              </p>
+            )}
+
+            <p>
+              During their tenure, the athlete exhibited good conduct, discipline, and sportsmanship. We wish <strong>{player.name}</strong> continued success in all future athletic and personal endeavors.
+            </p>
+          </div>
+
+          {/* 6. Signatures & Digital Seal Block */}
+          <div className="pt-6 mt-5 border-t border-slate-300">
+            <div className="flex items-end justify-between">
+              {/* Left: Digital Verification Seal */}
+              <div className="border border-slate-300 rounded p-2 bg-slate-50/60 max-w-[260px] text-left">
+                <div className="flex items-center gap-1 text-[10px] font-bold text-slate-800 uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
+                  <span>Digitally Verified & Approved</span>
                 </div>
+                <p className="text-[9.5px] text-slate-500 font-mono mt-0.5 truncate">
+                  Hash: {signatureHash.slice(0, 24)}...
+                </p>
+                <p className="text-[9.5px] text-slate-600 mt-0.5">
+                  Registry: SP Sports Academy Central Records
+                </p>
               </div>
 
-              {/* Box 2: Digitally Signed */}
-              <div className="border border-blue-600 bg-blue-50/40 rounded-lg p-2.5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-blue-800 block leading-none">
-                        Institutional Authority
-                      </span>
-                      <h4 className="text-xs font-black text-blue-950 uppercase mt-0.5">
-                        Digitally Signed
-                      </h4>
-                    </div>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-800 border border-blue-300">
-                    AUTHORIZED ✓
+              {/* Right: Institutional Signature */}
+              <div className="text-right">
+                <div className="h-9 flex items-end justify-end mb-1">
+                  <span className="font-serif italic text-slate-800 text-sm font-semibold tracking-wide">
+                    Authorized Signatory
                   </span>
                 </div>
-
-                <div className="mt-2 space-y-0.5 text-[10px] text-slate-700 border-t border-blue-200 pt-1.5 font-mono">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Signatory:</span>
-                    <span className="font-semibold text-slate-900">General Secretary / Director</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Authority:</span>
-                    <span className="font-semibold text-slate-900">SP Sports Academy Dhanbad</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Mode:</span>
-                    <span className="text-[9px] text-blue-700 font-semibold">Computer Generated Document</span>
-                  </div>
-                </div>
+                <p className="text-xs font-bold text-slate-950 uppercase tracking-wide">
+                  General Secretary / Director
+                </p>
+                <p className="text-[11px] font-semibold text-slate-700">
+                  SP Sports Academy, Dhanbad
+                </p>
+                <p className="text-[9px] text-slate-500 italic mt-0.5">
+                  (Computer-generated official record — valid without physical signature)
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Statutory Disclaimer & Bottom Reference Bar */}
-            <div className="p-1.5 bg-slate-50 border border-slate-200 rounded text-center text-[9px] text-slate-600 leading-tight">
-              This document is an electronic record under the Information Technology Act, 2000. It does not require physical ink signature or manual institutional stamp to maintain full legal validity across sporting authorities.
-            </div>
-
-            <div className="flex items-center justify-between text-[9px] text-slate-400 pt-1 border-t border-slate-200">
-              <span className="font-mono">DOC ID: {nocNumber}</span>
-              <span>SP Sports Academy Dhanbad, Jharkhand</span>
-              <span>Valid Across AKFI & National Affiliations</span>
-            </div>
+          {/* 7. Bottom Footnote */}
+          <div className="pt-3 mt-4 border-t border-slate-200 text-center text-[9px] text-slate-500">
+            This certificate is an official electronic record under the Information Technology Act, 2000. Verification portal: https://spkabaddi.me
           </div>
         </div>
       </div>
@@ -397,7 +274,6 @@ export const downloadNocPdfFromData = async (data: NocCertificateData): Promise<
   const prevScrollX = window.scrollX;
   const prevScrollY = window.scrollY;
 
-  // Create temporary container off-screen
   const container = document.createElement("div");
   container.style.position = "fixed";
   container.style.left = "-9999px";
@@ -411,15 +287,14 @@ export const downloadNocPdfFromData = async (data: NocCertificateData): Promise<
 
     const nocNumber =
       data.certificate?.nocNumber || data.player.noc?.nocNumber || "SPA-NOC-OFFICIAL";
-    const filename = `SP_Sports_Academy_NOC_${data.player.name.replace(/[^a-zA-Z0-9]/g, "_")}_${nocNumber}.pdf`;
+    const filename = `SP_Sports_Academy_NOC_${data.player.name.replace(/[^a-zA-Z0-9]/g, "_")}_${nocNumber.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
 
-    // Render component into container
     const { createRoot } = await import("react-dom/client");
     const root = createRoot(container);
 
     await new Promise<void>((resolve) => {
       root.render(<NocCertificateDocument data={data} />);
-      setTimeout(resolve, 350);
+      setTimeout(resolve, 300);
     });
 
     const element = container.querySelector("#noc-certificate-document") as HTMLElement;
@@ -428,7 +303,7 @@ export const downloadNocPdfFromData = async (data: NocCertificateData): Promise<
     }
 
     const opt = {
-      margin: [5, 5, 5, 5],
+      margin: [6, 6, 6, 6],
       filename,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -487,14 +362,14 @@ const NocCertificateModal = ({
   const handleDownload = async () => {
     setDownloading(true);
     toast({
-      title: "Generating 1-Page Official NOC",
-      description: "Compiling official letterhead certificate. Download will begin...",
+      title: "Generating Official NOC",
+      description: "Compiling 1-page institutional letterhead certificate...",
     });
     try {
       await downloadNocPdfFromData(data);
       toast({
         title: "Download Complete",
-        description: "Official 1-Page NOC certificate downloaded successfully.",
+        description: "Official NOC certificate downloaded successfully.",
       });
       if (onDownloaded) onDownloaded();
     } catch (err: unknown) {
@@ -518,7 +393,7 @@ const NocCertificateModal = ({
               <span>Official No Objection Certificate (NOC)</span>
             </DialogTitle>
             <p className="text-xs text-slate-500 mt-0.5">
-              Official 1-Page Computer Generated Certification • SP Sports Academy
+              1-Page Official Institutional Letterhead Certificate • SP Sports Academy
             </p>
           </div>
           <Button
@@ -543,7 +418,7 @@ const NocCertificateModal = ({
 
         <DialogFooter className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-slate-200">
           <p className="text-xs text-slate-500">
-            Guaranteed single-page A4 format with preserved official letterhead and digital signature blocks.
+            Professional 1-page A4 format with institutional letterhead and digital authorization.
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -565,7 +440,7 @@ const NocCertificateModal = ({
               ) : (
                 <Download className="h-4 w-4 mr-1.5" />
               )}
-              {downloading ? "Generating 1-Page PDF..." : "Download Official NOC (PDF)"}
+              {downloading ? "Generating PDF..." : "Download Official NOC (PDF)"}
             </Button>
           </div>
         </DialogFooter>
