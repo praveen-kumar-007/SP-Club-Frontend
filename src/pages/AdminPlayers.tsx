@@ -24,6 +24,12 @@ interface PlayerRow {
   clubDetails?: string;
   aadharNumber?: string;
   address?: string;
+  noc?: {
+    status?: 'none' | 'applied' | 'approved' | 'relieved';
+    coolingEndsAt?: string;
+    expiresAt?: string;
+    nocNumber?: string;
+  };
 }
 
 const AdminPlayers = () => {
@@ -255,15 +261,32 @@ const AdminPlayers = () => {
                         </td>
                         <td className="px-4 py-3">{player.idCardNumber || "N/A"}</td>
                         <td className="px-4 py-3">
-                          {player.status === 'approved' ? (
-                            <Badge className="bg-green-100 text-green-800">Approved</Badge>
-                          ) : player.status === 'rejected' ? (
-                            <Badge className="bg-red-100 text-red-800">Rejected</Badge>
-                          ) : player.status === 'pending' ? (
-                            <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
-                          ) : (
-                            <Badge className="bg-slate-100 text-slate-700">{player.status}</Badge>
-                          )}
+                          <div className="flex flex-col gap-1 items-start">
+                            {player.status === 'approved' ? (
+                              <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                            ) : player.status === 'rejected' ? (
+                              <Badge className="bg-red-100 text-red-800">Rejected</Badge>
+                            ) : player.status === 'pending' ? (
+                              <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+                            ) : (
+                              <Badge className="bg-slate-100 text-slate-700">{player.status}</Badge>
+                            )}
+                            {player.noc?.status === 'applied' && (
+                              <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[10px] animate-pulse">
+                                NOC: Cooling
+                              </Badge>
+                            )}
+                            {player.noc?.status === 'approved' && (
+                              <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white font-bold text-[10px]">
+                                NOC: Issued
+                              </Badge>
+                            )}
+                            {player.noc?.status === 'relieved' && (
+                              <Badge className="bg-slate-600 hover:bg-slate-600 text-white text-[10px]">
+                                Relieved
+                              </Badge>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 space-x-2">
                           {editingId === player._id ? (

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, type ChangeEvent } from "react";
+import { useState, useEffect, useMemo, useCallback, type ChangeEvent } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,10 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X } from "lucide-react";
-import API_BASE_URL from "@/config/api";
+import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X, FileCheck, Clock, ShieldCheck, Award } from "lucide-react";
+import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
+import NocCountdownBanner from "@/components/NocCountdownBanner";
+import NocCertificateModal, { NocCertificateData } from "@/components/NocCertificateModal";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -77,6 +79,23 @@ interface Registration {
   idCardGeneratedAt?: string;
   kitSize?: string;
   jerseyNumber?: number | null;
+  noc?: {
+    status?: 'none' | 'applied' | 'approved' | 'relieved';
+    appliedAt?: string;
+    coolingEndsAt?: string;
+    generatedAt?: string;
+    expiresAt?: string;
+    nocNumber?: string;
+    reason?: string;
+    destinationClub?: string;
+    appliedByAdmin?: string;
+    generatedByAdmin?: string;
+    isBypassed?: boolean;
+    bypassedBy?: string;
+    digitalSignatureHash?: string;
+    downloadCount?: number;
+    lastDownloadedAt?: string;
+  };
 }
 
 interface EditRegistrationForm {
@@ -177,6 +196,177 @@ const RegistrationDetail = () => {
     return role === "super admin" || role === "superadmin" || role === "super_admin";
   }, [adminUser]);
 
+  const [showNocApplyDialog, setShowNocApplyDialog] = useState(false);
+  const [nocReason, setNocReason] = useState("");
+  const [nocDestinationClub, setNocDestinationClub] = useState("");
+  const [isApplyingNoc, setIsApplyingNoc] = useState(false);
+  const [isBypassingNoc, setIsBypassingNoc] = useState(false);
+  const [isCancellingNoc, setIsCancellingNoc] = useState(false);
+  const [showNocCertModal, setShowNocCertModal] = useState(false);
+  const [nocCertData, setNocCertData] = useState<NocCertificateData | null>(null);
+  const [isLoadingNocCert, setIsLoadingNocCert] = useState(false);
+
+  const handleApplyNoc = async () => {
+    if (!token || !id) return;
+    setIsApplyingNoc(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_APPLY(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: nocReason.trim(),
+          destinationClub: nocDestinationClub.trim(),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to initiate NOC");
+      }
+      toast({
+        title: "NOC Initiated",
+        description: "14-day cooling countdown has started. Official notice email sent to the member.",
+      });
+      setShowNocApplyDialog(false);
+      setNocReason("");
+      setNocDestinationClub("");
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not initiate NOC",
+        variant: "destructive",
+      });
+    } finally {
+      setIsApplyingNoc(false);
+    }
+  };
+
+  const handleBypassNoc = async () => {
+    if (!token || !id) return;
+    const confirmBypass = window.confirm(
+      "⚡ Super Admin Bypass:\n\nAre you sure you want to immediately bypass the 14-day cooling period and generate the official NOC certificate right now?"
+    );
+    if (!confirmBypass) return;
+
+    setIsBypassingNoc(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_BYPASS(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to bypass NOC");
+      }
+      toast({
+        title: "NOC Certificate Generated!",
+        description: `Certificate ${data.noc?.nocNumber || ""} generated instantly via Super Admin bypass. Email sent to member.`,
+      });
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Bypass Error",
+        description: err instanceof Error ? err.message : "Could not bypass cooling period",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBypassingNoc(false);
+    }
+  };
+
+  const handleCancelNoc = async () => {
+    if (!token || !id) return;
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this pending NOC request? The countdown will stop and the member will return to normal active standing."
+    );
+    if (!confirmCancel) return;
+
+    setIsCancellingNoc(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_CANCEL(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to cancel NOC");
+      }
+      toast({
+        title: "NOC Cancelled",
+        description: "The NOC request has been withdrawn.",
+      });
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not cancel NOC",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCancellingNoc(false);
+    }
+  };
+
+  const handleViewNocCertificate = async () => {
+    if (!token || !id) return;
+    setIsLoadingNocCert(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_CERTIFICATE(id), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch NOC certificate");
+      }
+      setNocCertData(data);
+      setShowNocCertModal(true);
+    } catch (err: unknown) {
+      toast({
+        title: "Certificate Error",
+        description: err instanceof Error ? err.message : "Failed to load certificate",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingNocCert(false);
+    }
+  };
+
+  const fetchRegistration = useCallback(async () => {
+    if (!token || !id) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/registrations/${id}`,
+        {
+          headers: { "Authorization": `Bearer ${token}` },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch registration");
+      const data = await response.json();
+      setRegistration(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch registration",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, token, toast]);
+
   useEffect(() => {
     if (!token) {
       navigate("/admin/login");
@@ -205,7 +395,7 @@ const RegistrationDetail = () => {
     );
 
     return cleanup;
-  }, [id, token]);
+  }, [token, navigate, fetchRegistration]);
 
   // Countdown timer for timeout dialog
   useEffect(() => {
@@ -224,30 +414,6 @@ const RegistrationDetail = () => {
     setAadharFrontPreview(registration.aadharFront || "");
     setAadharBackPreview(registration.aadharBack || "");
   }, [registration]);
-
-  const fetchRegistration = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/registrations/${id}`,
-        {
-          headers: { "Authorization": `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch registration");
-      const data = await response.json();
-      setRegistration(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch registration",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleApprove = async () => {
     try {
@@ -1473,6 +1639,154 @@ const RegistrationDetail = () => {
                   </CardContent>
                 </Card>
 
+                {/* No Objection Certificate (NOC) Card */}
+                <Card className="border-indigo-200 overflow-hidden shadow-sm">
+                  <CardHeader className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-3.5 px-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+                        <FileCheck className="w-4 h-4 text-indigo-400" />
+                        No Objection Certificate (NOC)
+                      </CardTitle>
+                      {registration.noc?.status === "applied" && (
+                        <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[11px] animate-pulse">
+                          14-Day Cooling
+                        </Badge>
+                      )}
+                      {registration.noc?.status === "approved" && (
+                        <Badge className="bg-emerald-500 hover:bg-emerald-500 text-slate-950 font-bold text-[11px]">
+                          Issued
+                        </Badge>
+                      )}
+                      {registration.noc?.status === "relieved" && (
+                        <Badge className="bg-slate-600 text-white text-[11px]">
+                          Relieved
+                        </Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-3">
+                    {(!registration.noc || registration.noc.status === "none") && (
+                      <div className="space-y-3">
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                          Initiate clearance for this member. A <strong>mandatory 14-day cooling period</strong> will begin immediately with automated real-time countdown on both sides.
+                        </p>
+                        <Button
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
+                          onClick={() => setShowNocApplyDialog(true)}
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          Initiate 14-Day NOC Clearance
+                        </Button>
+                      </div>
+                    )}
+
+                    {registration.noc?.status === "applied" && (
+                      <div className="space-y-3">
+                        <NocCountdownBanner
+                          noc={registration.noc}
+                          playerName={registration.name}
+                          isAdmin={true}
+                          isSuperAdmin={isSuperAdmin}
+                          onBypassClick={handleBypassNoc}
+                          onCancelClick={handleCancelNoc}
+                          onComplete={fetchRegistration}
+                        />
+                      </div>
+                    )}
+
+                    {registration.noc?.status === "approved" && (
+                      <div className="space-y-3">
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-emerald-800">Certificate Status</span>
+                            <span className="text-xs font-bold text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded">
+                              {registration.noc.isBypassed ? "Generated (Bypassed)" : "Generated (Full Cooling)"}
+                            </span>
+                          </div>
+                          <p className="text-sm font-mono font-bold text-emerald-950">
+                            {registration.noc.nocNumber}
+                          </p>
+                          <div className="text-[11px] text-emerald-700 space-y-0.5 pt-1 border-t border-emerald-200/60">
+                            <p>Issued: {registration.noc.generatedAt ? new Date(registration.noc.generatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
+                            {registration.noc.expiresAt && (
+                              <p className="text-amber-800 font-medium">
+                                Archival Deadline: {new Date(registration.noc.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                              </p>
+                            )}
+                            <p>Downloads: {registration.noc.downloadCount || 0} times</p>
+                          </div>
+                        </div>
+                        <Button
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                          onClick={handleViewNocCertificate}
+                          disabled={isLoadingNocCert}
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          {isLoadingNocCert ? "Loading Certificate..." : "View & Download NOC Certificate"}
+                        </Button>
+                      </div>
+                    )}
+
+                    {registration.noc?.status === "relieved" && (
+                      <div className="bg-slate-100 border border-slate-300 rounded-lg p-3 text-xs text-slate-700 space-y-1">
+                        <p className="font-semibold text-slate-800">Member Relieved</p>
+                        <p>This player has completed the NOC archival period and is no longer an active trainee.</p>
+                        <p className="font-mono text-[11px] text-slate-600">NOC: {registration.noc.nocNumber}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Apply NOC Dialog */}
+                <Dialog open={showNocApplyDialog} onOpenChange={setShowNocApplyDialog}>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-indigo-600" />
+                        Initiate 14-Day NOC Process
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs text-indigo-900 leading-relaxed">
+                        <strong>Mandatory 14-Day Notice:</strong> Once initiated, an automatic 14-day cooling period begins. The member will be notified by official email with a real-time countdown timer. Academy equipment, kits, and dues must be audited during this window.
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Reason for Leaving / Transfer
+                        </label>
+                        <Textarea
+                          placeholder="e.g., Relocating to hometown / Joining university kabaddi squad / Personal reasons"
+                          value={nocReason}
+                          onChange={(e) => setNocReason(e.target.value)}
+                          className="min-h-20 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                          Destination Club / Academy / Institution (Optional)
+                        </label>
+                        <Input
+                          placeholder="e.g., Delhi State Kabaddi Association / University Team"
+                          value={nocDestinationClub}
+                          onChange={(e) => setNocDestinationClub(e.target.value)}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowNocApplyDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
+                        onClick={handleApplyNoc}
+                        disabled={isApplyingNoc}
+                      >
+                        {isApplyingNoc ? "Initiating..." : "Start 14-Day Cooling Timer"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </>
             )}
 
@@ -1521,6 +1835,13 @@ const RegistrationDetail = () => {
           </div>
         </div>
       </div>
+
+      <NocCertificateModal
+        open={showNocCertModal}
+        onOpenChange={setShowNocCertModal}
+        data={nocCertData}
+        onDownloaded={fetchRegistration}
+      />
     </div>
   );
 };

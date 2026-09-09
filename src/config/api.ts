@@ -62,6 +62,12 @@ export const API_ENDPOINTS = {
   PLAYER_FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/player/password/forgot/reset`,
   PLAYER_CHANGE_PASSWORD: `${API_BASE_URL}/api/player/password/change`,
   PLAYER_FEES: `${API_BASE_URL}/api/player/fees`,
+  ADMIN_NOC_APPLY: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/apply`,
+  ADMIN_NOC_BYPASS: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/bypass-generate`,
+  ADMIN_NOC_CANCEL: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/cancel`,
+  ADMIN_NOC_CERTIFICATE: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/certificate`,
+  PLAYER_NOC_CERTIFICATE: `${API_BASE_URL}/api/player/noc/certificate`,
+  PLAYER_NOC_DOWNLOADED: `${API_BASE_URL}/api/player/noc/downloaded`,
 };
 
 const normalizeFrontendBaseUrl = (value?: string): string => {

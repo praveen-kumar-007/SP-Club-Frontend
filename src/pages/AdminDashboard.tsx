@@ -62,6 +62,12 @@ interface Registration {
   photo: string;
   aadharFront: string;
   aadharBack: string;
+  noc?: {
+    status?: 'none' | 'applied' | 'approved' | 'relieved';
+    coolingEndsAt?: string;
+    expiresAt?: string;
+    nocNumber?: string;
+  };
 }
 
 interface Stats {
@@ -421,20 +427,35 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <Badge className="bg-green-500 text-white">Approved</Badge>;
-      case 'rejected':
-        return <Badge className="bg-red-500 text-white">Rejected</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-400 text-slate-900">Pending</Badge>;
-      default:
-        return <Badge className="bg-slate-200 text-slate-700">Unknown</Badge>;
-    }
+  const getStatusBadge = (status: string, noc?: Registration['noc']) => {
+    return (
+      <div className="flex flex-col gap-1 items-start">
+        {status === 'approved' && <Badge className="bg-green-500 text-white">Approved</Badge>}
+        {status === 'rejected' && <Badge className="bg-red-500 text-white">Rejected</Badge>}
+        {status === 'pending' && <Badge className="bg-yellow-400 text-slate-900">Pending</Badge>}
+        {status !== 'approved' && status !== 'rejected' && status !== 'pending' && (
+          <Badge className="bg-slate-200 text-slate-700">Unknown</Badge>
+        )}
+        {noc?.status === 'applied' && (
+          <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[10px] animate-pulse">
+            NOC: Cooling
+          </Badge>
+        )}
+        {noc?.status === 'approved' && (
+          <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white font-bold text-[10px]">
+            NOC: Issued
+          </Badge>
+        )}
+        {noc?.status === 'relieved' && (
+          <Badge className="bg-slate-600 hover:bg-slate-600 text-white text-[10px]">
+            Relieved (NOC)
+          </Badge>
+        )}
+      </div>
+    );
   };
 
-  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<any>; title: string; value: number; color: string }) => (
+  const StatCard = ({ icon: Icon, title, value, color }: { icon: React.ComponentType<{ className?: string; size?: string | number }>; title: string; value: number; color: string }) => (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
@@ -989,7 +1010,7 @@ const AdminDashboard = () => {
                                 <Badge variant="outline">{reg.role}</Badge>
                               </TableCell>
                               <TableCell>
-                                {getStatusBadge(reg.status)}
+                                {getStatusBadge(reg.status, reg.noc)}
                               </TableCell>
                               <TableCell className="text-right whitespace-nowrap">
                                 <div className="flex gap-2 justify-end items-center">

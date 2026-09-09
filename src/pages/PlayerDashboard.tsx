@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,11 +9,30 @@ import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCale
 import Seo from "@/components/Seo";
 import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange, getKitSizeRange } from "@/utils/kitSizes";
-import { AlertTriangle, Award, Bell, CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, CreditCard, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2, Wallet } from "lucide-react";
+import { AlertTriangle, Award, Bell, CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, Clock, CreditCard, Download, FileCheck, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2, Wallet } from "lucide-react";
+import NocCountdownBanner from "@/components/NocCountdownBanner";
+import NocCertificateModal, { NocCertificateData } from "@/components/NocCertificateModal";
+
+export interface NocInfo {
+    status?: "none" | "applied" | "approved" | "relieved";
+    appliedAt?: string;
+    coolingEndsAt?: string;
+    generatedAt?: string;
+    expiresAt?: string;
+    nocNumber?: string;
+    reason?: string;
+    destinationClub?: string;
+    digitalSignatureHash?: string;
+    isBypassed?: boolean;
+    downloadCount?: number;
+    lastDownloadedAt?: string;
+}
 
 interface PlayerProfile {
     id: string;
+    _id?: string;
     name: string;
+    fathersName?: string;
     email: string;
     role: string;
     idCardNumber: string;
@@ -30,6 +49,7 @@ interface PlayerProfile {
     status?: string;
     feeAccessEnabled?: boolean;
     photo: string;
+    noc?: NocInfo;
     certificates: Array<{
         title: string;
         fileUrl: string;
@@ -110,6 +130,9 @@ const PlayerDashboard = () => {
     const [attendanceEntries, setAttendanceEntries] = useState<AttendanceEntry[]>([]);
     const [practiceDates, setPracticeDates] = useState<string[]>([]);
     const [loadingAttendance, setLoadingAttendance] = useState(false);
+    const [nocCertificateData, setNocCertificateData] = useState<NocCertificateData | null>(null);
+    const [showNocCertificateModal, setShowNocCertificateModal] = useState(false);
+    const [loadingNocCert, setLoadingNocCert] = useState(false);
     const photoInputRef = useRef<HTMLInputElement | null>(null);
     const selectedKitRange = getKitSizeRange(kitSize);
     const attendanceMonthLabel = useMemo(() => {
@@ -129,6 +152,48 @@ const PlayerDashboard = () => {
     })();
     const playerId = parsedPlayer?.id as string | undefined;
     const playerToken = localStorage.getItem("playerToken") || undefined;
+
+    const handleOpenNocCertificate = async () => {
+        if (!playerToken) return;
+        setLoadingNocCert(true);
+        try {
+            const res = await fetch(API_ENDPOINTS.PLAYER_NOC_CERTIFICATE, {
+                headers: {
+                    Authorization: `Bearer ${playerToken}`,
+                },
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Failed to load NOC Certificate");
+            }
+            setNocCertificateData(data);
+            setShowNocCertificateModal(true);
+        } catch (err: unknown) {
+            toast({
+                title: "Could not load NOC",
+                description: err instanceof Error ? err.message : "Failed to retrieve certificate details.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoadingNocCert(false);
+        }
+    };
+
+    const handleNocDownloaded = async () => {
+        if (!playerToken) return;
+        try {
+            await fetch(API_ENDPOINTS.PLAYER_NOC_DOWNLOADED, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${playerToken}`,
+                    "Content-Type": "application/json",
+                },
+            });
+            fetchPlayerProfile(playerToken);
+        } catch (e) {
+            console.error("Failed to notify NOC download", e);
+        }
+    };
 
     const fetchPlayerProfile = async (activePlayerToken: string) => {
         const profileResponse = await fetch(API_ENDPOINTS.PLAYER_ME, {
@@ -162,7 +227,7 @@ const PlayerDashboard = () => {
         setUnreadMessageCount(Number(data.unreadCount || 0));
     };
 
-    const fetchAttendance = async (activePlayerToken: string, month: string) => {
+    const fetchAttendance = useCallback(async (activePlayerToken: string, month: string) => {
         setLoadingAttendance(true);
         try {
             const response = await fetch(`${API_ENDPOINTS.PLAYER_ATTENDANCE}?month=${month}`, {
@@ -187,7 +252,7 @@ const PlayerDashboard = () => {
         } finally {
             setLoadingAttendance(false);
         }
-    };
+    }, [toast]);
 
     const fetchCurrentMonthFeeStatus = async (activePlayerToken: string) => {
         setLoadingFeeStatus(true);
@@ -253,7 +318,7 @@ const PlayerDashboard = () => {
     useEffect(() => {
         if (!playerToken || isLoading) return;
         fetchAttendance(playerToken, attendanceMonth);
-    }, [attendanceMonth, playerToken, isLoading]);
+    }, [attendanceMonth, playerToken, isLoading, fetchAttendance]);
 
     useEffect(() => {
         if (!isLoading && player && player.status !== "approved") {
@@ -515,6 +580,85 @@ const PlayerDashboard = () => {
                         </div>
                     </CardHeader>
                 </Card>
+
+                {player?.noc?.status === "applied" && (
+                    <NocCountdownBanner
+                        noc={player.noc}
+                        playerName={player.name}
+                        isAdmin={false}
+                        onComplete={() => {
+                            if (playerToken) fetchPlayerProfile(playerToken);
+                        }}
+                    />
+                )}
+
+                {player?.noc?.status === "approved" && (
+                    <Card className="border-2 border-emerald-500 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white shadow-xl overflow-hidden relative">
+                        <div className="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+                            <Award className="w-56 h-56 text-white" />
+                        </div>
+                        <CardHeader className="pb-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2.5 bg-emerald-500/20 border border-emerald-400/40 rounded-xl text-emerald-400 shrink-0">
+                                        <FileCheck className="w-7 h-7" />
+                                    </div>
+                                    <div>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                                                Official NOC Issued
+                                            </CardTitle>
+                                            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-300 border border-emerald-400/40">
+                                                Valid & Verified
+                                            </span>
+                                        </div>
+                                        <CardDescription className="text-emerald-100/80 text-xs sm:text-sm mt-1">
+                                            Certificate ID: <span className="font-mono font-bold text-white bg-black/40 px-2 py-0.5 rounded border border-white/20">{player.noc.nocNumber || "NOC-CONFIRMED"}</span>
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={handleOpenNocCertificate}
+                                    disabled={loadingNocCert}
+                                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold shadow-lg transition-all w-full sm:w-auto"
+                                >
+                                    {loadingNocCert ? (
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : (
+                                        <Download className="w-4 h-4 mr-2" />
+                                    )}
+                                    View & Download NOC Certificate
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-sm text-emerald-50">
+                            <p className="leading-relaxed text-slate-200">
+                                Your <strong>No Objection Certificate (NOC)</strong> has been formally issued and digitally signed under the authority of SP Sports Academy. All academy dues, equipment returns, and clearance verifications stand completed.
+                            </p>
+                            {player.noc.expiresAt && (
+                                <div className="bg-amber-950/60 border border-amber-500/40 rounded-lg p-3 text-xs sm:text-sm flex items-start gap-2.5 text-amber-200">
+                                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                                    <div>
+                                        <strong>14-Day Post-Issuance Download Notice:</strong> Per academy regulations, your dashboard credentials and certificate download will remain accessible until{" "}
+                                        <strong className="text-amber-100">{new Date(player.noc.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</strong>.
+                                        Please download and archive your official PDF before this period ends, after which player records are archived.
+                                    </div>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {player?.noc?.status === "relieved" && (
+                    <Card className="border-amber-400 bg-amber-50 text-amber-900 p-4">
+                        <div className="flex items-center gap-3">
+                            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                            <div className="text-sm">
+                                <strong>Membership Relieved:</strong> This player account has completed its active tenure with SP Sports Academy following official NOC clearance.
+                            </div>
+                        </div>
+                    </Card>
+                )}
 
                 <Card>
                     <CardHeader>
@@ -955,6 +1099,13 @@ const PlayerDashboard = () => {
                 </div>
 
             </div>
+
+            <NocCertificateModal
+                open={showNocCertificateModal}
+                onOpenChange={setShowNocCertificateModal}
+                data={nocCertificateData}
+                onDownloaded={handleNocDownloaded}
+            />
         </div>
     );
 };
