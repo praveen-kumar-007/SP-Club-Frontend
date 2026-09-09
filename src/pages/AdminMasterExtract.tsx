@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
     ArrowLeft,
+    Award,
     CheckCircle2,
     Database,
     Download,
     FileSpreadsheet,
     History,
+    Lock,
     MessageSquare,
     Printer,
     Search,
@@ -34,6 +36,12 @@ interface AttendanceRecord {
     deviceId?: string;
     deviceName?: string;
     markedByType?: string;
+    markedByAdminId?: {
+        _id?: string;
+        username?: string;
+        email?: string;
+        role?: string;
+    };
     adminNote?: string;
     markedAt?: string;
 }
@@ -42,9 +50,23 @@ interface FeePaymentRecord {
     month: string;
     isPaid: boolean;
     updatedAt?: string;
+    updatedBy?: {
+        _id?: string;
+        username?: string;
+        email?: string;
+        role?: string;
+    };
+}
+
+interface CertificateRecord {
+    _id?: string;
+    title: string;
+    fileUrl: string;
+    issuedAt?: string;
 }
 
 interface PlayerLoginHistory {
+    _id?: string;
     ipAddress?: string;
     userAgent?: string;
     deviceName?: string;
@@ -92,18 +114,25 @@ interface FullPlayer {
     jerseyNumber?: number;
     message?: string;
     photo?: string;
+    certificates?: CertificateRecord[];
+    newsletter?: boolean;
+    terms?: boolean;
     status: "pending" | "approved" | "rejected";
     registeredAt: string;
     approvedAt?: string;
-    approvedBy?: { username?: string; email?: string; role?: string };
+    approvedBy?: { _id?: string; username?: string; email?: string; role?: string };
     rejectedAt?: string;
     rejectionReason?: string;
     idCardNumber?: string;
     idCardGeneratedAt?: string;
+    idCardGeneratedBy?: { _id?: string; username?: string; email?: string; role?: string };
     idCardRole?: string;
     playerPasswordSetAt?: string;
     playerLastLogin?: string;
     playerFailedLoginAttempts?: number;
+    playerForcePasswordReset?: boolean;
+    playerLastFailedLoginAt?: string;
+    playerPasswordResetRequestedAt?: string;
     playerLoginHistory?: PlayerLoginHistory[];
     attendance?: AttendanceRecord[];
     feeAccessEnabled?: boolean;
@@ -286,17 +315,18 @@ const AdminMasterExtract = () => {
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit",
+            second: "2-digit",
         });
     };
 
-    // Standardized cross-device PDF export via html2pdf.js
+    // Standardized cross-device PDF export without truncation
     const handleDownloadPdf = async () => {
         if (!documentRef.current) return;
 
         setDownloadingPdf(true);
         toast({
             title: "Generating PDF Dossier",
-            description: "Compiling vector document layout. Download will start automatically...",
+            description: "Compiling complete unconstrained document layout. Download will start automatically...",
         });
 
         try {
@@ -306,7 +336,7 @@ const AdminMasterExtract = () => {
                 : `SP_Sports_Academy_Master_Extraction_${new Date().toISOString().split("T")[0]}.pdf`;
 
             const orientation: "portrait" | "landscape" = viewMode === "single" ? "portrait" : "landscape";
-            const opt: html2pdf.Options = {
+            const opt = {
                 margin: [6, 6, 6, 6],
                 filename,
                 image: { type: "jpeg", quality: 0.98 },
@@ -365,6 +395,7 @@ const AdminMasterExtract = () => {
                 title="Master Record Extraction & Dossier | SP Sports Academy"
                 description="Comprehensive player dossier and master records extraction center for SP Sports Academy."
             />
+
             {/* Screen Controls Toolbar (Hidden in Print & PDF) */}
             <div className="max-w-[1200px] mx-auto mb-6 space-y-4 print:hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -374,7 +405,7 @@ const AdminMasterExtract = () => {
                             <span>Master Data & Dossier Extraction Center</span>
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                            Extract every minute registration, attendance, fee, communication, and credential detail.
+                            Extract every minute registration, attendance, GPS, fee, and administrative log without truncation.
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -506,7 +537,7 @@ const AdminMasterExtract = () => {
             <div
                 id="master-extract-document"
                 ref={documentRef}
-                className="max-w-[1000px] mx-auto bg-white p-6 sm:p-10 shadow-xl border border-slate-200 rounded-xl text-slate-900 font-sans print:shadow-none print:border-none print:p-0 print:m-0"
+                className="max-w-[1050px] mx-auto bg-white p-6 sm:p-10 shadow-xl border border-slate-200 rounded-xl text-slate-900 font-sans print:shadow-none print:border-none print:p-0 print:m-0"
                 style={{ minHeight: "1100px" }}
             >
                 {/* Official Academy Header */}
@@ -536,7 +567,7 @@ const AdminMasterExtract = () => {
 
                         <div className="text-right flex flex-col items-end">
                             <div className="border border-slate-300 rounded px-2.5 py-1 bg-slate-50 text-[11px] font-mono font-semibold">
-                                <span className="text-slate-500">REF:</span> SP-EXT-{selectedPlayer?._id.slice(-8).toUpperCase() || "MASTER"}
+                                <span className="text-slate-500">REF:</span> SP-EXT-{selectedPlayer?._id ? selectedPlayer._id.slice(-8).toUpperCase() : "MASTER"}
                             </div>
                             <span className="text-[10px] text-slate-400 mt-1">Official Confidential Record</span>
                             <span className="text-[10px] text-slate-500 mt-0.5">{extractTimestamp}</span>
@@ -697,7 +728,7 @@ const AdminMasterExtract = () => {
                                     <span className="font-semibold text-slate-800">{selectedPlayer.clubDetails || "SP Sports Academy Main"}</span>
                                 </div>
                                 <div>
-                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Registration Date</span>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Registration Date & Time</span>
                                     <span className="font-medium text-slate-800">{formatDateTime(selectedPlayer.registeredAt)}</span>
                                 </div>
                                 <div>
@@ -706,84 +737,163 @@ const AdminMasterExtract = () => {
                                 </div>
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Approved By Admin</span>
-                                    <span className="font-medium text-slate-800">{selectedPlayer.approvedBy?.username || "Admin Authority"}</span>
+                                    <span className="font-medium text-slate-800">
+                                        {selectedPlayer.approvedBy?.username ? `${selectedPlayer.approvedBy.username} (${selectedPlayer.approvedBy.role || "Admin"})` : "Admin Authority"}
+                                    </span>
                                 </div>
                                 <div>
-                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">ID Card Generated</span>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">ID Card Generated Date</span>
                                     <span className="font-medium text-slate-800">{formatDate(selectedPlayer.idCardGeneratedAt)}</span>
                                 </div>
+                                <div>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">ID Card Assigned Role</span>
+                                    <span className="font-medium text-slate-800">{selectedPlayer.idCardRole || selectedPlayer.role}</span>
+                                </div>
+                                <div>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Consent & Preferences</span>
+                                    <span className="font-medium text-slate-800">
+                                        Terms: {selectedPlayer.terms ? "Agreed" : "No"} • Newsletter: {selectedPlayer.newsletter ? "Subscribed" : "No"}
+                                    </span>
+                                </div>
+                                {selectedPlayer.message && (
+                                    <div className="sm:col-span-4 bg-slate-50 border border-slate-200 p-2.5 rounded">
+                                        <strong className="block text-xs uppercase text-slate-600 mb-0.5">Registration Statement / Message:</strong>
+                                        <p className="text-slate-800 italic">{selectedPlayer.message}</p>
+                                    </div>
+                                )}
                                 {selectedPlayer.rejectionReason && (
-                                    <div className="sm:col-span-4 bg-red-50 border border-red-200 p-2 rounded text-red-700">
-                                        <strong className="block text-xs uppercase">Rejection Reason:</strong>
+                                    <div className="sm:col-span-4 bg-red-50 border border-red-200 p-2.5 rounded text-red-700">
+                                        <strong className="block text-xs uppercase">Rejection Log:</strong>
                                         <span>{selectedPlayer.rejectionReason} (Dated: {formatDate(selectedPlayer.rejectedAt)})</span>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Section 3: Attendance Analytics & Detailed Log */}
-                        <div className="border border-slate-200 rounded-lg p-4 bg-white">
-                            <div className="flex items-center justify-between mb-3 border-b pb-1.5">
-                                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
-                                    <CheckCircle2 size={16} className="text-emerald-600" />
-                                    <span>Complete Attendance Ledger ({selectedPlayer.attendance?.length || 0} Sessions)</span>
+                        {/* Section 2B: Certificates & Qualifications (if any) */}
+                        {Array.isArray(selectedPlayer.certificates) && selectedPlayer.certificates.length > 0 && (
+                            <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-900 mb-3 border-b pb-1.5 flex items-center gap-1.5">
+                                    <Award size={16} className="text-amber-600" />
+                                    <span>Certificates & Documented Achievements ({selectedPlayer.certificates.length})</span>
                                 </h2>
+                                <div className="grid sm:grid-cols-2 gap-2">
+                                    {selectedPlayer.certificates.map((cert, idx) => (
+                                        <div key={cert._id || idx} className="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                                            <div>
+                                                <span className="font-bold text-slate-900 block">{cert.title}</span>
+                                                <span className="text-[10px] text-slate-500">Issued: {formatDate(cert.issuedAt)}</span>
+                                            </div>
+                                            <a
+                                                href={cert.fileUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-blue-600 hover:underline text-[11px] font-semibold"
+                                            >
+                                                View Document ↗
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Section 3: Attendance Analytics & Complete Detailed Log (NO SCROLLBAR) */}
+                        <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b pb-2">
+                                <div>
+                                    <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
+                                        <CheckCircle2 size={16} className="text-emerald-600" />
+                                        <span>Complete Attendance Ledger ({selectedPlayer.attendance?.length || 0} Total Sessions Recorded)</span>
+                                    </h2>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        Full unconstrained ledger displaying all GPS coordinates, admin action notes, timestamps, and device fingerprints.
+                                    </p>
+                                </div>
                                 <div className="flex items-center gap-2 text-xs font-semibold">
-                                    <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                    <span className="text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
                                         Present: {singlePlayerData?.summary.presentCount ?? selectedPlayer.attendance?.filter(a => a.status === 'present').length ?? 0}
                                     </span>
-                                    <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                                    <span className="text-red-700 bg-red-50 px-2.5 py-1 rounded border border-red-200">
                                         Absent: {singlePlayerData?.summary.absentCount ?? selectedPlayer.attendance?.filter(a => a.status === 'absent').length ?? 0}
                                     </span>
-                                    <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                                        Ratio: {singlePlayerData?.summary.attendancePercentage ?? 0}%
+                                    <span className="text-blue-700 bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+                                        Rate: {singlePlayerData?.summary.attendancePercentage ?? 0}%
                                     </span>
                                 </div>
                             </div>
 
                             {selectedPlayer.attendance && selectedPlayer.attendance.length > 0 ? (
-                                <div className="max-h-72 overflow-y-auto border rounded border-slate-200">
+                                <div className="border rounded-lg border-slate-200 overflow-hidden">
                                     <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="bg-slate-100 text-slate-700 sticky top-0">
-                                            <tr className="border-b">
-                                                <th className="py-1.5 px-2">Date</th>
-                                                <th className="py-1.5 px-2">Status</th>
-                                                <th className="py-1.5 px-2">Marked Time</th>
-                                                <th className="py-1.5 px-2">Marked By</th>
-                                                <th className="py-1.5 px-2">Device / Identity</th>
-                                                <th className="py-1.5 px-2">GPS Location</th>
+                                        <thead className="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                            <tr>
+                                                <th className="py-2 px-2.5 font-bold">#</th>
+                                                <th className="py-2 px-2.5 font-bold">Date</th>
+                                                <th className="py-2 px-2.5 font-bold">Status</th>
+                                                <th className="py-2 px-2.5 font-bold">Marked Time</th>
+                                                <th className="py-2 px-2.5 font-bold">Marked By / Actor</th>
+                                                <th className="py-2 px-2.5 font-bold">Admin Log Note</th>
+                                                <th className="py-2 px-2.5 font-bold">Device / Hardware</th>
+                                                <th className="py-2 px-2.5 font-bold">GPS Coordinates & Accuracy</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {selectedPlayer.attendance.map((att, idx) => (
-                                                <tr key={`${att.date}-${idx}`} className="hover:bg-slate-50">
-                                                    <td className="py-1.5 px-2 font-semibold text-slate-800">{att.date}</td>
-                                                    <td className="py-1.5 px-2">
-                                                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                <tr key={`${att.date}-${idx}`} className={idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+                                                    <td className="py-2 px-2.5 font-mono text-[11px] text-slate-400">{idx + 1}</td>
+                                                    <td className="py-2 px-2.5 font-bold text-slate-900 whitespace-nowrap">{att.date}</td>
+                                                    <td className="py-2 px-2.5 whitespace-nowrap">
+                                                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                                                             att.status === "present"
-                                                                ? "bg-emerald-100 text-emerald-800"
-                                                                : "bg-red-100 text-red-800"
+                                                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                                                : "bg-red-100 text-red-800 border border-red-300"
                                                         }`}>
                                                             {att.status}
                                                         </span>
                                                     </td>
-                                                    <td className="py-1.5 px-2 text-slate-600 font-mono text-[11px]">
+                                                    <td className="py-2 px-2.5 text-slate-700 font-mono text-[11px] whitespace-nowrap">
                                                         {formatDateTime(att.markedAt)}
                                                     </td>
-                                                    <td className="py-1.5 px-2 capitalize text-slate-700 font-medium">
-                                                        {att.markedByType || "player"}
-                                                    </td>
-                                                    <td className="py-1.5 px-2 text-slate-600 text-[11px] truncate max-w-[140px]">
-                                                        {att.deviceName || att.deviceId || "Registered Device"}
-                                                    </td>
-                                                    <td className="py-1.5 px-2 text-slate-600 text-[11px]">
-                                                        {att.location?.latitude ? (
-                                                            <span>
-                                                                {att.location.latitude.toFixed(4)}, {att.location.longitude?.toFixed(4)}
-                                                                {att.location.address ? ` (${att.location.address})` : ""}
+                                                    <td className="py-2 px-2.5 text-slate-800 font-medium">
+                                                        {att.markedByType === "admin" ? (
+                                                            <span className="text-blue-800 font-semibold">
+                                                                Admin {att.markedByAdminId?.username ? `(${att.markedByAdminId.username})` : ""}
                                                             </span>
                                                         ) : (
-                                                            "Academy Geo-fence"
+                                                            <span className="text-slate-700">Player Self-Check-in</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-2 px-2.5 text-slate-600 text-[11px]">
+                                                        {att.adminNote || "—"}
+                                                    </td>
+                                                    <td className="py-2 px-2.5 text-slate-600 text-[11px]">
+                                                        <span className="block font-medium text-slate-700">{att.deviceName || "Registered Device"}</span>
+                                                        {att.deviceId && (
+                                                            <span className="font-mono text-[10px] text-slate-400 block truncate max-w-[120px]">
+                                                                ID: {att.deviceId}
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-2 px-2.5 text-slate-600 text-[11px]">
+                                                        {att.location?.latitude ? (
+                                                            <div>
+                                                                <span className="font-mono font-medium text-slate-800 block">
+                                                                    {att.location.latitude.toFixed(4)}° N, {att.location.longitude?.toFixed(4)}° E
+                                                                </span>
+                                                                {att.location.accuracy !== undefined && att.location.accuracy !== null && (
+                                                                    <span className="text-[10px] text-slate-400 block">
+                                                                        Accuracy: ±{att.location.accuracy.toFixed(1)}m
+                                                                    </span>
+                                                                )}
+                                                                {att.location.address && (
+                                                                    <span className="text-[10px] text-slate-500 block truncate max-w-[160px]">
+                                                                        {att.location.address}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-slate-500 italic">Academy Geo-fence Verified</span>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -792,98 +902,161 @@ const AdminMasterExtract = () => {
                                     </table>
                                 </div>
                             ) : (
-                                <p className="text-xs text-slate-500 py-3 text-center bg-slate-50 rounded">
+                                <p className="text-xs text-slate-500 py-4 text-center bg-slate-50 rounded">
                                     No attendance sessions recorded yet for this player.
                                 </p>
                             )}
                         </div>
 
-                        {/* Section 4: Fee Payments Ledger */}
+                        {/* Section 4: Fee Payments Detailed Ledger (NO SCROLLBAR) */}
                         <div className="border border-slate-200 rounded-lg p-4 bg-white">
                             <div className="flex items-center justify-between mb-3 border-b pb-1.5">
                                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-teal-900 flex items-center gap-1.5">
                                     <Wallet size={16} className="text-teal-600" />
-                                    <span>Fee Payments & Dues Status</span>
+                                    <span>Fee Payments & Dues Ledger</span>
                                 </h2>
                                 <span className="text-xs font-semibold text-slate-600">
-                                    Fee Access: {selectedPlayer.feeAccessEnabled ? "Active" : "Disabled"}
+                                    Fee Access Status: {selectedPlayer.feeAccessEnabled ? "Active" : "Disabled"}
                                 </span>
                             </div>
 
                             {selectedPlayer.feePayments && selectedPlayer.feePayments.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    {selectedPlayer.feePayments.map((fee, idx) => (
-                                        <div
-                                            key={`${fee.month}-${idx}`}
-                                            className={`p-2 rounded border text-xs flex items-center justify-between ${
-                                                fee.isPaid
-                                                    ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-                                                    : "bg-red-50 border-red-200 text-red-900"
-                                            }`}
-                                        >
-                                            <span className="font-semibold">{fee.month}</span>
-                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-white shadow-xs">
-                                                {fee.isPaid ? "PAID" : "DUE"}
-                                            </span>
-                                        </div>
-                                    ))}
+                                <div className="border rounded-lg border-slate-200 overflow-hidden">
+                                    <table className="w-full text-left text-xs border-collapse">
+                                        <thead className="bg-slate-100 text-slate-700 border-b">
+                                            <tr>
+                                                <th className="py-2 px-3 font-bold">#</th>
+                                                <th className="py-2 px-3 font-bold">Billing Month</th>
+                                                <th className="py-2 px-3 font-bold">Payment Status</th>
+                                                <th className="py-2 px-3 font-bold">Last Updated Timestamp</th>
+                                                <th className="py-2 px-3 font-bold">Updated By Admin</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {selectedPlayer.feePayments.map((fee, idx) => (
+                                                <tr key={`${fee.month}-${idx}`} className={idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+                                                    <td className="py-2 px-3 font-mono text-[11px] text-slate-400">{idx + 1}</td>
+                                                    <td className="py-2 px-3 font-bold text-slate-900">{fee.month}</td>
+                                                    <td className="py-2 px-3">
+                                                        <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                                            fee.isPaid
+                                                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                                                : "bg-red-100 text-red-800 border border-red-300"
+                                                        }`}>
+                                                            {fee.isPaid ? "PAID" : "DUE"}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-2 px-3 text-slate-700 font-mono text-[11px]">
+                                                        {fee.updatedAt ? formatDateTime(fee.updatedAt) : "—"}
+                                                    </td>
+                                                    <td className="py-2 px-3 text-slate-700 font-medium">
+                                                        {fee.updatedBy?.username ? `${fee.updatedBy.username} (${fee.updatedBy.role || "Admin"})` : "System/Admin"}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             ) : (
-                                <p className="text-xs text-slate-500 py-3 text-center bg-slate-50 rounded">
+                                <p className="text-xs text-slate-500 py-4 text-center bg-slate-50 rounded">
                                     No fee records registered for this player.
                                 </p>
                             )}
                         </div>
 
-                        {/* Section 5: Communications, Messages & Inquiries */}
-                        {singlePlayerData?.messages && singlePlayerData.messages.length > 0 && (
-                            <div className="border border-slate-200 rounded-lg p-4 bg-white">
-                                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-indigo-900 mb-3 border-b pb-1.5 flex items-center gap-1.5">
-                                    <MessageSquare size={16} className="text-indigo-600" />
-                                    <span>Communications & Messages ({singlePlayerData.messages.length})</span>
-                                </h2>
-                                <div className="space-y-2 max-h-56 overflow-y-auto">
-                                    {singlePlayerData.messages.map((msg) => (
-                                        <div key={msg._id} className="p-2.5 rounded bg-slate-50 border border-slate-200 text-xs">
-                                            <div className="flex items-center justify-between text-slate-500 mb-1">
-                                                <span className="font-bold text-slate-800 capitalize">
-                                                    {msg.type === "player_to_admin" ? "Player → Admin" : "Admin → Player"}
-                                                </span>
-                                                <span className="font-mono text-[11px]">{formatDateTime(msg.createdAt)}</span>
-                                            </div>
-                                            <p className="font-semibold text-slate-800">{msg.subject}</p>
-                                            <p className="text-slate-600 mt-0.5 leading-relaxed">{msg.message}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Section 6: Security & Device Activity */}
+                        {/* Section 5: Security & Device Activity Audit Log (NO SCROLLBAR) */}
                         <div className="border border-slate-200 rounded-lg p-4 bg-white">
                             <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-violet-900 mb-3 border-b pb-1.5 flex items-center gap-1.5">
                                 <History size={16} className="text-violet-600" />
-                                <span>Security & Account Activity Audit</span>
+                                <span>Security, Credentials & Account Activity Audit</span>
                             </h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Password Set Date</span>
                                     <span className="font-medium text-slate-800">{formatDateTime(selectedPlayer.playerPasswordSetAt)}</span>
                                 </div>
                                 <div>
-                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Last Login Timestamp</span>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Last Successful Login</span>
                                     <span className="font-medium text-slate-800">{formatDateTime(selectedPlayer.playerLastLogin)}</span>
                                 </div>
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Failed Login Attempts</span>
-                                    <span className="font-medium text-slate-800">{selectedPlayer.playerFailedLoginAttempts || 0}</span>
+                                    <span className={`font-bold ${selectedPlayer.playerFailedLoginAttempts ? "text-red-600" : "text-slate-800"}`}>
+                                        {selectedPlayer.playerFailedLoginAttempts || 0} failed
+                                    </span>
                                 </div>
                                 <div>
-                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Login History Count</span>
-                                    <span className="font-medium text-slate-800">{selectedPlayer.playerLoginHistory?.length || 0} sessions</span>
+                                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Force Password Reset</span>
+                                    <span className="font-medium text-slate-800">
+                                        {selectedPlayer.playerForcePasswordReset ? "Enabled by Admin" : "Disabled"}
+                                    </span>
                                 </div>
                             </div>
+
+                            {/* Detailed Login Sessions Log */}
+                            {Array.isArray(selectedPlayer.playerLoginHistory) && selectedPlayer.playerLoginHistory.length > 0 ? (
+                                <div>
+                                    <h3 className="text-xs font-bold uppercase text-slate-700 mb-2 flex items-center gap-1">
+                                        <Lock size={14} />
+                                        <span>Recorded Login Sessions ({selectedPlayer.playerLoginHistory.length})</span>
+                                    </h3>
+                                    <div className="border rounded border-slate-200 overflow-hidden">
+                                        <table className="w-full text-left text-xs border-collapse">
+                                            <thead className="bg-slate-100 text-slate-700 border-b">
+                                                <tr>
+                                                    <th className="py-1.5 px-2.5">#</th>
+                                                    <th className="py-1.5 px-2.5">Login Timestamp</th>
+                                                    <th className="py-1.5 px-2.5">IP Address</th>
+                                                    <th className="py-1.5 px-2.5">Device Name</th>
+                                                    <th className="py-1.5 px-2.5">Browser & User Agent</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {selectedPlayer.playerLoginHistory.map((sess, idx) => (
+                                                    <tr key={sess._id || idx} className="hover:bg-slate-50">
+                                                        <td className="py-1.5 px-2.5 font-mono text-slate-400">{idx + 1}</td>
+                                                        <td className="py-1.5 px-2.5 font-mono text-slate-800">{formatDateTime(sess.loggedInAt)}</td>
+                                                        <td className="py-1.5 px-2.5 font-mono text-blue-700">{sess.ipAddress || "Unknown"}</td>
+                                                        <td className="py-1.5 px-2.5 text-slate-700">{sess.deviceName || "Standard Device"}</td>
+                                                        <td className="py-1.5 px-2.5 text-slate-500 text-[11px] truncate max-w-[240px]">
+                                                            {sess.userAgent || "—"}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 rounded">
+                                    No active player login session logs on record.
+                                </p>
+                            )}
                         </div>
+
+                        {/* Section 6: Communications, Messages & Inquiries (NO SCROLLBAR) */}
+                        {singlePlayerData?.messages && singlePlayerData.messages.length > 0 && (
+                            <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-indigo-900 mb-3 border-b pb-1.5 flex items-center gap-1.5">
+                                    <MessageSquare size={16} className="text-indigo-600" />
+                                    <span>Official Communications & Messages ({singlePlayerData.messages.length})</span>
+                                </h2>
+                                <div className="space-y-2.5">
+                                    {singlePlayerData.messages.map((msg) => (
+                                        <div key={msg._id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+                                            <div className="flex items-center justify-between text-slate-500 mb-1">
+                                                <span className="font-bold text-slate-900 uppercase tracking-wider">
+                                                    {msg.type === "player_to_admin" ? "Player → Admin" : "Admin → Player"}
+                                                </span>
+                                                <span className="font-mono text-[11px]">{formatDateTime(msg.createdAt)}</span>
+                                            </div>
+                                            <p className="font-bold text-slate-900 text-[13px]">{msg.subject}</p>
+                                            <p className="text-slate-700 mt-1 leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Section 7: Official Attestation & Seal */}
                         <div className="border-t-2 border-slate-900 pt-6 mt-8">
