@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Mail, Power, Search, Send } from "lucide-react";
+import { ArrowLeft, FileText, Mail, Paperclip, Power, Search, Send, X } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
+
+interface MailAttachment {
+    name: string;
+    size: number;
+    type: string;
+    base64: string;
+}
 
 interface Player {
     _id: string;
@@ -39,6 +46,8 @@ const AdminMailCenter = () => {
     const [message, setMessage] = useState("");
     const [cc, setCc] = useState("");
     const [bcc, setBcc] = useState("");
+    const [attachments, setAttachments] = useState<MailAttachment[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const adminToken = localStorage.getItem("adminToken");
@@ -184,6 +193,74 @@ const AdminMailCenter = () => {
         setSelectedIds([]);
     };
 
+    const formatFileSize = (bytes: number): string => {
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
+    const MAX_TOTAL_SIZE = 15 * 1024 * 1024; // 15 MB
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const fileList = Array.from(files);
+        let currentTotalSize = attachments.reduce((sum, a) => sum + a.size, 0);
+
+        const newAttachments: MailAttachment[] = [];
+
+        for (const file of fileList) {
+            if (currentTotalSize + file.size > MAX_TOTAL_SIZE) {
+                toast({
+                    title: "Attachment Size Limit",
+                    description: `Adding "${file.name}" exceeds the 15 MB total attachment limit.`,
+                    variant: "destructive",
+                });
+                continue;
+            }
+
+            try {
+                const base64 = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const result = reader.result as string;
+                        const cleaned = result.replace(/^data:[^;]+;base64,/, "");
+                        resolve(cleaned);
+                    };
+                    reader.onerror = (err) => reject(err);
+                    reader.readAsDataURL(file);
+                });
+
+                currentTotalSize += file.size;
+                newAttachments.push({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type || "application/octet-stream",
+                    base64,
+                });
+            } catch (err) {
+                toast({
+                    title: "File Read Error",
+                    description: `Failed to read file "${file.name}".`,
+                    variant: "destructive",
+                });
+            }
+        }
+
+        if (newAttachments.length > 0) {
+            setAttachments((prev) => [...prev, ...newAttachments]);
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const removeAttachment = (indexToRemove: number) => {
+        setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    };
+
     const handleSend = async () => {
         if (!token) return;
 
@@ -250,6 +327,9 @@ const AdminMailCenter = () => {
                     playerIds: mode === "selected" ? selectedIds : undefined,
                     cc: cc.trim() ? cc.trim() : undefined,
                     bcc: bcc.trim() ? bcc.trim() : undefined,
+                    attachments: attachments.length > 0
+                        ? attachments.map((att) => ({ name: att.name, content: att.base64 }))
+                        : undefined,
                     subject: subject.trim(),
                     message: message.trim(),
                 }),
@@ -269,6 +349,7 @@ const AdminMailCenter = () => {
             setMessage("");
             setCc("");
             setBcc("");
+            setAttachments([]);
             if (mode === "selected") {
                 setSelectedIds([]);
             }
@@ -460,6 +541,70 @@ const AdminMailCenter = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
+                        </div>
+
+                        {/* Attachments Section */}
+                        <div className="space-y-3 pt-1">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                <Label className="font-semibold text-slate-700 flex items-center gap-2">
+                                    <Paperclip size={16} className="text-slate-500" />
+                                    <span>Attachments (PDF, Docs, Images)</span>
+                                    <Badge variant="outline" className="text-xs font-normal text-slate-500">
+                                        Optional • Max 15 MB
+                                    </Badge>
+                                </Label>
+
+                                <div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        multiple
+                                        accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp"
+                                        className="hidden"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 gap-1.5"
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        <Paperclip size={14} />
+                                        Attach Files
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {attachments.length > 0 && (
+                                <div className="space-y-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        {attachments.map((att, index) => (
+                                            <div
+                                                key={`${att.name}-${index}`}
+                                                className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 transition"
+                                            >
+                                                <FileText size={14} className="text-blue-600 flex-shrink-0" />
+                                                <span className="font-medium max-w-[180px] sm:max-w-[260px] truncate" title={att.name}>
+                                                    {att.name}
+                                                </span>
+                                                <span className="text-slate-500">({formatFileSize(att.size)})</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeAttachment(index)}
+                                                    className="text-slate-400 hover:text-red-600 ml-1"
+                                                    title="Remove attachment"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-[11px] text-slate-500">
+                                        Total size: {formatFileSize(attachments.reduce((sum, a) => sum + a.size, 0))} / 15 MB
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="pt-2">
