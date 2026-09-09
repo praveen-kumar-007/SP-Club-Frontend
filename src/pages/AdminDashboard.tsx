@@ -500,120 +500,128 @@ const AdminDashboard = () => {
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          {/* Top row: Title and Logout */}
-          <div className="flex items-start justify-between gap-3 mb-3 md:mb-0">
+        <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Top row: Title, User info, and Logout */}
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-              <p className="text-xs md:text-sm text-gray-600">Welcome, {adminUser?.username} ({adminUser?.role})</p>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+              <p className="text-xs md:text-sm text-gray-600 mt-0.5">
+                Welcome, <span className="font-semibold text-gray-800">{adminUser?.username}</span> ({adminUser?.role})
+              </p>
             </div>
             <Button
               variant="destructive"
               onClick={handleLogout}
-              className="md:hidden font-semibold px-4 py-2 h-10"
+              className="font-semibold shadow-sm hover:shadow transition px-4 py-2 h-9 md:h-10 text-xs md:text-sm"
             >
-              <LogOut size={18} className="mr-1" />
+              <LogOut size={16} className="mr-1.5" />
               <span>Logout</span>
             </Button>
           </div>
 
-          {/* Bottom row: Action buttons - hidden on mobile, full on desktop */}
-          <div className="hidden md:flex justify-end gap-3 mt-3">
+          {/* Bottom row: Action buttons - Responsive flex-wrap on desktop */}
+          <div className="hidden md:flex flex-wrap items-center gap-2 lg:gap-2.5 mt-4 pt-3 border-t border-gray-100">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/player-attendance")}
-              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-700 font-semibold"
+              className="bg-emerald-50/90 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <UserRoundCheck size={18} className="mr-2" />
-              <span className="flex items-center gap-2">
+              <UserRoundCheck size={16} className="mr-1.5 text-emerald-600" />
+              <span className="flex items-center gap-1.5">
                 Player Attendance
                 <CountBadge count={indicators.attendance} />
               </span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/date-attendance")}
-              className="bg-teal-50 hover:bg-teal-100 border-teal-300 text-teal-700 font-semibold"
+              className="bg-teal-50/90 hover:bg-teal-100 border-teal-300 text-teal-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <CalendarDays size={18} className="mr-2" />
+              <CalendarDays size={16} className="mr-1.5 text-teal-600" />
               <span>Attendance by Date</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/inquiries")}
-              className="bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700 font-semibold"
+              className="bg-blue-50/90 hover:bg-blue-100 border-blue-300 text-blue-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <Mail size={18} className="mr-2" />
-              <span className="flex items-center gap-2">
+              <Mail size={16} className="mr-1.5 text-blue-600" />
+              <span className="flex items-center gap-1.5">
                 View Inquiries
                 <CountBadge count={indicators.inquiries} />
               </span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/messages")}
-              className="bg-indigo-50 hover:bg-indigo-100 border-indigo-300 text-indigo-700 font-semibold"
+              className="bg-indigo-50/90 hover:bg-indigo-100 border-indigo-300 text-indigo-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <MessageSquare size={18} className="mr-2" />
-              <span className="flex items-center gap-2">
+              <MessageSquare size={16} className="mr-1.5 text-indigo-600" />
+              <span className="flex items-center gap-1.5">
                 Player Messages
                 <CountBadge count={indicators.playerMessages} />
               </span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/players")}
-              className="bg-slate-50 hover:bg-slate-100 border-slate-300 text-slate-700 font-semibold"
+              className="bg-slate-50 hover:bg-slate-100 border-slate-300 text-slate-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <Search size={18} className="mr-2" />
+              <Search size={16} className="mr-1.5 text-slate-600" />
               <span>Player Directory</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/fees")}
-              className="bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-700 font-semibold"
+              className="bg-emerald-50/90 hover:bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <Wallet size={18} className="mr-2" />
+              <Wallet size={16} className="mr-1.5 text-emerald-600" />
               <span>Fee Payments</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/mail")}
-              className="bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-700 font-semibold"
+              className="bg-cyan-50/90 hover:bg-cyan-100 border-cyan-300 text-cyan-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <Send size={18} className="mr-2" />
-              Mail Center
+              <Send size={16} className="mr-1.5 text-cyan-600" />
+              <span>Mail Center</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/login-history")}
-              className="bg-violet-50 hover:bg-violet-100 border-violet-300 text-violet-700 font-semibold"
+              className="bg-violet-50/90 hover:bg-violet-100 border-violet-300 text-violet-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              <History size={18} className="mr-2" />
-              <span className="flex items-center gap-2">
+              <History size={16} className="mr-1.5 text-violet-600" />
+              <span className="flex items-center gap-1.5">
                 Login History
                 <CountBadge count={indicators.loginHistory} />
               </span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/news")}
-              className="bg-orange-50 hover:bg-orange-100 border-orange-300 text-orange-700 font-semibold"
+              className="bg-orange-50/90 hover:bg-orange-100 border-orange-300 text-orange-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              📰
-              <span className="ml-2">Manage News</span>
+              <span className="mr-1.5">📰</span>
+              <span>Manage News</span>
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => navigate("/admin/gallery")}
-              className="bg-purple-50 hover:bg-purple-100 border-purple-300 text-purple-700 font-semibold"
+              className="bg-purple-50/90 hover:bg-purple-100 border-purple-300 text-purple-800 font-semibold text-xs lg:text-sm h-9 shadow-sm"
             >
-              🖼️
-              <span className="ml-2">Gallery Manager</span>
-            </Button>
-            <Button variant="destructive" onClick={handleLogout} className="font-semibold">
-              <LogOut size={18} className="mr-2" />
-              Logout
+              <span className="mr-1.5">🖼️</span>
+              <span>Gallery Manager</span>
             </Button>
           </div>
 
@@ -702,7 +710,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {(statsError || registrationsError) && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {statsError && <div>Stats error: {(statsError as Error).message}</div>}
@@ -902,18 +910,18 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto rounded-lg border border-gray-100">
                       <Table>
                         <TableHeader>
-                          <TableRow>
-                            <TableHead>Photo</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Age Group</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                          <TableRow className="bg-gray-50/70">
+                            <TableHead className="w-16">Photo</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Name</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Email</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Phone</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Age Group</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Role</TableHead>
+                            <TableHead className="whitespace-nowrap font-semibold">Status</TableHead>
+                            <TableHead className="text-right whitespace-nowrap font-semibold">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -967,8 +975,8 @@ const AdminDashboard = () => {
                               <TableCell>
                                 {getStatusBadge(reg.status)}
                               </TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex gap-2 justify-end">
+                              <TableCell className="text-right whitespace-nowrap">
+                                <div className="flex gap-2 justify-end items-center">
                                   <Button
                                     size="sm"
                                     className="bg-blue-600 hover:bg-blue-700 text-white"
