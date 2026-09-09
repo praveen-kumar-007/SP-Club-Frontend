@@ -222,3 +222,19 @@
   object-fit: cover;
   object-position: center center;
 }
+
+@media print {
+  header,
+  footer,
+  nav,
+  aside,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body, html {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

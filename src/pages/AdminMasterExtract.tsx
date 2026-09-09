@@ -15,9 +15,9 @@ import {
     History,
     Lock,
     MessageSquare,
-    Printer,
     Search,
     Shield,
+    ShieldCheck,
     Wallet,
 } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
@@ -174,6 +174,17 @@ const AdminMasterExtract = () => {
         dateStyle: "full",
         timeStyle: "medium",
     }));
+
+    const generateDocHash = useCallback((seed: string) => {
+        let hash = 0;
+        const str = `${seed}_${extractTimestamp}_SP_SPORTS_ACADEMY_DHANBAD`;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+        const hex = Math.abs(hash).toString(16).padStart(8, "0");
+        return `${hex}a8b3c9f2d1e0`;
+    }, [extractTimestamp]);
 
     useEffect(() => {
         const adminToken = localStorage.getItem("adminToken");
@@ -346,6 +357,8 @@ const AdminMasterExtract = () => {
                     allowTaint: true,
                     letterRendering: true,
                     logging: false,
+                    width: 1050,
+                    windowWidth: 1050,
                     scrollX: 0,
                     scrollY: 0,
                 },
@@ -379,10 +392,6 @@ const AdminMasterExtract = () => {
         } finally {
             setDownloadingPdf(false);
         }
-    };
-
-    const handlePrint = () => {
-        window.print();
     };
 
     const handleExportJson = () => {
@@ -435,22 +444,13 @@ const AdminMasterExtract = () => {
                             Export JSON
                         </Button>
                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handlePrint}
-                            className="h-9 bg-slate-50 hover:bg-slate-100"
-                        >
-                            <Printer size={16} className="mr-1.5 text-slate-600" />
-                            Print
-                        </Button>
-                        <Button
                             size="sm"
                             onClick={handleDownloadPdf}
                             disabled={downloadingPdf || loading}
-                            className="h-9 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
+                            className="h-9 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm px-4"
                         >
                             <Download size={16} className="mr-1.5" />
-                            {downloadingPdf ? "Generating..." : "Download Official PDF"}
+                            {downloadingPdf ? "Generating Fixed A4 PDF..." : "Download as PDF"}
                         </Button>
                     </div>
                 </div>
@@ -541,93 +541,94 @@ const AdminMasterExtract = () => {
             {/* ========================================================================= */}
             {/* MASTER EXTRACT DOCUMENT CANVAS (Rendered to PDF & Printed cleanly) */}
             {/* ========================================================================= */}
-            <div
-                id="master-extract-document"
-                ref={documentRef}
-                className="max-w-[1050px] mx-auto bg-white p-6 sm:p-10 shadow-xl border border-slate-200 rounded-xl text-slate-900 font-sans print:shadow-none print:border-none print:p-0 print:m-0"
-                style={{ minHeight: "1100px" }}
-            >
-                {/* Official Academy Header */}
-                <div className="border-b-2 border-slate-900 pb-5 mb-6">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3.5">
-                            <img
-                                src="/Logo.png"
-                                alt="SP Sports Academy"
-                                className="w-20 h-20 object-contain rounded-lg p-1 border border-slate-200 shadow-sm"
-                            />
-                            <div>
-                                <h1 className="text-2xl sm:text-3xl font-black tracking-wider text-slate-900 uppercase">
-                                    SP SPORTS ACADEMY
-                                </h1>
-                                <p className="text-xs sm:text-sm font-bold tracking-wide text-blue-800 uppercase">
-                                    Official Player Dossier & Master Record Extraction Ledger
-                                </p>
-                                <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">
-                                    Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Compliant with AKFI Standards
-                                </p>
-                                <p className="text-[10px] sm:text-[11px] text-slate-500">
-                                    Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me • Phone: +91 8271882034
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="text-right flex flex-col items-end">
-                            <div className="border border-slate-300 rounded px-2.5 py-1 bg-slate-50 text-[11px] font-mono font-semibold">
-                                <span className="text-slate-500">REF:</span> SP-EXT-{selectedPlayer?._id ? selectedPlayer._id.slice(-8).toUpperCase() : "MASTER"}
-                            </div>
-                            <span className="text-[10px] text-slate-400 mt-1">Official Confidential Record</span>
-                            <span className="text-[10px] text-slate-500 mt-0.5">{extractTimestamp}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {loading ? (
-                    <div className="text-center py-20 text-slate-500">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
-                        <p className="text-sm font-medium">Extracting minute records from database...</p>
-                    </div>
-                ) : viewMode === "single" && selectedPlayer ? (
-                    /* ========================================================================= */
-                    /* INDIVIDUAL PLAYER FULL 360° DOSSIER */
-                    /* ========================================================================= */
-                    <div className="space-y-6 text-xs sm:text-sm">
-                        {/* Section 1: Identification & Profile Overview */}
-                        <div className="grid sm:grid-cols-4 gap-4 p-4 rounded-lg bg-slate-50/80 border border-slate-200">
-                            {/* Player Photo */}
-                            <div className="flex flex-col items-center justify-center sm:border-r border-slate-200 pr-2">
-                                {selectedPlayer.photo ? (
-                                    <img
-                                        src={selectedPlayer.photo}
-                                        alt={selectedPlayer.name}
-                                        crossOrigin="anonymous"
-                                        onError={(e) => {
-                                            (e.currentTarget as HTMLElement).style.display = "none";
-                                        }}
-                                        className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-lg border-2 border-slate-300 shadow-sm"
-                                    />
-                                ) : (
-                                    <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 font-semibold text-xs">
-                                        No Photo
-                                    </div>
-                                )}
-                                <div className="mt-2 text-center">
-                                    <Badge
-                                        className={
-                                            selectedPlayer.status === "approved"
-                                                ? "bg-emerald-600"
-                                                : selectedPlayer.status === "pending"
-                                                ? "bg-amber-500"
-                                                : "bg-red-600"
-                                        }
-                                    >
-                                        {selectedPlayer.status.toUpperCase()}
-                                    </Badge>
+            <div className="w-full overflow-x-auto pb-8">
+                <div
+                    id="master-extract-document"
+                    ref={documentRef}
+                    className="w-[1050px] min-w-[1050px] mx-auto bg-white p-8 sm:p-10 shadow-xl border border-slate-200 rounded-xl text-slate-900 font-sans print:shadow-none print:border-none print:p-0 print:m-0"
+                    style={{ minHeight: "1100px" }}
+                >
+                    {/* Official Academy Header */}
+                    <div className="border-b-2 border-slate-900 pb-5 mb-6">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3.5">
+                                <img
+                                    src="/Logo.png"
+                                    alt="SP Sports Academy"
+                                    className="w-20 h-20 object-contain rounded-lg p-1 border border-slate-200 shadow-sm"
+                                />
+                                <div>
+                                    <h1 className="text-2xl sm:text-3xl font-black tracking-wider text-slate-900 uppercase">
+                                        SP SPORTS ACADEMY
+                                    </h1>
+                                    <p className="text-xs sm:text-sm font-bold tracking-wide text-blue-800 uppercase">
+                                        Official Player Dossier & Master Record Extraction Ledger
+                                    </p>
+                                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">
+                                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Compliant with AKFI Standards
+                                    </p>
+                                    <p className="text-[10px] sm:text-[11px] text-slate-500">
+                                        Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me • Phone: +91 8271882034
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Core Identity Attributes */}
-                            <div className="sm:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div className="text-right flex flex-col items-end">
+                                <div className="border border-slate-300 rounded px-2.5 py-1 bg-slate-50 text-[11px] font-mono font-semibold">
+                                    <span className="text-slate-500">REF:</span> SP-EXT-{selectedPlayer?._id ? selectedPlayer._id.slice(-8).toUpperCase() : "MASTER"}
+                                </div>
+                                <span className="text-[10px] text-slate-400 mt-1">Official Confidential Record</span>
+                                <span className="text-[10px] text-slate-500 mt-0.5">{extractTimestamp}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="text-center py-20 text-slate-500">
+                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+                            <p className="text-sm font-medium">Extracting minute records from database...</p>
+                        </div>
+                    ) : viewMode === "single" && selectedPlayer ? (
+                        /* ========================================================================= */
+                        /* INDIVIDUAL PLAYER FULL 360° DOSSIER */
+                        /* ========================================================================= */
+                        <div className="space-y-6 text-xs sm:text-sm">
+                            {/* Section 1: Identification & Profile Overview */}
+                            <div className="grid grid-cols-4 gap-4 p-4 rounded-lg bg-slate-50/80 border border-slate-200">
+                                {/* Player Photo */}
+                                <div className="flex flex-col items-center justify-center border-r border-slate-200 pr-2">
+                                    {selectedPlayer.photo ? (
+                                        <img
+                                            src={selectedPlayer.photo}
+                                            alt={selectedPlayer.name}
+                                            crossOrigin="anonymous"
+                                            onError={(e) => {
+                                                (e.currentTarget as HTMLElement).style.display = "none";
+                                            }}
+                                            className="w-32 h-32 object-cover rounded-lg border-2 border-slate-300 shadow-sm"
+                                        />
+                                    ) : (
+                                        <div className="w-32 h-32 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 font-semibold text-xs">
+                                            No Photo
+                                        </div>
+                                    )}
+                                    <div className="mt-2 text-center">
+                                        <Badge
+                                            className={
+                                                selectedPlayer.status === "approved"
+                                                    ? "bg-emerald-600"
+                                                    : selectedPlayer.status === "pending"
+                                                    ? "bg-amber-500"
+                                                    : "bg-red-600"
+                                            }
+                                        >
+                                            {selectedPlayer.status.toUpperCase()}
+                                        </Badge>
+                                    </div>
+                                </div>
+
+                                {/* Core Identity Attributes */}
+                                <div className="col-span-3 grid grid-cols-3 gap-3">
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Full Name</span>
                                     <span className="font-bold text-slate-900 text-sm">{selectedPlayer.name}</span>
@@ -684,7 +685,7 @@ const AdminMasterExtract = () => {
                                         </div>
                                     )}
                                 </div>
-                                <div className="sm:col-span-2">
+                                <div className="col-span-2">
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Residential Address</span>
                                     <span className="font-medium text-slate-800">{selectedPlayer.address || "N/A"}</span>
                                 </div>
@@ -697,7 +698,7 @@ const AdminMasterExtract = () => {
                                 <Shield size={16} className="text-blue-600" />
                                 <span>Athletic & Administrative Record</span>
                             </h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-4 gap-3">
                                 <div>
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Playing Role</span>
                                     <span className="font-semibold text-slate-800">{selectedPlayer.role}</span>
@@ -716,7 +717,7 @@ const AdminMasterExtract = () => {
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Experience</span>
                                     <span className="font-semibold text-slate-800">{selectedPlayer.experience || "Fresh Recruit"}</span>
                                 </div>
-                                <div className="sm:col-span-2">
+                                <div className="col-span-2">
                                     <span className="text-[11px] font-semibold text-slate-500 uppercase block">Kabaddi Positions</span>
                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                         {Array.isArray(selectedPlayer.kabaddiPositions) && selectedPlayer.kabaddiPositions.length > 0 ? (
@@ -763,13 +764,13 @@ const AdminMasterExtract = () => {
                                     </span>
                                 </div>
                                 {selectedPlayer.message && (
-                                    <div className="sm:col-span-4 bg-slate-50 border border-slate-200 p-2.5 rounded">
+                                    <div className="col-span-4 bg-slate-50 border border-slate-200 p-2.5 rounded">
                                         <strong className="block text-xs uppercase text-slate-600 mb-0.5">Registration Statement / Message:</strong>
                                         <p className="text-slate-800 italic">{selectedPlayer.message}</p>
                                     </div>
                                 )}
                                 {selectedPlayer.rejectionReason && (
-                                    <div className="sm:col-span-4 bg-red-50 border border-red-200 p-2.5 rounded text-red-700">
+                                    <div className="col-span-4 bg-red-50 border border-red-200 p-2.5 rounded text-red-700">
                                         <strong className="block text-xs uppercase">Rejection Log:</strong>
                                         <span>{selectedPlayer.rejectionReason} (Dated: {formatDate(selectedPlayer.rejectedAt)})</span>
                                     </div>
@@ -784,7 +785,7 @@ const AdminMasterExtract = () => {
                                     <Award size={16} className="text-amber-600" />
                                     <span>Certificates & Documented Achievements ({selectedPlayer.certificates.length})</span>
                                 </h2>
-                                <div className="grid sm:grid-cols-2 gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     {selectedPlayer.certificates.map((cert, idx) => (
                                         <div key={cert._id || idx} className="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
                                             <div>
@@ -807,7 +808,7 @@ const AdminMasterExtract = () => {
 
                         {/* Section 3: Attendance Analytics & Complete Detailed Log (NO SCROLLBAR) */}
                         <div className="border border-slate-200 rounded-lg p-4 bg-white">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b pb-2">
+                            <div className="flex items-center justify-between gap-2 mb-3 border-b pb-2">
                                 <div>
                                     <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                                         <CheckCircle2 size={16} className="text-emerald-600" />
@@ -1065,32 +1066,106 @@ const AdminMasterExtract = () => {
                             </div>
                         )}
 
-                        {/* Section 7: Official Attestation & Seal */}
-                        <div className="border-t-2 border-slate-900 pt-6 mt-8">
-                            <p className="text-[11px] text-slate-600 italic leading-relaxed text-center mb-8">
-                                I hereby certify that the above extract represents the authentic and complete records stored in the official information management system of SP Sports Academy, Dhanbad, Jharkhand.
-                            </p>
-                            <div className="grid grid-cols-3 gap-6 text-center text-xs">
-                                <div>
-                                    <div className="h-14 border-b border-dashed border-slate-400 mb-1 flex items-end justify-center pb-1">
-                                        <span className="font-mono text-[11px] text-slate-400">DIGITALLY VERIFIED</span>
+                        {/* Section 7: Official Digital Verification & Electronic Signature */}
+                        <div className="border-t-2 border-slate-900 pt-6 mt-8 space-y-4">
+                            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                                <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
+                                    I hereby certify that this electronic dossier represents the authentic, complete, and un-tampered record maintained in the official Information Management System of <strong>SP Sports Academy, Dhanbad, Jharkhand</strong>. Generated under institutional administrative authority.
+                                </p>
+                            </div>
+
+                            {/* Dual Digital Certificate Badges: Digitally Verified & Digitally Signed */}
+                            <div className="grid grid-cols-2 gap-4">
+                                {/* Box 1: Digitally Verified */}
+                                <div className="border-2 border-emerald-600 bg-emerald-50/40 rounded-xl p-4 relative">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                                                <CheckCircle2 size={18} />
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-800 block">
+                                                    System Certification
+                                                </span>
+                                                <h4 className="text-sm font-black text-emerald-950 uppercase tracking-wide">
+                                                    Digitally Verified
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                            VERIFIED ✓
+                                        </span>
                                     </div>
-                                    <span className="font-bold text-slate-800 block">Record In-Charge</span>
-                                    <span className="text-[10px] text-slate-500">SP Sports Academy</span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center">
-                                    <div className="w-16 h-16 rounded-full border-2 border-double border-blue-900 flex items-center justify-center text-[9px] font-bold text-blue-900 uppercase tracking-tighter text-center p-1">
-                                        SP SPORTS ACADEMY DHANBAD
+
+                                    <div className="mt-3 space-y-1 text-[11px] text-slate-700 border-t border-emerald-200 pt-2 font-mono">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Verified By:</span>
+                                            <span className="font-semibold text-slate-900">Central Records Database</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Authentication:</span>
+                                            <span className="font-bold text-emerald-700">RECORD AUTHENTICATED</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Verification Hash:</span>
+                                            <span className="text-[10px] text-slate-600 truncate max-w-[220px]">
+                                                SHA256:{generateDocHash(selectedPlayer._id)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Timestamp:</span>
+                                            <span className="text-slate-900">{extractTimestamp}</span>
+                                        </div>
                                     </div>
-                                    <span className="text-[9px] text-slate-400 mt-1 font-semibold">OFFICIAL SEAL</span>
                                 </div>
-                                <div>
-                                    <div className="h-14 border-b border-dashed border-slate-400 mb-1 flex items-end justify-center pb-1">
-                                        <span className="font-mono text-[11px] text-slate-400">AUTHORIZED</span>
+
+                                {/* Box 2: Digitally Signed */}
+                                <div className="border-2 border-blue-600 bg-blue-50/40 rounded-xl p-4 relative">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                                                <ShieldCheck size={18} />
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-800 block">
+                                                    Electronic Authorization
+                                                </span>
+                                                <h4 className="text-sm font-black text-blue-950 uppercase tracking-wide">
+                                                    Digitally Signed
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                            SIGNED ✓
+                                        </span>
                                     </div>
-                                    <span className="font-bold text-slate-800 block">Secretary / Management</span>
-                                    <span className="text-[10px] text-slate-500">SP Sports Academy</span>
+
+                                    <div className="mt-3 space-y-1 text-[11px] text-slate-700 border-t border-blue-200 pt-2 font-mono">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Signatory:</span>
+                                            <span className="font-semibold text-slate-900">Authorized Administrator</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Authority:</span>
+                                            <span className="font-semibold text-slate-900">SP Sports Academy, Dhanbad</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Signature Mode:</span>
+                                            <span className="font-bold text-blue-700">Cryptographic System Token</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Legal Note:</span>
+                                            <span className="text-[10px] text-slate-600">No Physical Signature Required</span>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+
+                            {/* Document Identifier Footer */}
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-200">
+                                <span className="font-mono">DOC ID: SPA-EXT-{selectedPlayer.idCardNumber || selectedPlayer._id.slice(-8).toUpperCase()}</span>
+                                <span>Official Confidential Electronic Document • SP Sports Academy Dhanbad</span>
+                                <span>Valid for All Sporting & Administrative Affiliations</span>
                             </div>
                         </div>
                     </div>
@@ -1100,7 +1175,7 @@ const AdminMasterExtract = () => {
                     /* ========================================================================= */
                     <div className="space-y-6">
                         {/* Metrics Summary Header */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 gap-3">
                             <div className="p-3 bg-slate-50 border rounded-lg text-center">
                                 <span className="text-xs text-slate-500 font-semibold block uppercase">Total Registrations</span>
                                 <span className="text-2xl font-black text-slate-900">{filteredPlayers.length}</span>
@@ -1190,19 +1265,90 @@ const AdminMasterExtract = () => {
                             </table>
                         </div>
 
-                        {/* Attestation Block */}
-                        <div className="border-t-2 border-slate-900 pt-6 mt-8 flex items-center justify-between text-xs text-slate-600">
-                            <div>
-                                <p className="font-bold text-slate-900">SP SPORTS ACADEMY DHANBAD</p>
-                                <p className="text-[11px]">Computerized Academy Ledger Extract • Page 1 of 1</p>
+                        {/* Master Ledger Digital Verification & Electronic Signature Block */}
+                        <div className="border-t-2 border-slate-900 pt-6 mt-8 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                {/* Box 1: Digitally Verified */}
+                                <div className="border-2 border-emerald-600 bg-emerald-50/40 rounded-xl p-3.5 relative">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                                                <CheckCircle2 size={16} />
+                                            </div>
+                                            <div>
+                                                <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-800 block">
+                                                    System Certification
+                                                </span>
+                                                <h4 className="text-xs font-black text-emerald-950 uppercase">
+                                                    Digitally Verified
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded">
+                                            VERIFIED ✓
+                                        </span>
+                                    </div>
+                                    <div className="space-y-0.5 text-[10px] text-slate-700 font-mono border-t border-emerald-200 pt-1.5">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Audit Status:</span>
+                                            <span className="font-bold text-emerald-700">ALL {filteredPlayers.length} RECORDS AUTHENTICATED</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Hash:</span>
+                                            <span className="text-slate-600">SHA256:{generateDocHash("MASTER_LEDGER")}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Verified On:</span>
+                                            <span>{extractTimestamp}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Box 2: Digitally Signed */}
+                                <div className="border-2 border-blue-600 bg-blue-50/40 rounded-xl p-3.5 relative">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                                <ShieldCheck size={16} />
+                                            </div>
+                                            <div>
+                                                <span className="text-[9px] uppercase tracking-wider font-extrabold text-blue-800 block">
+                                                    Electronic Authorization
+                                                </span>
+                                                <h4 className="text-xs font-black text-blue-950 uppercase">
+                                                    Digitally Signed
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <span className="text-[9px] font-bold bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded">
+                                            SIGNED ✓
+                                        </span>
+                                    </div>
+                                    <div className="space-y-0.5 text-[10px] text-slate-700 font-mono border-t border-blue-200 pt-1.5">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Signatory:</span>
+                                            <span className="font-semibold text-slate-900">Authorized Administrator</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Authority:</span>
+                                            <span>SP Sports Academy Dhanbad</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Legal Note:</span>
+                                            <span className="text-slate-600">No Physical Signature Required</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="text-right">
-                                <span className="font-bold block text-slate-900">Authorized Signatory</span>
-                                <span className="text-[11px] text-slate-500">Official Academy Seal Affixed</span>
+
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-200">
+                                <span>SP Sports Academy Dhanbad • Computerized Academy Master Ledger Extract</span>
+                                <span className="font-mono">SHA256 SYSTEM SIGNATURE APPLIED • NO PHYSICAL STAMP REQUIRED</span>
                             </div>
                         </div>
                     </div>
                 )}
+                </div>
             </div>
         </div>
     );

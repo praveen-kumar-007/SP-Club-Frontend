@@ -133,7 +133,9 @@ const App = () => {
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
           <div className="min-h-screen flex flex-col">
-            <Header />
+            <div className="print:hidden">
+              <Header />
+            </div>
             <main className="flex-1">
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>
@@ -177,7 +179,9 @@ const App = () => {
                 </Routes>
               </Suspense>
             </main>
-            <Footer />
+            <div className="print:hidden">
+              <Footer />
+            </div>
           </div>
         </BrowserRouter>
       </TooltipProvider>
