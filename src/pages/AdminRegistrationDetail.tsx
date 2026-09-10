@@ -937,25 +937,25 @@ const RegistrationDetail = () => {
       </AlertDialog>
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-            <Button variant="ghost" onClick={() => navigate("/admin/dashboard")}>
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="shrink-0 h-9 w-9 p-0">
               <ArrowLeft size={20} />
             </Button>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold break-words">{registration.name}</h1>
-              <p className="text-gray-600">{registration.email}</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold break-words text-slate-900 leading-tight">{registration.name}</h1>
+              <p className="text-gray-500 text-xs sm:text-sm truncate">{registration.email}</p>
             </div>
           </div>
-          <div className="self-start sm:self-auto">{getStatusBadge(registration.status)}</div>
+          <div className="self-start sm:self-auto shrink-0">{getStatusBadge(registration.status)}</div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-7 xl:col-span-8 space-y-6 min-w-0">
             {/* Photo */}
             {(registration.photo || isEditing) && (
               <Card>
@@ -1358,7 +1358,7 @@ const RegistrationDetail = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6 min-w-0">
             {/* Status Card */}
             <Card>
               <CardHeader>
@@ -1421,7 +1421,7 @@ const RegistrationDetail = () => {
             </Card>
 
             <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
-              <DialogContent>
+              <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Edit Role & ID Details</DialogTitle>
                 </DialogHeader>
@@ -1496,7 +1496,7 @@ const RegistrationDetail = () => {
                         Reject Registration
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Reject Registration</DialogTitle>
                       </DialogHeader>
@@ -1538,7 +1538,7 @@ const RegistrationDetail = () => {
                         Reject This Approval
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Reject Approved Registration</DialogTitle>
                       </DialogHeader>
@@ -1634,7 +1634,7 @@ const RegistrationDetail = () => {
                               Generate ID Card
                             </Button>
                           </DialogTrigger>
-                          <DialogContent>
+                          <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>Generate ID Card</DialogTitle>
                             </DialogHeader>
@@ -1709,29 +1709,29 @@ const RegistrationDetail = () => {
                 {/* No Objection Certificate (NOC) Card */}
                 <Card className="border-indigo-200 overflow-hidden shadow-sm">
                   <CardHeader className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white py-3.5 px-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
-                        <FileCheck className="w-4 h-4 text-indigo-400" />
-                        No Objection Certificate (NOC)
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <CardTitle className="text-base font-bold flex items-center gap-2 text-white min-w-0">
+                        <FileCheck className="w-4 h-4 text-indigo-400 shrink-0" />
+                        <span className="truncate">No Objection Certificate (NOC)</span>
                       </CardTitle>
                       {registration.noc?.status === "applied" && (
-                        <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[11px] animate-pulse">
+                        <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[11px] animate-pulse shrink-0">
                           14-Day Cooling
                         </Badge>
                       )}
                       {registration.noc?.status === "approved" && (
-                        <Badge className="bg-emerald-500 hover:bg-emerald-500 text-slate-950 font-bold text-[11px]">
+                        <Badge className="bg-emerald-500 hover:bg-emerald-500 text-slate-950 font-bold text-[11px] shrink-0">
                           Issued
                         </Badge>
                       )}
                       {registration.noc?.status === "relieved" && (
-                        <Badge className="bg-slate-600 text-white text-[11px]">
+                        <Badge className="bg-slate-600 text-white text-[11px] shrink-0">
                           Relieved
                         </Badge>
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent className="p-4 space-y-3">
+                  <CardContent className="p-3 sm:p-4 space-y-3">
                     {(!registration.noc || registration.noc.status === "none") && (
                       <div className="space-y-3">
                         <p className="text-xs text-slate-600 leading-relaxed">
@@ -1748,7 +1748,7 @@ const RegistrationDetail = () => {
                     )}
 
                     {registration.noc?.status === "applied" && (
-                      <div className="space-y-3">
+                      <div className="space-y-3 min-w-0 w-full overflow-hidden">
                         <NocCountdownBanner
                           noc={registration.noc}
                           playerName={registration.name}
@@ -1806,7 +1806,7 @@ const RegistrationDetail = () => {
 
                 {/* Apply NOC Dialog */}
                 <Dialog open={showNocApplyDialog} onOpenChange={setShowNocApplyDialog}>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-2">
                         <Clock className="w-5 h-5 text-indigo-600" />

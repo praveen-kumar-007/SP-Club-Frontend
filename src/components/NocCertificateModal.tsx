@@ -468,8 +468,8 @@ const NocCertificateModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[860px] w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 bg-slate-100 text-slate-900">
-        <DialogHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-200">
+      <DialogContent className="w-[95vw] max-w-[860px] max-h-[92vh] overflow-y-auto p-3.5 sm:p-6 bg-slate-100 text-slate-900">
+        <DialogHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
           <div>
             <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <FileCheck className="h-5 w-5 text-emerald-600" />

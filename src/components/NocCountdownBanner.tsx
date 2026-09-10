@@ -133,32 +133,32 @@ const NocCountdownBanner = ({
   }, [coolingEndsAt]);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-500/10 via-amber-50 to-orange-50/70 p-5 sm:p-6 shadow-md">
+    <div className="relative overflow-hidden rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-500/10 via-amber-50 to-orange-50/70 p-3.5 sm:p-5 md:p-6 shadow-md w-full min-w-0">
       {/* Background Institutional Accent */}
       <div className="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-amber-200/30 blur-2xl pointer-events-none" />
 
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 space-y-3.5 sm:space-y-4">
         {/* Top Header Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-amber-200/80 pb-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm ring-4 ring-amber-100">
-              <Clock className="h-6 w-6 animate-pulse" />
+        <div className="flex flex-col gap-2.5 border-b border-amber-200/80 pb-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm ring-4 ring-amber-100 shrink-0">
+              <Clock className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-black tracking-wider uppercase bg-amber-200 text-amber-900">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-black tracking-wider uppercase bg-amber-200 text-amber-900">
                   Institutional Cooling Period
                 </span>
-                <span className="text-[11px] font-bold text-slate-500">14-Day Mandatory Notice</span>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-500">14-Day Mandatory Notice</span>
               </div>
-              <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">
+              <h3 className="text-sm sm:text-base md:text-lg font-black text-slate-900 tracking-tight mt-1 leading-snug break-words">
                 No Objection Certificate (NOC) Processing Countdown
               </h3>
             </div>
           </div>
 
-          {/* Terms & Conditions Modal Trigger */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Header Action Buttons: Terms & Cancel */}
+          <div className="flex flex-wrap items-center justify-between xs:justify-end gap-2 shrink-0 pt-0.5">
             <Dialog open={showTermsModal} onOpenChange={setShowTermsModal}>
               <DialogTrigger asChild>
                 <Button
@@ -166,15 +166,15 @@ const NocCountdownBanner = ({
                   size="sm"
                   className="h-8 border-amber-300 bg-white/90 text-amber-900 hover:bg-amber-100 text-xs font-semibold shadow-xs"
                 >
-                  <FileText className="h-3.5 w-3.5 mr-1 text-amber-600" />
-                  NOC Terms & Guidelines
+                  <FileText className="h-3.5 w-3.5 mr-1 text-amber-600 shrink-0" />
+                  <span>NOC Terms & Guidelines</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md sm:max-w-lg bg-white text-slate-900">
+              <DialogContent className="w-[95vw] max-w-md sm:max-w-lg bg-white text-slate-900 max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2 text-slate-900 font-bold">
-                    <ShieldAlert className="h-5 w-5 text-amber-600" />
-                    SP Sports Academy — NOC Institutional Guidelines
+                  <DialogTitle className="flex items-center gap-2 text-slate-900 font-bold text-base sm:text-lg">
+                    <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0" />
+                    <span>SP Sports Academy — NOC Guidelines</span>
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3.5 text-xs sm:text-sm text-slate-600 max-h-[60vh] overflow-y-auto pr-1">
@@ -203,7 +203,7 @@ const NocCountdownBanner = ({
                     </li>
                   </ul>
 
-                  <div className="p-3 bg-slate-100 rounded-lg text-slate-500 text-xs flex items-center justify-between">
+                  <div className="p-3 bg-slate-100 rounded-lg text-slate-500 text-xs flex flex-wrap items-center justify-between gap-2">
                     <span>Authorized by SP Sports Academy Authority</span>
                     <a
                       href="https://spkabaddi.me/terms"
@@ -216,7 +216,7 @@ const NocCountdownBanner = ({
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button onClick={() => setShowTermsModal(false)} size="sm" className="bg-slate-900 text-white">
+                  <Button onClick={() => setShowTermsModal(false)} size="sm" className="bg-slate-900 text-white w-full sm:w-auto">
                     Understood & Acknowledged
                   </Button>
                 </DialogFooter>
@@ -229,7 +229,7 @@ const NocCountdownBanner = ({
                 variant="ghost"
                 size="sm"
                 onClick={onCancelClick}
-                className="h-8 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                className="h-8 text-xs text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold"
               >
                 Cancel NOC
               </Button>
@@ -239,14 +239,14 @@ const NocCountdownBanner = ({
 
         {/* Reason / Destination Callout (If Present) */}
         {(reason || destinationClub) && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-700 bg-white/70 px-3 py-1.5 rounded-lg border border-amber-200/60">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-700 bg-white/70 px-3 py-1.5 rounded-lg border border-amber-200/60 min-w-0">
             {destinationClub && (
-              <span>
+              <span className="break-words">
                 <strong className="text-slate-900">Destination:</strong> {destinationClub}
               </span>
             )}
             {reason && (
-              <span>
+              <span className="break-words">
                 <strong className="text-slate-900">Application Reason:</strong> {reason}
               </span>
             )}
@@ -254,43 +254,43 @@ const NocCountdownBanner = ({
         )}
 
         {/* Live Second-by-Second Countdown Display Grid */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3 text-center">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 md:gap-3 text-center">
           {/* Days */}
-          <div className="bg-white rounded-xl border border-amber-200 p-2.5 sm:p-3 shadow-xs">
-            <span className="block text-2xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
+          <div className="bg-white rounded-xl border border-amber-200 p-2 sm:p-2.5 md:p-3 shadow-xs min-w-0">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 font-mono tracking-tight truncate tabular-nums">
               {String(timeRemaining.days).padStart(2, "0")}
             </span>
-            <span className="block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5">
+            <span className="block text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5 truncate">
               Days
             </span>
           </div>
 
           {/* Hours */}
-          <div className="bg-white rounded-xl border border-amber-200 p-2.5 sm:p-3 shadow-xs">
-            <span className="block text-2xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
+          <div className="bg-white rounded-xl border border-amber-200 p-2 sm:p-2.5 md:p-3 shadow-xs min-w-0">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 font-mono tracking-tight truncate tabular-nums">
               {String(timeRemaining.hours).padStart(2, "0")}
             </span>
-            <span className="block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5">
+            <span className="block text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5 truncate">
               Hours
             </span>
           </div>
 
           {/* Minutes */}
-          <div className="bg-white rounded-xl border border-amber-200 p-2.5 sm:p-3 shadow-xs">
-            <span className="block text-2xl sm:text-4xl font-black text-slate-900 font-mono tracking-tight">
+          <div className="bg-white rounded-xl border border-amber-200 p-2 sm:p-2.5 md:p-3 shadow-xs min-w-0">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 font-mono tracking-tight truncate tabular-nums">
               {String(timeRemaining.minutes).padStart(2, "0")}
             </span>
-            <span className="block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5">
+            <span className="block text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5 truncate">
               Minutes
             </span>
           </div>
 
           {/* Seconds (Tick Animation) */}
-          <div className="bg-white rounded-xl border border-amber-300 p-2.5 sm:p-3 shadow-xs ring-2 ring-amber-300/40">
-            <span className="block text-2xl sm:text-4xl font-black text-amber-600 font-mono tracking-tight animate-pulse">
+          <div className="bg-white rounded-xl border border-amber-300 p-2 sm:p-2.5 md:p-3 shadow-xs ring-2 ring-amber-300/40 min-w-0">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-amber-600 font-mono tracking-tight animate-pulse truncate tabular-nums">
               {String(timeRemaining.seconds).padStart(2, "0")}
             </span>
-            <span className="block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5">
+            <span className="block text-[9px] sm:text-[11px] md:text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5 truncate">
               Seconds
             </span>
           </div>
@@ -298,9 +298,9 @@ const NocCountdownBanner = ({
 
         {/* Progress Bar & ETA Indicator */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
-            <span>Progress: {progressPercent}% of 14 days elapsed</span>
-            <span>NOC Unlock Date: <strong>{targetDateLabel}</strong></span>
+          <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1 text-[11px] font-semibold text-slate-600">
+            <span className="truncate">Progress: {progressPercent}% of 14 days elapsed</span>
+            <span className="text-slate-700 truncate">NOC Unlock Date: <strong>{targetDateLabel}</strong></span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-amber-200/80">
             <div
@@ -312,14 +312,14 @@ const NocCountdownBanner = ({
 
         {/* Super Admin Instant Bypass Special Action Button */}
         {isSuperAdmin && onBypassClick && (
-          <div className="pt-2 border-t border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white/60 p-3 rounded-xl">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-emerald-600 fill-emerald-600" />
-              <div>
-                <p className="text-xs font-bold text-slate-900">
+          <div className="pt-2 border-t border-amber-200 flex flex-col gap-2.5 bg-white/70 p-3 sm:p-3.5 rounded-xl border border-amber-200/60">
+            <div className="flex items-start gap-2.5">
+              <Zap className="h-4 w-4 text-emerald-600 fill-emerald-600 shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-900 leading-tight">
                   Super Admin Expedited Clearance Override
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
                   Bypass the remaining {timeRemaining.days}d {timeRemaining.hours}h and generate the official NOC immediately.
                 </p>
               </div>
@@ -329,10 +329,10 @@ const NocCountdownBanner = ({
               onClick={onBypassClick}
               disabled={isBypassing}
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-4 shadow-sm shrink-0"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 px-3 h-auto whitespace-normal leading-snug shadow-sm flex items-center justify-center text-center transition-all"
             >
-              <Zap className="h-3.5 w-3.5 mr-1 fill-white" />
-              {isBypassing ? "Generating Instant NOC..." : "⚡ Generate NOC Instantly (Bypass Timer)"}
+              <Zap className="h-3.5 w-3.5 mr-1.5 fill-white shrink-0" />
+              <span>{isBypassing ? "Generating Instant NOC..." : "⚡ Generate NOC Instantly (Bypass Timer)"}</span>
             </Button>
           </div>
         )}
