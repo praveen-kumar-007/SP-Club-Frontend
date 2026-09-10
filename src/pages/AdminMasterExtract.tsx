@@ -11,6 +11,7 @@ import {
     CheckCircle2,
     Database,
     Download,
+    FileCheck,
     FileSpreadsheet,
     History,
     Lock,
@@ -139,6 +140,23 @@ interface FullPlayer {
     attendance?: AttendanceRecord[];
     feeAccessEnabled?: boolean;
     feePayments?: FeePaymentRecord[];
+    noc?: {
+        status?: "none" | "applied" | "approved" | "relieved";
+        appliedAt?: string;
+        coolingEndsAt?: string;
+        generatedAt?: string;
+        expiresAt?: string;
+        nocNumber?: string;
+        reason?: string;
+        destinationClub?: string;
+        appliedByAdmin?: { _id?: string; username?: string; email?: string; role?: string };
+        generatedByAdmin?: { _id?: string; username?: string; email?: string; role?: string };
+        isBypassed?: boolean;
+        bypassedBy?: { _id?: string; username?: string; email?: string; role?: string };
+        digitalSignatureHash?: string;
+        downloadCount?: number;
+        lastDownloadedAt?: string;
+    };
 }
 
 const AdminMasterExtract = () => {
@@ -170,6 +188,7 @@ const AdminMasterExtract = () => {
     } | null>(null);
 
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [nocFilter, setNocFilter] = useState<string>("all");
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [extractTimestamp] = useState<string>(new Date().toLocaleString("en-IN", {
         timeZone: "Asia/Kolkata",
@@ -276,16 +295,26 @@ const AdminMasterExtract = () => {
     }, [token, selectedPlayerId, viewMode, fetchSinglePlayerDossier]);
 
     const filteredPlayers = useMemo(() => {
-        if (!searchQuery.trim()) return playersList;
+        let list = playersList;
+        if (nocFilter === "cooling") {
+            list = list.filter((p) => p.noc?.status === "applied");
+        } else if (nocFilter === "issued") {
+            list = list.filter((p) => p.noc?.status === "approved" || p.noc?.status === "relieved");
+        } else if (nocFilter === "none") {
+            list = list.filter((p) => !p.noc || p.noc.status === "none" || !p.noc.status);
+        }
+
+        if (!searchQuery.trim()) return list;
         const q = searchQuery.toLowerCase().trim();
-        return playersList.filter((p) =>
+        return list.filter((p) =>
             (p.name && p.name.toLowerCase().includes(q)) ||
             (p.email && p.email.toLowerCase().includes(q)) ||
             (p.phone && p.phone.includes(q)) ||
             (p.aadharNumber && p.aadharNumber.includes(q)) ||
-            (p.idCardNumber && p.idCardNumber.toLowerCase().includes(q))
+            (p.idCardNumber && p.idCardNumber.toLowerCase().includes(q)) ||
+            (p.noc?.nocNumber && p.noc.nocNumber.toLowerCase().includes(q))
         );
-    }, [playersList, searchQuery]);
+    }, [playersList, searchQuery, nocFilter]);
 
     const selectedPlayer = useMemo(() => {
         if (singlePlayerData?.player && singlePlayerData.player._id === selectedPlayerId) {
@@ -498,23 +527,49 @@ const AdminMasterExtract = () => {
                                 </button>
                             </div>
 
-                            {/* Status Filter */}
-                            <div className="flex items-center gap-1.5 text-xs">
-                                <span className="text-slate-500 font-medium">Status:</span>
-                                {["all", "approved", "pending", "rejected"].map((st) => (
-                                    <button
-                                        key={st}
-                                        type="button"
-                                        onClick={() => setStatusFilter(st)}
-                                        className={`px-2.5 py-1 rounded-md capitalize font-medium transition ${
-                                            statusFilter === st
-                                                ? "bg-blue-600 text-white"
-                                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                        }`}
-                                    >
-                                        {st}
-                                    </button>
-                                ))}
+                            <div className="flex flex-wrap items-center gap-3">
+                                {/* Status Filter */}
+                                <div className="flex items-center gap-1.5 text-xs">
+                                    <span className="text-slate-500 font-medium">Status:</span>
+                                    {["all", "approved", "pending", "rejected"].map((st) => (
+                                        <button
+                                            key={st}
+                                            type="button"
+                                            onClick={() => setStatusFilter(st)}
+                                            className={`px-2.5 py-1 rounded-md capitalize font-medium transition ${
+                                                statusFilter === st
+                                                    ? "bg-blue-600 text-white"
+                                                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            {st}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* NOC Clearance Filter */}
+                                <div className="flex items-center gap-1.5 text-xs border-l border-slate-200 pl-3">
+                                    <span className="text-slate-500 font-medium">NOC:</span>
+                                    {[
+                                        { id: "all", label: "All" },
+                                        { id: "cooling", label: "14d Cooling" },
+                                        { id: "issued", label: "NOC Issued" },
+                                        { id: "none", label: "No NOC" },
+                                    ].map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            type="button"
+                                            onClick={() => setNocFilter(tab.id)}
+                                            className={`px-2.5 py-1 rounded-md text-xs font-medium transition ${
+                                                nocFilter === tab.id
+                                                    ? "bg-indigo-600 text-white"
+                                                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            {tab.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
@@ -580,7 +635,7 @@ const AdminMasterExtract = () => {
                                         Official Player Dossier & Master Record Extraction Ledger
                                     </p>
                                     <p className="text-[11px] text-slate-600 mt-0.5">
-                                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Compliant with AKFI Standards
+                                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • SP Sports Academy Central Registry
                                     </p>
                                     <p className="text-[10px] text-slate-500">
                                         Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me • Phone: +91 8271882034
@@ -813,6 +868,141 @@ const AdminMasterExtract = () => {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Section 2C: Official No Objection Certificate (NOC) & Clearance Record */}
+                            <div className="pdf-card border border-slate-200 rounded-lg p-4 bg-white">
+                                <div className="flex items-center justify-between gap-2 mb-3 border-b pb-2">
+                                    <h2 className="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                                        <FileCheck size={16} className="text-indigo-600" />
+                                        <span>No Objection Certificate (NOC) & Clearance Record</span>
+                                    </h2>
+                                    <Badge
+                                        className={
+                                            selectedPlayer.noc?.status === "approved"
+                                                ? "bg-emerald-600 text-white text-[10px] px-2 py-0.5"
+                                                : selectedPlayer.noc?.status === "applied"
+                                                ? "bg-amber-500 text-slate-950 font-bold text-[10px] px-2 py-0.5 animate-pulse"
+                                                : selectedPlayer.noc?.status === "relieved"
+                                                ? "bg-slate-600 text-white text-[10px] px-2 py-0.5"
+                                                : "bg-slate-100 text-slate-700 border border-slate-300 text-[10px] px-2 py-0.5"
+                                        }
+                                    >
+                                        {selectedPlayer.noc?.status === "approved"
+                                            ? "OFFICIAL NOC ISSUED"
+                                            : selectedPlayer.noc?.status === "applied"
+                                            ? "14-DAY COOLING ACTIVE"
+                                            : selectedPlayer.noc?.status === "relieved"
+                                            ? "INSTITUTIONALLY RELIEVED"
+                                            : "NO NOC FILED (ACTIVE)"}
+                                    </Badge>
+                                </div>
+
+                                {selectedPlayer.noc && selectedPlayer.noc.status !== "none" ? (
+                                    <div className="space-y-3">
+                                        <div className="grid grid-cols-3 gap-x-3 gap-y-2.5 text-xs">
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Certificate Number</span>
+                                                <span className="font-bold font-mono text-indigo-950 text-xs">
+                                                    {selectedPlayer.noc.nocNumber || "Pending Issuance"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Clearance Status</span>
+                                                <span className="font-semibold text-slate-800 capitalize">
+                                                    {selectedPlayer.noc.status === "applied" ? "14-Day Cooling in Progress" : selectedPlayer.noc.status || "N/A"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Clearance Authority Mode</span>
+                                                <span className="font-semibold text-slate-800">
+                                                    {selectedPlayer.noc.isBypassed
+                                                        ? "Expedited Super Admin Override"
+                                                        : selectedPlayer.noc.status === "approved"
+                                                        ? "Standard 14-Day Institutional Cooling Completed"
+                                                        : "Standard 14-Day Timeline"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Application Initiated Date</span>
+                                                <span className="font-medium text-slate-800">
+                                                    {selectedPlayer.noc.appliedAt ? formatDateTime(selectedPlayer.noc.appliedAt) : "N/A"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">14-Day Transition Completion</span>
+                                                <span className="font-medium text-amber-900 font-semibold">
+                                                    {selectedPlayer.noc.coolingEndsAt ? formatDateTime(selectedPlayer.noc.coolingEndsAt) : "N/A"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Official Issuance Date</span>
+                                                <span className="font-medium text-emerald-800 font-semibold">
+                                                    {selectedPlayer.noc.generatedAt ? formatDateTime(selectedPlayer.noc.generatedAt) : "Pending Completion"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Archival / Retention Deadline</span>
+                                                <span className="font-medium text-red-700">
+                                                    {selectedPlayer.noc.expiresAt ? formatDateTime(selectedPlayer.noc.expiresAt) : "N/A"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Destination Club / Academy</span>
+                                                <span className="font-semibold text-slate-800">
+                                                    {selectedPlayer.noc.destinationClub || "Not Specified / Open Clearance"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-semibold text-slate-500 uppercase block">Authorized / Certified By</span>
+                                                <span className="font-medium text-slate-800">
+                                                    {selectedPlayer.noc.bypassedBy?.username
+                                                        ? `${selectedPlayer.noc.bypassedBy.username} (Super Admin)`
+                                                        : selectedPlayer.noc.generatedByAdmin?.username
+                                                        ? `${selectedPlayer.noc.generatedByAdmin.username} (${selectedPlayer.noc.generatedByAdmin.role || "Admin"})`
+                                                        : selectedPlayer.noc.appliedByAdmin?.username
+                                                        ? `${selectedPlayer.noc.appliedByAdmin.username} (${selectedPlayer.noc.appliedByAdmin.role || "Admin"})`
+                                                        : "SP Sports Academy Authority"}
+                                                </span>
+                                            </div>
+                                            {selectedPlayer.noc.reason && (
+                                                <div className="col-span-3 bg-slate-50 border border-slate-200 p-2.5 rounded">
+                                                    <strong className="block text-[10px] uppercase text-slate-600 mb-0.5">Application Reason / Statement:</strong>
+                                                    <p className="text-slate-800 italic text-xs">{selectedPlayer.noc.reason}</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Cryptographic & Audit Box */}
+                                        <div className="border border-slate-200 rounded p-2.5 bg-slate-50 text-[11px] font-mono text-slate-700 space-y-1">
+                                            <div className="flex flex-wrap justify-between items-center gap-1">
+                                                <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">Digital Certificate Hash:</span>
+                                                <span className="font-bold text-slate-900 break-all text-[10px]">
+                                                    {selectedPlayer.noc.digitalSignatureHash || "GENERATION_IN_PROGRESS"}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap justify-between items-center gap-1 pt-1 border-t border-slate-200">
+                                                <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">Download Audit & Dossier Logs:</span>
+                                                <span className="text-slate-800 font-sans">
+                                                    Downloaded <strong>{selectedPlayer.noc.downloadCount || 0} times</strong>
+                                                    {selectedPlayer.noc.lastDownloadedAt && ` • Last: ${formatDateTime(selectedPlayer.noc.lastDownloadedAt)}`}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                                        <div>
+                                            <p className="font-semibold text-slate-800">No Clearance or NOC Requested</p>
+                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                                This player is an active trainee in good standing with SP Sports Academy. No transfer, relief, or NOC cooling procedures have been initiated.
+                                            </p>
+                                        </div>
+                                        <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 font-bold shrink-0">
+                                            ACTIVE TRAINEE ✓
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Section 3: Attendance Analytics & Complete Detailed Log */}
                             <div className="border border-slate-200 rounded-lg p-4 bg-white">
@@ -1179,7 +1369,7 @@ const AdminMasterExtract = () => {
                         /* ========================================================================= */
                         <div className="space-y-6">
                             {/* Metrics Summary Header */}
-                            <div className="pdf-card grid grid-cols-4 gap-3">
+                            <div className="pdf-card grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                                 <div className="p-3 bg-slate-50 border rounded-lg text-center">
                                     <span className="text-xs text-slate-500 font-semibold block uppercase">Total Registrations</span>
                                     <span className="text-2xl font-black text-slate-900">{filteredPlayers.length}</span>
@@ -1202,6 +1392,18 @@ const AdminMasterExtract = () => {
                                         {filteredPlayers.filter((p) => p.status === "rejected").length}
                                     </span>
                                 </div>
+                                <div className="p-3 bg-amber-50/70 border border-amber-300 rounded-lg text-center">
+                                    <span className="text-xs text-amber-800 font-semibold block uppercase">14d NOC Cooling</span>
+                                    <span className="text-2xl font-black text-amber-900">
+                                        {filteredPlayers.filter((p) => p.noc?.status === "applied").length}
+                                    </span>
+                                </div>
+                                <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-center">
+                                    <span className="text-xs text-indigo-700 font-semibold block uppercase">NOC Issued / Relieved</span>
+                                    <span className="text-2xl font-black text-indigo-900">
+                                        {filteredPlayers.filter((p) => p.noc?.status === "approved" || p.noc?.status === "relieved").length}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Master Ledger Table */}
@@ -1209,45 +1411,46 @@ const AdminMasterExtract = () => {
                                 <table className="w-full text-left text-xs border-collapse table-fixed">
                                     <thead className="bg-slate-900 text-white">
                                         <tr>
-                                            <th className="py-2.5 px-2.5 w-8 text-center">#</th>
-                                            <th className="py-2.5 px-2.5 w-24">ID Card No.</th>
-                                            <th className="py-2.5 px-2.5 w-36">Player Name</th>
-                                            <th className="py-2.5 px-2.5 w-28">Father's Name</th>
-                                            <th className="py-2.5 px-2.5 w-36">Contact Details</th>
-                                            <th className="py-2.5 px-2.5 w-28">Aadhar No.</th>
-                                            <th className="py-2.5 px-2.5 w-28">Role / Age Group</th>
-                                            <th className="py-2.5 px-2.5 w-20 text-center">Status</th>
-                                            <th className="py-2.5 px-2.5 w-24 text-center">Attendance</th>
-                                            <th className="py-2.5 px-2.5 w-24">Registered At</th>
+                                            <th className="py-2.5 px-2 w-7 text-center">#</th>
+                                            <th className="py-2.5 px-2 w-24">ID Card No.</th>
+                                            <th className="py-2.5 px-2 w-32">Player Name</th>
+                                            <th className="py-2.5 px-2 w-24">Father's Name</th>
+                                            <th className="py-2.5 px-2 w-32">Contact Details</th>
+                                            <th className="py-2.5 px-2 w-24">Aadhar No.</th>
+                                            <th className="py-2.5 px-2 w-24">Role / Group</th>
+                                            <th className="py-2.5 px-2 w-18 text-center">Status</th>
+                                            <th className="py-2.5 px-2 w-28 text-center">NOC Clearance</th>
+                                            <th className="py-2.5 px-2 w-20 text-center">Attendance</th>
+                                            <th className="py-2.5 px-2 w-20">Registered At</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200 text-slate-800">
                                         {filteredPlayers.map((player, index) => (
                                             <tr key={player._id} className="pdf-card-row hover:bg-slate-50">
-                                                <td className="py-2 px-2.5 font-semibold text-center">{index + 1}</td>
-                                                <td className="py-2 px-2.5 font-mono font-bold text-blue-700">
+                                                <td className="py-2 px-2 font-semibold text-center">{index + 1}</td>
+                                                <td className="py-2 px-2 font-mono font-bold text-blue-700">
                                                     {player.idCardNumber || "—"}
                                                 </td>
-                                                <td className="py-2 px-2.5 font-semibold text-slate-900">
+                                                <td className="py-2 px-2 font-semibold text-slate-900">
                                                     {player.name}
                                                     <span className="block text-[10px] text-slate-500 font-normal">
                                                         {player.gender} • Blood: {player.bloodGroup || "N/A"}
                                                     </span>
                                                 </td>
-                                                <td className="py-2 px-2.5 text-slate-700 truncate">{player.fathersName}</td>
-                                                <td className="py-2 px-2.5">
-                                                    <span className="font-mono block">{player.phone}</span>
-                                                    <span className="text-[10px] text-slate-500 block truncate max-w-[130px]">
+                                                <td className="py-2 px-2 text-slate-700 truncate">{player.fathersName}</td>
+                                                <td className="py-2 px-2">
+                                                    <span className="font-mono block text-[11px]">{player.phone}</span>
+                                                    <span className="text-[10px] text-slate-500 block truncate max-w-[120px]">
                                                         {player.email}
                                                     </span>
                                                 </td>
-                                                <td className="py-2 px-2.5 font-mono">{player.aadharNumber}</td>
-                                                <td className="py-2 px-2.5 capitalize">
+                                                <td className="py-2 px-2 font-mono text-[11px]">{player.aadharNumber}</td>
+                                                <td className="py-2 px-2 capitalize">
                                                     <span className="font-medium block">{player.role}</span>
                                                     <span className="text-[10px] text-slate-500 block">{player.ageGroup || "N/A"}</span>
                                                 </td>
-                                                <td className="py-2 px-2.5 text-center">
-                                                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                                <td className="py-2 px-2 text-center">
+                                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
                                                         player.status === "approved"
                                                             ? "bg-emerald-100 text-emerald-800"
                                                             : player.status === "pending"
@@ -1257,10 +1460,44 @@ const AdminMasterExtract = () => {
                                                         {player.status}
                                                     </span>
                                                 </td>
-                                                <td className="py-2 px-2.5 font-medium text-center">
-                                                    {player.attendance?.length || 0} sessions
+                                                <td className="py-2 px-2 text-center">
+                                                    {player.noc?.status === "approved" ? (
+                                                        <div className="space-y-0.5">
+                                                            <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                                Issued ✓
+                                                            </span>
+                                                            <span className="block font-mono text-[9px] font-bold text-emerald-700 truncate max-w-[110px] mx-auto" title={player.noc.nocNumber}>
+                                                                {player.noc.nocNumber || "YES"}
+                                                            </span>
+                                                        </div>
+                                                    ) : player.noc?.status === "applied" ? (
+                                                        <div className="space-y-0.5">
+                                                            <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-300">
+                                                                14d Cooling
+                                                            </span>
+                                                            <span className="block text-[9px] text-amber-700 font-medium">
+                                                                In Transition
+                                                            </span>
+                                                        </div>
+                                                    ) : player.noc?.status === "relieved" ? (
+                                                        <div className="space-y-0.5">
+                                                            <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-slate-200 text-slate-800">
+                                                                Relieved
+                                                            </span>
+                                                            {player.noc.nocNumber && (
+                                                                <span className="block font-mono text-[9px] text-slate-600 truncate max-w-[110px] mx-auto">
+                                                                    {player.noc.nocNumber}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-[10px]">Active</span>
+                                                    )}
                                                 </td>
-                                                <td className="py-2 px-2.5 text-slate-500 text-[11px] whitespace-nowrap">
+                                                <td className="py-2 px-2 font-medium text-center">
+                                                    {player.attendance?.length || 0}
+                                                </td>
+                                                <td className="py-2 px-2 text-slate-500 text-[10px] whitespace-nowrap">
                                                     {formatDate(player.registeredAt)}
                                                 </td>
                                             </tr>
