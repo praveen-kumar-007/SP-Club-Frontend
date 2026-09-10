@@ -111,7 +111,9 @@ interface FullPlayer {
     kabaddiPositions?: string[];
     clubDetails?: string;
     kitSize?: string;
+    kitSizeSelectedAt?: string;
     jerseyNumber?: number;
+    jerseyAssignedAt?: string;
     message?: string;
     photo?: string;
     certificates?: CertificateRecord[];
@@ -750,11 +752,23 @@ const AdminMasterExtract = () => {
                                     </div>
                                     <div>
                                         <span className="text-[10px] font-semibold text-slate-500 uppercase block">ID Card Generated Date</span>
-                                        <span className="font-medium text-slate-800">{formatDate(selectedPlayer.idCardGeneratedAt)}</span>
+                                        <span className="font-medium text-slate-800">{formatDate(selectedPlayer.idCardGeneratedAt || selectedPlayer.registeredAt)}</span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] font-semibold text-slate-500 uppercase block">ID Card Assigned Role</span>
                                         <span className="font-medium text-slate-800">{selectedPlayer.idCardRole || selectedPlayer.role}</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-semibold text-slate-500 uppercase block">Kit Size Selection Date</span>
+                                        <span className="font-medium text-slate-800">
+                                            {selectedPlayer.kitSize ? formatDate(selectedPlayer.kitSizeSelectedAt || selectedPlayer.registeredAt) : "N/A"}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-semibold text-slate-500 uppercase block">Jersey Assigned Date</span>
+                                        <span className="font-medium text-slate-800">
+                                            {selectedPlayer.jerseyNumber ? formatDate(selectedPlayer.jerseyAssignedAt || selectedPlayer.registeredAt) : "N/A"}
+                                        </span>
                                     </div>
                                     <div>
                                         <span className="text-[10px] font-semibold text-slate-500 uppercase block">Consent & Preferences</span>

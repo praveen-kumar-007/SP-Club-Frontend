@@ -20,7 +20,11 @@ interface PlayerRow {
   idCardNumber: string;
   gender: string;
   kitSize?: string;
+  kitSizeSelectedAt?: string;
   jerseyNumber?: number;
+  jerseyAssignedAt?: string;
+  idCardGeneratedAt?: string;
+  registeredAt?: string;
   clubDetails?: string;
   aadharNumber?: string;
   address?: string;
@@ -242,7 +246,14 @@ const AdminPlayers = () => {
                               ))}
                             </select>
                           ) : (
-                            formatKitSizeWithRange(player.kitSize, "-")
+                            <div>
+                              <span>{formatKitSizeWithRange(player.kitSize, "-")}</span>
+                              {player.kitSize && (player.kitSizeSelectedAt || player.registeredAt) && (
+                                <span className="block text-[10px] text-slate-500">
+                                  {new Date(player.kitSizeSelectedAt || player.registeredAt || "").toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -256,10 +267,26 @@ const AdminPlayers = () => {
                               onChange={(e) => setEditingJerseyNumber(e.target.value)}
                             />
                           ) : (
-                            player.jerseyNumber ?? "-"
+                            <div>
+                              <span>{player.jerseyNumber ?? "-"}</span>
+                              {player.jerseyNumber && (player.jerseyAssignedAt || player.registeredAt) && (
+                                <span className="block text-[10px] text-slate-500">
+                                  {new Date(player.jerseyAssignedAt || player.registeredAt || "").toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </td>
-                        <td className="px-4 py-3">{player.idCardNumber || "N/A"}</td>
+                        <td className="px-4 py-3">
+                          <div>
+                            <span className="font-mono">{player.idCardNumber || "N/A"}</span>
+                            {player.idCardNumber && (player.idCardGeneratedAt || player.registeredAt) && (
+                              <span className="block text-[10px] text-slate-500">
+                                {new Date(player.idCardGeneratedAt || player.registeredAt || "").toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1 items-start">
                             {player.status === 'approved' ? (

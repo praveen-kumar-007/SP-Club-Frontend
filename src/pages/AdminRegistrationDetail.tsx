@@ -48,6 +48,18 @@ const calculateAgeGroup = (dob: string): string => {
   return 'Over 25';
 };
 
+const formatDisplayDate = (dateStr?: string | Date | null): string => {
+  if (!dateStr) return "N/A";
+  const d = new Date(dateStr);
+  return Number.isNaN(d.getTime())
+    ? "N/A"
+    : d.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+};
+
 interface Registration {
   _id: string;
   name: string;
@@ -78,7 +90,9 @@ interface Registration {
   idCardNumber?: string;
   idCardGeneratedAt?: string;
   kitSize?: string;
+  kitSizeSelectedAt?: string;
   jerseyNumber?: number | null;
+  jerseyAssignedAt?: string;
   noc?: {
     status?: 'none' | 'applied' | 'approved' | 'relieved';
     appliedAt?: string;
@@ -1233,7 +1247,14 @@ const RegistrationDetail = () => {
                       ))}
                     </select>
                   ) : (
-                    <p className="font-medium">{formatKitSizeWithRange(registration.kitSize)}</p>
+                    <>
+                      <p className="font-medium">{formatKitSizeWithRange(registration.kitSize)}</p>
+                      {registration.kitSize ? (
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Selected Date: {formatDisplayDate(registration.kitSizeSelectedAt || registration.registeredAt)}
+                        </p>
+                      ) : null}
+                    </>
                   )}
                 </div>
                 <div>
@@ -1247,7 +1268,14 @@ const RegistrationDetail = () => {
                       onChange={(e) => setEditForm((prev) => prev ? { ...prev, jerseyNumber: e.target.value } : prev)}
                     />
                   ) : (
-                    <p className="font-medium">{registration.jerseyNumber ?? "Not assigned"}</p>
+                    <>
+                      <p className="font-medium">{registration.jerseyNumber ?? "Not assigned"}</p>
+                      {registration.jerseyNumber != null ? (
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Assigned Date: {formatDisplayDate(registration.jerseyAssignedAt || registration.registeredAt)}
+                        </p>
+                      ) : null}
+                    </>
                   )}
                 </div>
                 <div>
@@ -1572,7 +1600,7 @@ const RegistrationDetail = () => {
                           </div>
                           <p className="text-lg font-bold text-green-900">{registration.idCardNumber}</p>
                           <p className="text-xs text-green-700">
-                            Generated: {registration.idCardGeneratedAt ? new Date(registration.idCardGeneratedAt).toLocaleDateString() : 'N/A'}
+                            Generated: {formatDisplayDate(registration.idCardGeneratedAt || registration.registeredAt)}
                           </p>
                         </div>
                         <Link to={`/id-card/${registration._id}`} target="_blank">

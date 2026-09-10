@@ -43,9 +43,13 @@ interface PlayerProfile {
     bloodGroup: string;
     gender: string;
     address: string;
-    clubDetails: string;
+    clubDetails?: string;
+    registeredAt?: string;
+    idCardGeneratedAt?: string;
     kitSize?: string;
+    kitSizeSelectedAt?: string;
     jerseyNumber?: number;
+    jerseyAssignedAt?: string;
     status?: string;
     feeAccessEnabled?: boolean;
     photo: string;
@@ -99,6 +103,18 @@ const formatDistanceAway = (distanceMeters: number) => {
     const kilometers = Math.floor(safeDistance / 1000);
     const meters = safeDistance % 1000;
     return `${kilometers} km and ${meters} meter`;
+};
+
+const formatDisplayDate = (dateStr?: string | Date | null): string => {
+    if (!dateStr) return "N/A";
+    const d = new Date(dateStr);
+    return Number.isNaN(d.getTime())
+        ? "N/A"
+        : d.toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+          });
 };
 
 const getCurrentMonth = () => {
@@ -915,10 +931,20 @@ const PlayerDashboard = () => {
                             <div>
                                 <p className="text-xs text-slate-500">Kit Size</p>
                                 <p className="font-medium text-slate-800">{formatKitSizeWithRange(player?.kitSize)}</p>
+                                {player?.kitSize ? (
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        Selected Date: {formatDisplayDate(player.kitSizeSelectedAt || player.registeredAt)}
+                                    </p>
+                                ) : null}
                             </div>
                             <div>
                                 <p className="text-xs text-slate-500">Jersey Number</p>
                                 <p className="font-medium text-slate-800">{player?.jerseyNumber ?? "Not assigned"}</p>
+                                {player?.jerseyNumber != null ? (
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        Assigned Date: {formatDisplayDate(player.jerseyAssignedAt || player.registeredAt)}
+                                    </p>
+                                ) : null}
                             </div>
                             <div className="sm:col-span-2">
                                 {editingKitDetails ? (
@@ -1011,6 +1037,11 @@ const PlayerDashboard = () => {
                             <p className="text-sm text-slate-600">
                                 ID Card Number: <span className="font-semibold text-slate-800">{player?.idCardNumber || "Not generated"}</span>
                             </p>
+                            {player?.idCardNumber ? (
+                                <p className="text-xs text-slate-600">
+                                    ID Card Generated Date: <span className="font-semibold text-slate-800">{formatDisplayDate(player.idCardGeneratedAt || player.registeredAt)}</span>
+                                </p>
+                            ) : null}
                             <Button
                                 variant="outline"
                                 className="w-full sm:w-auto"

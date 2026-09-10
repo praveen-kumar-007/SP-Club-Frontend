@@ -14,6 +14,7 @@ interface MemberData {
   fathersName: string;
   photo: string;
   idCardGeneratedAt: string;
+  registeredAt?: string;
   idCardRole?: string;
   role?: string;
 }
@@ -315,7 +316,7 @@ const IDCardGenerator = () => {
               color: "#444"
             }}>
               <p><strong style={{ color: "#003366" }}>Issued By:</strong> Club Authority</p>
-              <p><strong style={{ color: "#003366" }}>Valid From:</strong> {formatValidDate(memberData.idCardGeneratedAt)}</p>
+              <p><strong style={{ color: "#003366" }}>Valid From:</strong> {formatValidDate(memberData.idCardGeneratedAt || memberData.registeredAt)}</p>
             </div>
             <div style={{
               fontSize: "8px",
