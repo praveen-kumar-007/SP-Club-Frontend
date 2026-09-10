@@ -1850,10 +1850,10 @@ const RegistrationDetail = () => {
                             {registration.noc.nocNumber}
                           </p>
                           <div className="text-[11px] text-emerald-700 space-y-0.5 pt-1 border-t border-emerald-200/60">
-                            <p>Issued: {registration.noc.generatedAt ? new Date(registration.noc.generatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
+                            <p>Issued: {registration.noc.generatedAt ? new Date(registration.noc.generatedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
                             {registration.noc.expiresAt && (
                               <p className="text-amber-800 font-medium">
-                                Archival Deadline: {new Date(registration.noc.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                Archival Deadline: {new Date(registration.noc.expiresAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}
                               </p>
                             )}
                             <p>Downloads: {registration.noc.downloadCount || 0} times</p>
