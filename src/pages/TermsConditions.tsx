@@ -169,7 +169,7 @@ const TermsConditions = () => {
                         <li>Good standing membership record</li>
                       </ul>
                     </li>
-                    <li>The club reserves the right to deny NOC requests if it conflicts with club interests or AKFI regulations.</li>
+                    <li>The academy reviews and coordinates all NOC requests in accordance with SP Sports Academy institutional transition guidelines.</li>
                   </ul>
                 </div>
               </div>

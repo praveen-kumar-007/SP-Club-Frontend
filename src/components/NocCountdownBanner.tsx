@@ -178,28 +178,28 @@ const NocCountdownBanner = ({
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-3.5 text-xs sm:text-sm text-slate-600 max-h-[60vh] overflow-y-auto pr-1">
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 font-medium leading-relaxed">
-                    Under standard SP Sports Academy and Amateur Kabaddi Federation of India (AKFI) regulations, a mandatory <strong>14-day institutional cooling period</strong> applies to all official No Objection Certificate (NOC) requests.
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 text-xs sm:text-sm leading-relaxed">
+                    As per the institutional guidelines of <strong>SP Sports Academy</strong>, a standard <strong>14-day cooling and transition period</strong> is observed for all official No Objection Certificate (NOC) requests. This ensures a smooth handover, proper clearance of academy equipment and records, and a gentle transition for the player.
                   </div>
 
                   <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">
-                    Clearance Obligations During 14-Day Period:
+                    Clearance & Handover Guidelines (14-Day Transition):
                   </h4>
                   <ul className="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
                     <li>
-                      <strong>Dues & Fee Settlement:</strong> All monthly training fees, tournament contributions, and academy club dues must be fully cleared.
+                      <strong>Dues & Fee Settlement:</strong> Kindly ensure all monthly training contributions and any pending academy dues are cleared.
                     </li>
                     <li>
-                      <strong>Equipment & Kit Surrender:</strong> Academy equipment, official jerseys, and inventory allocated must be surrendered to the equipment manager.
+                      <strong>Equipment & Kit Handover:</strong> Academy training kits, jerseys, and equipment assigned to the member should be handed over to the equipment manager.
                     </li>
                     <li>
-                      <strong>Disciplinary Clearance:</strong> Verification of zero active disciplinary actions or contractual tournament commitments.
+                      <strong>Administrative Clearance:</strong> Verification of zero active disciplinary actions or pending tournament commitments.
                     </li>
                     <li>
-                      <strong>Automated Issuance:</strong> Once the 14-day countdown completes, the official computer-generated NOC with institutional letterhead and cryptographic hash will unlock immediately.
+                      <strong>Automated Issuance:</strong> Once the 14-day countdown completes, the official computer-generated NOC on SP Sports Academy letterhead with cryptographic hash will unlock immediately.
                     </li>
                     <li>
-                      <strong>Post-Issuance Download Window:</strong> The member receives a 14-day window to download their official certificate and dossiers before profile credentials are automatically archived.
+                      <strong>Post-Issuance Download Window:</strong> The member receives a convenient 14-day window to download their official certificate and dossiers before profile credentials are archived.
                     </li>
                   </ul>
 
