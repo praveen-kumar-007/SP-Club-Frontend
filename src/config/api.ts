@@ -65,6 +65,7 @@ export const API_ENDPOINTS = {
   ADMIN_NOC_APPLY: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/apply`,
   ADMIN_NOC_BYPASS: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/bypass-generate`,
   ADMIN_NOC_CANCEL: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/cancel`,
+  ADMIN_NOC_RESEND_EMAIL: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/resend-email`,
   ADMIN_NOC_CERTIFICATE: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/noc/certificate`,
   PLAYER_NOC_CERTIFICATE: `${API_BASE_URL}/api/player/noc/certificate`,
   PLAYER_NOC_DOWNLOADED: `${API_BASE_URL}/api/player/noc/downloaded`,

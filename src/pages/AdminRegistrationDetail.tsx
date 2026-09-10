@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X, FileCheck, Clock, ShieldCheck, Award } from "lucide-react";
+import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X, FileCheck, Clock, ShieldCheck, Award, Mail } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
@@ -327,6 +327,38 @@ const RegistrationDetail = () => {
       });
     } finally {
       setIsCancellingNoc(false);
+    }
+  };
+
+  const [isResendingNocEmail, setIsResendingNocEmail] = useState(false);
+
+  const handleResendNocEmail = async () => {
+    if (!token || !id) return;
+    setIsResendingNocEmail(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_RESEND_EMAIL(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to resend NOC email");
+      }
+      toast({
+        title: "NOC Email Sent",
+        description: data.message || "Official notice email has been resent to member and CC/BCC recipients.",
+      });
+    } catch (err: unknown) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not resend NOC email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResendingNocEmail(false);
     }
   };
 
@@ -948,7 +980,22 @@ const RegistrationDetail = () => {
               <p className="text-gray-500 text-xs sm:text-sm truncate">{registration.email}</p>
             </div>
           </div>
-          <div className="self-start sm:self-auto shrink-0">{getStatusBadge(registration.status)}</div>
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+            {registration.noc?.status && registration.noc.status !== "none" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-indigo-300 bg-indigo-50/50 text-indigo-800 hover:bg-indigo-100 font-semibold text-xs h-8"
+                onClick={handleResendNocEmail}
+                disabled={isResendingNocEmail}
+                title="Resend NOC email with CC and BCC integration"
+              >
+                <Mail className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+                {isResendingNocEmail ? "Sending Notice..." : "Resend NOC Mail"}
+              </Button>
+            )}
+            {getStatusBadge(registration.status)}
+          </div>
         </div>
       </div>
 
@@ -1758,6 +1805,35 @@ const RegistrationDetail = () => {
                           onCancelClick={handleCancelNoc}
                           onComplete={fetchRegistration}
                         />
+
+                        {/* Direct Resend NOC Notice Email Section */}
+                        <div className="bg-indigo-50/80 border border-indigo-200 rounded-lg p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-indigo-950 flex items-center gap-1.5">
+                              <Mail className="w-3.5 h-3.5 text-indigo-600" />
+                              NOC Notice Email
+                            </span>
+                            <span className="text-[10px] bg-indigo-200/80 text-indigo-900 font-semibold px-2 py-0.5 rounded-full">
+                              CC & BCC Integrated
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-600 leading-snug">
+                            Resend the official 14-day institutional cooling notification directly to player and administrative archives:
+                          </p>
+                          <div className="text-[10px] text-slate-600 bg-white/90 rounded p-2 border border-indigo-100 font-mono space-y-0.5">
+                            <div><strong className="text-slate-800">To:</strong> {registration.email}</div>
+                            <div><strong className="text-slate-800">CC:</strong> pappukrpappu.1234@gmail.com, spkabaddigroupdhanbad@gmail.com</div>
+                            <div><strong className="text-slate-800">BCC:</strong> praveen.pr105@gmail.com</div>
+                          </div>
+                          <Button
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-xs"
+                            onClick={handleResendNocEmail}
+                            disabled={isResendingNocEmail}
+                          >
+                            <Mail className="w-3.5 h-3.5 mr-1.5" />
+                            {isResendingNocEmail ? "Resending Notice Email..." : "Resend NOC Notice Email"}
+                          </Button>
+                        </div>
                       </div>
                     )}
 
@@ -1790,6 +1866,15 @@ const RegistrationDetail = () => {
                         >
                           <Download className="w-4 h-4 mr-2" />
                           {isLoadingNocCert ? "Downloading 1-Page NOC..." : "Download Official NOC (PDF)"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-medium"
+                          onClick={handleResendNocEmail}
+                          disabled={isResendingNocEmail}
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          {isResendingNocEmail ? "Resending Email..." : "Resend NOC Issuance Email"}
                         </Button>
                       </div>
                     )}
