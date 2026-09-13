@@ -98,8 +98,7 @@ const AdminMailCenter = () => {
     const [testFathersName, setTestFathersName] = useState<string>("Rajendra Sharma");
     const [testPhone, setTestPhone] = useState<string>("9876543210");
     const [testRole, setTestRole] = useState<string>("Kabaddi Player (Raider)");
-    const [testTempRegId, setTestTempRegId] = useState<string>("TEMP-SP-DEMO89");
-    const [testIsTemporary, setTestIsTemporary] = useState<boolean>(true);
+    const [testTempRegId, setTestTempRegId] = useState<string>("SP-REG-104829");
     const [testDaysElapsed, setTestDaysElapsed] = useState<number>(6);
     const [testDocuments, setTestDocuments] = useState<string[]>(DEFAULT_DOCUMENTS);
     const [newDocText, setNewDocText] = useState<string>("");
@@ -358,13 +357,9 @@ const AdminMailCenter = () => {
             setTestPhone(cand.phone || "");
             setTestRole(cand.role || "Kabaddi Player");
             if (cand.idCardNumber) {
-                setTestTempRegId(testIsTemporary ? `TEMP-${cand.idCardNumber}` : cand.idCardNumber);
+                setTestTempRegId(cand.idCardNumber);
             } else {
-                setTestTempRegId(
-                    testIsTemporary
-                        ? `TEMP-SP-${cand._id.slice(-6).toUpperCase()}`
-                        : `SP-REG-${cand._id.slice(-6).toUpperCase()}`
-                );
+                setTestTempRegId(`SP-REG-${cand._id.slice(-6).toUpperCase()}`);
             }
         }
     };
@@ -425,8 +420,7 @@ const AdminMailCenter = () => {
                         role: testRole.trim() || "Player",
                     },
                     playerId: selectedCandidateId || undefined,
-                    tempRegId: testTempRegId.trim() || "TEMP-SP-TEST",
-                    isTemporary: testIsTemporary,
+                    tempRegId: testTempRegId.trim() || "SP-REG-104829",
                     daysElapsed: Number(testDaysElapsed) || 6,
                     documents: testDocuments,
                     customReason: testCustomReason.trim(),
@@ -436,12 +430,12 @@ const AdminMailCenter = () => {
             const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.message || "Failed to dispatch test email");
+                throw new Error(data.message || "Failed to dispatch email");
             }
 
             toast({
-                title: "Test Mail Sent Successfully! ✉️",
-                description: `Sent "${testMailType}" template to ${testRecipientEmail.trim()} with Ref: ${testTempRegId}`,
+                title: "Email Sent Successfully! ✉️",
+                description: `Dispatched "${testMailType}" template to ${testRecipientEmail.trim()} with Ref: ${testTempRegId}`,
             });
         } catch (error) {
             toast({
@@ -707,25 +701,25 @@ const AdminMailCenter = () => {
                 <Tabs defaultValue="test_suite" className="space-y-6">
                     <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-200 p-1">
                         <TabsTrigger value="test_suite" className="font-semibold text-xs sm:text-sm">
-                            🧪 Mail Testing & Simulator
+                            🎯 Template Dispatch & Manual Send
                         </TabsTrigger>
                         <TabsTrigger value="broadcast" className="font-semibold text-xs sm:text-sm">
                             📢 Broadcast Compose
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* TAB 1: MAIL TESTING & SIMULATOR SUITE */}
+                    {/* TAB 1: TEMPLATE DISPATCH & MANUAL SEND */}
                     <TabsContent value="test_suite" className="space-y-6">
                         <Card className="border border-blue-200 shadow-sm">
                             <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50/50 border-b border-blue-100">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                     <div>
                                         <CardTitle className="text-lg text-blue-950 flex items-center gap-2">
-                                            <span>Email Template Testing & Manual Dispatch Suite</span>
-                                            <Badge className="bg-blue-600 text-white text-[10px]">Interactive</Badge>
+                                            <span>Targeted Template & Manual Email Dispatch</span>
+                                            <Badge className="bg-blue-600 text-white text-[10px]">Official Dispatch</Badge>
                                         </CardTitle>
                                         <CardDescription className="text-xs text-slate-600 mt-1">
-                                            Test any system email template (Verification Reminder, 30-Day Rejection, Processing, Approval) with dummy inputs or select an existing player.
+                                            Dispatch any official system email template (Verification Reminder, 30-Day Rejection, Processing, Approval, Birthday) directly with custom details or by selecting a candidate.
                                         </CardDescription>
                                     </div>
                                     <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-blue-200 shadow-xs">
@@ -881,51 +875,35 @@ const AdminMailCenter = () => {
                                         <div className="space-y-1.5">
                                             <Label htmlFor="testEmail" className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
                                                 <Mail size={13} className="text-blue-600" />
-                                                <span>Target Test Email Address (Where to send this email): *</span>
+                                                <span>Target Recipient Email Address: *</span>
                                             </Label>
                                             <Input
                                                 id="testEmail"
-                                                placeholder="e.g. your_email@gmail.com or candidate email"
+                                                placeholder="e.g. candidate_email@gmail.com"
                                                 value={testRecipientEmail}
                                                 onChange={(e) => setTestRecipientEmail(e.target.value)}
                                                 className="bg-white border-blue-300 font-mono text-xs"
                                             />
                                             <p className="text-[11px] text-slate-500">
-                                                You can enter your own personal email to test or the player's registered address.
+                                                Enter the target recipient email address where this official notification should be delivered.
                                             </p>
                                         </div>
 
                                         {/* Registration Number Mode */}
                                         <div className="space-y-1.5">
-                                            <div className="flex items-center justify-between">
-                                                <Label htmlFor="tempRegId" className="font-bold text-xs text-slate-700">
-                                                    Application / Registration Reference Number:
-                                                </Label>
-                                                <div className="flex items-center gap-1.5">
-                                                    <Checkbox
-                                                        id="isTempCheck"
-                                                        checked={testIsTemporary}
-                                                        onCheckedChange={(v) => {
-                                                            const isChecked = Boolean(v);
-                                                            setTestIsTemporary(isChecked);
-                                                            if (isChecked && !testTempRegId.startsWith("TEMP-")) {
-                                                                setTestTempRegId(`TEMP-${testTempRegId}`);
-                                                            } else if (!isChecked && testTempRegId.startsWith("TEMP-")) {
-                                                                setTestTempRegId(testTempRegId.replace(/^TEMP-/, ""));
-                                                            }
-                                                        }}
-                                                    />
-                                                    <label htmlFor="isTempCheck" className="text-[11px] text-amber-800 font-medium cursor-pointer">
-                                                        Mention as Temporary ID
-                                                    </label>
-                                                </div>
-                                            </div>
+                                            <Label htmlFor="tempRegId" className="font-bold text-xs text-slate-700">
+                                                Application / Registration Reference ID:
+                                            </Label>
                                             <Input
                                                 id="tempRegId"
                                                 value={testTempRegId}
                                                 onChange={(e) => setTestTempRegId(e.target.value)}
                                                 className="bg-white font-mono text-xs"
+                                                placeholder="e.g. SP-REG-104829"
                                             />
+                                            <p className="text-[11px] text-slate-500">
+                                                Official application ID that appears in the letterhead and subject.
+                                            </p>
                                         </div>
                                     </div>
 
@@ -1086,7 +1064,7 @@ const AdminMailCenter = () => {
                                     <div className="flex items-center justify-between border-b pb-2">
                                         <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                             <Info size={14} className="text-blue-600" />
-                                            Live Summary of Selected Test Configuration:
+                                            Live Summary of Selected Dispatch Configuration:
                                         </span>
                                         <Badge variant="outline" className="text-[11px] font-mono">
                                             Template: {testMailType}
@@ -1095,7 +1073,7 @@ const AdminMailCenter = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-700">
                                         <div><strong className="text-slate-900">To Email:</strong> {testRecipientEmail || "(Enter target email above)"}</div>
                                         <div><strong className="text-slate-900">Player:</strong> {testCandidateName}</div>
-                                        <div><strong className="text-slate-900">App ID:</strong> {testTempRegId} {testIsTemporary && "(TEMP)"}</div>
+                                        <div><strong className="text-slate-900">App ID:</strong> {testTempRegId}</div>
                                     </div>
                                     {/* Professional Map & Location Preview Card */}
                                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3.5 space-y-2.5">
@@ -1153,7 +1131,7 @@ const AdminMailCenter = () => {
                                         className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 gap-2 shadow-sm"
                                     >
                                         <Send size={16} className={sendingTestMail ? "animate-pulse" : ""} />
-                                        {sendingTestMail ? "Sending Test Mail..." : "Send Test Mail Now"}
+                                        {sendingTestMail ? "Sending Official Email..." : "Send Official Template Email Now"}
                                     </Button>
                                 </div>
                             </CardContent>
