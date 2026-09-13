@@ -54,10 +54,24 @@ const formatDisplayDate = (dateStr?: string | Date | null): string => {
   return Number.isNaN(d.getTime())
     ? "N/A"
     : d.toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
         day: "numeric",
         month: "short",
         year: "numeric",
       });
+};
+
+const formatDobToInputYMD = (dob?: string | Date): string => {
+  if (!dob) return "";
+  const d = new Date(dob);
+  if (isNaN(d.getTime())) return "";
+  // Ensure we get the YYYY-MM-DD corresponding to Indian Standard Time (Asia/Kolkata)
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 };
 
 interface Registration {
@@ -142,7 +156,7 @@ const toEditForm = (registration: Registration): EditRegistrationForm => ({
   gender: registration.gender || "",
   bloodGroup: registration.bloodGroup || "",
   role: registration.role || "",
-  dob: registration.dob ? new Date(registration.dob).toISOString().split("T")[0] : "",
+  dob: formatDobToInputYMD(registration.dob),
   aadharNumber: registration.aadharNumber || "",
   address: registration.address || "",
   clubDetails: registration.clubDetails || "",

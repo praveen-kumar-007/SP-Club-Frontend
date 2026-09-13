@@ -30,6 +30,7 @@ import {
     UserCheck,
     X,
     AlertTriangle,
+    Cake,
 } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 
@@ -85,7 +86,7 @@ const AdminMailCenter = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Mail Tester & Simulator state
-    const [testMailType, setTestMailType] = useState<"pending_reminder" | "rejection" | "processing" | "approved">(
+    const [testMailType, setTestMailType] = useState<"pending_reminder" | "rejection" | "processing" | "approved" | "birthday">(
         "pending_reminder"
     );
     const [testMode, setTestMode] = useState<"custom" | "select_player">("custom");
@@ -488,6 +489,49 @@ const AdminMailCenter = () => {
         }
     };
 
+    // Run On-Demand Birthday Check in Indian Standard Time (IST)
+    const [runningBirthdayCheck, setRunningBirthdayCheck] = useState<boolean>(false);
+    const handleRunBirthdayCheck = async () => {
+        if (!token) return;
+
+        setRunningBirthdayCheck(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/mail/process-birthdays`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to execute birthday check");
+            }
+
+            const summary = data.summary || {};
+            if (summary.sent) {
+                toast({
+                    title: "Birthdays Found! 🎂",
+                    description: `Found ${summary.count} player(s) with birthday today in IST. Follow-up email sent!`,
+                });
+            } else {
+                toast({
+                    title: "Birthday Check (IST)",
+                    description: summary.message || "No player birthdays today according to Indian Standard Time.",
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Birthday Check Failed",
+                description: error instanceof Error ? error.message : "Error running birthday check",
+                variant: "destructive",
+            });
+        } finally {
+            setRunningBirthdayCheck(false);
+        }
+    };
+
     const handleSend = async () => {
         if (!token) return;
 
@@ -605,7 +649,16 @@ const AdminMailCenter = () => {
                             Broadcast announcements, test and simulate formal notification templates, and trigger automated verification cycles.
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                            variant="outline"
+                            className="bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100 gap-1.5"
+                            onClick={handleRunBirthdayCheck}
+                            disabled={runningBirthdayCheck}
+                        >
+                            <Cake size={14} className={runningBirthdayCheck ? "animate-spin" : ""} />
+                            {runningBirthdayCheck ? "Checking IST..." : "🎂 Check Birthdays (IST)"}
+                        </Button>
                         <Button
                             variant="outline"
                             className="bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 gap-1.5"
@@ -687,7 +740,7 @@ const AdminMailCenter = () => {
                                     <Label className="font-bold text-sm text-slate-800 flex items-center gap-1.5">
                                         <span>1. Select Email Template to Test / Dispatch:</span>
                                     </Label>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                                         <div
                                             onClick={() => setTestMailType("pending_reminder")}
                                             className={`p-3 rounded-xl border cursor-pointer transition ${testMailType === "pending_reminder" ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/20 shadow-xs" : "bg-white hover:bg-slate-50 border-slate-200"}`}
@@ -737,6 +790,19 @@ const AdminMailCenter = () => {
                                             </div>
                                             <p className="text-[11px] text-slate-600 leading-snug">
                                                 Player acceptance confirmation with default login password.
+                                            </p>
+                                        </div>
+
+                                        <div
+                                            onClick={() => setTestMailType("birthday")}
+                                            className={`p-3 rounded-xl border cursor-pointer transition ${testMailType === "birthday" ? "bg-purple-50/80 border-purple-500 ring-2 ring-purple-500/20 shadow-xs" : "bg-white hover:bg-slate-50 border-slate-200"}`}
+                                        >
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs font-bold text-purple-900">Birthday Followup</span>
+                                                <Badge className="bg-purple-600 text-[10px]">🎂 IST Alert</Badge>
+                                            </div>
+                                            <p className="text-[11px] text-slate-600 leading-snug">
+                                                Player birthday notification evaluated strictly in Indian Standard Time (IST).
                                             </p>
                                         </div>
                                     </div>
