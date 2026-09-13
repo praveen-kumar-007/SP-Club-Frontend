@@ -31,8 +31,12 @@ import {
     X,
     AlertTriangle,
     Cake,
+    MapPin,
+    Navigation,
+    ExternalLink,
 } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_DIRECTIONS_LINK, GOOGLE_MAPS_LINK } from "@/config/maps";
 
 interface MailAttachment {
     name: string;
@@ -1076,44 +1080,76 @@ const AdminMailCenter = () => {
                                         <div><strong className="text-slate-900">App ID:</strong> {testTempRegId}</div>
                                     </div>
                                     {/* Professional Map & Location Preview Card */}
-                                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3.5 space-y-2.5">
-                                        <div className="flex items-center justify-between pb-2 border-b border-blue-200">
+                                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3.5 sm:p-4 space-y-3 shadow-xs">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-blue-200">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-base">📍</span>
+                                                <MapPin className="w-5 h-5 text-blue-700 shrink-0" />
                                                 <div>
-                                                    <div className="text-xs font-bold text-blue-950">SP Sports Academy — Campus & Office Location</div>
-                                                    <div className="text-[11px] text-blue-700">Shakti Mandir Path, Dhanbad, Jharkhand 826001</div>
+                                                    <div className="text-xs sm:text-sm font-bold text-blue-950">SP Sports Academy — Campus & Office Location</div>
+                                                    <div className="text-[11px] sm:text-xs text-blue-700 font-medium">Shakti Mandir Path, Dhanbad, Jharkhand 826001</div>
                                                 </div>
                                             </div>
-                                            <span className="text-[10px] uppercase font-bold tracking-wider bg-blue-600 text-white px-2.5 py-0.5 rounded-full">
-                                                SP SPORTS ACADEMY PIN ✓
+                                            <span className="self-start sm:self-auto text-[10px] uppercase font-extrabold tracking-wider bg-blue-600 text-white px-2.5 py-0.5 rounded-full shadow-xs">
+                                                ACADEMY PINNED ✓
                                             </span>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-700 bg-white/80 p-2.5 rounded-lg border border-blue-100">
-                                            <div>
-                                                <span className="text-slate-500 block">GPS Coordinates:</span>
-                                                <span className="font-mono font-bold text-blue-900">23.7811364° N, 86.4234188° E</span>
-                                                <span className="text-emerald-700 font-semibold ml-1.5">(Plus Code: QCJF+F93)</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-slate-500 block">Visiting & Verification Hours:</span>
-                                                <span className="font-bold text-amber-700">02:00 PM – 08:00 PM everyday</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                                            <span className="text-[11px] text-slate-600">
-                                                Includes direct Google Maps directions URL & interactive coordinate pin in all emails.
-                                            </span>
+                                        {/* Embedded Visual Map Preview (Matches outgoing email view) */}
+                                        <div className="w-full rounded-xl overflow-hidden border border-blue-200/80 bg-slate-950 shadow-md">
                                             <a
-                                                href="https://www.google.com/maps/dir/?api=1&destination=23.7811364,86.4234188"
+                                                href={GOOGLE_MAPS_DIRECTIONS_LINK}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="inline-flex items-center gap-1 text-[11px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md shadow-xs transition-colors"
+                                                className="block group relative"
                                             >
-                                                🧭 Open SP Sports Academy in Google Maps
+                                                <img
+                                                    src="/sp_sports_academy_map.jpg"
+                                                    alt="SP Sports Academy Visual Location Map"
+                                                    className="w-full max-h-[260px] sm:max-h-[300px] object-cover transition-transform duration-300 group-hover:scale-[1.01]"
+                                                />
+                                                <div className="bg-slate-900/95 text-amber-300 text-xs font-bold py-1.5 px-3 text-center border-t border-slate-800 flex items-center justify-center gap-1.5">
+                                                    <Navigation size={13} />
+                                                    <span>Actual Visual Map Card sent in outgoing candidate emails (Click to test Navigation)</span>
+                                                </div>
                                             </a>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 bg-white/90 p-2.5 rounded-lg border border-blue-100">
+                                            <div>
+                                                <span className="text-slate-500 block font-medium">Campus Address:</span>
+                                                <span className="font-semibold text-slate-900">SP Sports Academy, Shakti Mandir Path, Dhanbad 826001</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-slate-500 block font-medium">Visiting & Verification Hours:</span>
+                                                <span className="font-bold text-amber-700">02:00 PM – 08:00 PM everyday</span>
+                                                <span className="text-[11px] text-slate-500 block">(2:00 PM to 8:00 PM daily • All 7 Days)</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
+                                            <span className="text-[11px] text-slate-600">
+                                                Visual map with turn-by-turn navigation is automatically embedded in outgoing official templates.
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <a
+                                                    href={GOOGLE_MAPS_DIRECTIONS_LINK}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center gap-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-md shadow-xs transition-colors"
+                                                >
+                                                    <Navigation size={13} />
+                                                    Get Directions
+                                                </a>
+                                                <a
+                                                    href={GOOGLE_MAPS_LINK}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white border border-blue-200 px-3 py-1.5 rounded-md transition-colors"
+                                                >
+                                                    <ExternalLink size={13} />
+                                                    Full Map
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

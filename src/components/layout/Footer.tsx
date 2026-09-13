@@ -1,11 +1,11 @@
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Send } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Send, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import API_BASE_URL from "@/config/api";
-import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, GOOGLE_MAPS_DIRECTIONS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -225,27 +225,40 @@ const Footer = () => {
           {/* Map Card */}
           <div className="md:col-span-2 xl:col-span-2">
             <h4 className="font-semibold text-xl mb-4 text-amber-400">Find Us</h4>
-            <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
-              <div className="aspect-video">
+            <div className="rounded-xl border border-slate-700 bg-slate-800/90 overflow-hidden shadow-lg">
+              <div className="aspect-video w-full">
                 <iframe
                   title="SP Sports Academy Location"
                   src={GOOGLE_MAPS_EMBED_URL}
-                  className="w-full h-full"
+                  className="w-full h-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen
                 />
               </div>
               <div className="p-4 space-y-3">
-                <p className="text-sm text-slate-300">{SP_KABADDI_LOCATION.address}</p>
-                <a
-                  href={GOOGLE_MAPS_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors"
-                >
-                  Open full map
-                </a>
+                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                  {SP_KABADDI_LOCATION.address}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <a
+                    href={GOOGLE_MAPS_DIRECTIONS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-3 py-1.5 rounded-md transition-colors"
+                  >
+                    <Navigation size={12} />
+                    Directions
+                  </a>
+                  <a
+                    href={GOOGLE_MAPS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors underline-offset-4 hover:underline"
+                  >
+                    Open full map
+                  </a>
+                </div>
               </div>
             </div>
           </div>

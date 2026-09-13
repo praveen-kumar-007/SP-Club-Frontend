@@ -29,10 +29,13 @@ export const GOOGLE_MAPS_API_KEY =
   import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
 export const GOOGLE_MAPS_LINK =
-  "https://www.google.com/maps/search/?api=1&query=QCJF%2BF93+SP+Kabaddi+Group+Dhanbad%2C+Shakti+Mandir+Path%2C+Dhanbad%2C+Jharkhand+826001";
+  "https://www.google.com/maps/search/?api=1&query=23.7811364,86.4234188";
+
+export const GOOGLE_MAPS_DIRECTIONS_LINK =
+  "https://www.google.com/maps/dir/?api=1&destination=23.7811364,86.4234188";
 
 export const GOOGLE_MAPS_EMBED_URL = GOOGLE_MAPS_API_KEY
   ? `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
       SP_KABADDI_LOCATION.query,
     )}`
-  : GOOGLE_MAPS_LINK.replace("/search/?api=1&query=", "/maps?q=");
+  : "https://maps.google.com/maps?q=23.7811364,86.4234188&hl=en&z=16&output=embed";

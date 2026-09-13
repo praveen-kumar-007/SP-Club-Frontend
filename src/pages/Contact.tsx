@@ -7,10 +7,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Navigation, ExternalLink } from "lucide-react";
 import Seo from "@/components/Seo";
 import { API_ENDPOINTS } from "@/config/api";
-import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_LINK, GOOGLE_MAPS_DIRECTIONS_LINK, SP_KABADDI_LOCATION } from "@/config/maps";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -300,30 +300,31 @@ const Contact = () => {
               </Card>
 
               {/* Map Section */}
-              <Card className="bg-[#1e3a5f] border-gray-700 overflow-hidden shadow-xl">
-                <CardHeader className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-950 border-b border-gray-700 py-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-xl md:text-2xl text-white flex items-center gap-2">
+              <Card className="bg-[#1e3a5f] border-gray-700 overflow-hidden shadow-2xl rounded-2xl">
+                <CardHeader className="bg-gradient-to-r from-blue-950 via-[#132845] to-[#1e3a5f] border-b border-gray-700/80 p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="space-y-1">
+                      <CardTitle className="text-xl sm:text-2xl text-white flex items-center gap-2.5">
                         <MapPin className="text-[#facc15] w-6 h-6 shrink-0" />
-                        SP Sports Academy — Campus Location
+                        <span>SP Sports Academy — Campus Location</span>
                       </CardTitle>
-                      <p className="text-xs text-blue-200 mt-1">
+                      <p className="text-xs sm:text-sm text-blue-200/90 font-medium">
                         Shakti Mandir Path, Dhanbad, Jharkhand 826001 • Official Campus & Office
                       </p>
                     </div>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#facc15] text-[#0a192f] shadow-sm">
-                      SP SPORTS ACADEMY PIN ✓
+                    <span className="self-start sm:self-auto inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-[#facc15] text-[#0a192f] shadow-sm tracking-wide">
+                      ACADEMY PINNED ✓
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6 space-y-4">
-                  <div className="overflow-hidden rounded-xl border border-gray-600 bg-[#0a192f] shadow-inner">
-                    <div className="aspect-video relative">
+                <CardContent className="p-4 sm:p-6 space-y-5">
+                  {/* Visual Map Container */}
+                  <div className="overflow-hidden rounded-xl border border-gray-600/80 bg-[#0a192f] shadow-inner relative">
+                    <div className="w-full aspect-[4/3] sm:aspect-video md:aspect-[21/9] min-h-[300px] sm:min-h-[360px]">
                       <iframe
                         title="SP Sports Academy Official Campus Map"
                         src={GOOGLE_MAPS_EMBED_URL}
-                        className="h-full w-full"
+                        className="h-full w-full border-0"
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                         allowFullScreen
@@ -331,29 +332,40 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  {/* Coordinates & Visiting Info Box */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3.5 bg-[#0a192f]/80 rounded-xl border border-blue-900/60 text-xs">
-                    <div>
-                      <span className="text-gray-400 block font-medium">GPS Coordinates & Plus Code:</span>
-                      <span className="font-mono font-bold text-yellow-400 text-sm">
-                        {SP_KABADDI_LOCATION.latitude}° N, {SP_KABADDI_LOCATION.longitude}° E
-                      </span>
-                      <span className="text-blue-300 ml-2">(QCJF+F93 Dhanbad)</span>
+                  {/* Office & Verification Timing Card */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 p-4 bg-[#0a192f]/90 rounded-xl border border-blue-800/50">
+                    <div className="flex items-start space-x-3">
+                      <Clock className="w-5 h-5 text-[#facc15] shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-xs uppercase tracking-wider text-gray-400 block font-semibold">Office & Visiting Hours</span>
+                        <span className="text-sm font-bold text-emerald-400">02:00 PM – 08:00 PM everyday</span>
+                        <span className="text-xs text-gray-300 block mt-0.5">(2:00 PM to 8:00 PM daily • All 7 Days)</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-gray-400 block font-medium">Office & Verification Visiting Hours:</span>
-                      <span className="font-bold text-emerald-400 text-sm">02:00 PM – 08:00 PM everyday</span>
-                      <span className="text-gray-400 block text-[11px]">(2:00 PM to 8:00 PM daily)</span>
+                    <div className="flex items-start space-x-3">
+                      <MapPin className="w-5 h-5 text-[#facc15] shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-xs uppercase tracking-wider text-gray-400 block font-semibold">Campus Address</span>
+                        <span className="text-sm text-gray-200 font-medium block">
+                          SP Sports Academy, Shakti Mandir Path
+                        </span>
+                        <span className="text-xs text-gray-400">Dhanbad, Jharkhand 826001</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
-                    <p className="text-sm text-gray-300">
-                      {mapAddress}
-                    </p>
-                    <Button asChild className="bg-[#facc15] hover:bg-[#eab308] text-[#0a192f] font-bold shadow-md">
-                      <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer">
-                        🧭 Get Directions to SP Sports Academy
+                  {/* Action Buttons to Go There */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                    <Button asChild className="bg-[#facc15] hover:bg-[#eab308] text-[#0a192f] font-bold text-sm shadow-md py-5 flex-1">
+                      <a href={GOOGLE_MAPS_DIRECTIONS_LINK} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                        <Navigation className="w-4 h-4" />
+                        <span>Get Directions to SP Sports Academy</span>
+                      </a>
+                    </Button>
+                    <Button asChild variant="outline" className="border-gray-600 bg-[#0a192f] text-white hover:bg-slate-800 font-semibold text-sm py-5 sm:flex-none">
+                      <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                        <ExternalLink className="w-4 h-4 text-[#facc15]" />
+                        <span>Open in Google Maps</span>
                       </a>
                     </Button>
                   </div>
