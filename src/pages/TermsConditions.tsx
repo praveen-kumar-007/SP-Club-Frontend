@@ -38,7 +38,7 @@ const TermsConditions = () => {
       {/* Main Content */}
       <section className="py-16">
         <div className="container mx-auto px-6 max-w-5xl">
-          
+
           {/* Introduction */}
           <div className="mb-12 p-6 bg-amber-500/10 border border-amber-500/30 rounded-xl">
             <div className="flex items-start gap-4">
@@ -386,8 +386,8 @@ const TermsConditions = () => {
               By completing the registration process and becoming a member of SP Sports Academy, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, as well as all AKFI regulations and guidelines. You further acknowledge that violation of these terms may result in disciplinary action as outlined above.
             </p>
             <div className="mt-6">
-              <a 
-                href="/register" 
+              <a
+                href="/register"
                 className="inline-block px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105"
               >
                 I Agree - Proceed to Registration

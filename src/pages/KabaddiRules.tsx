@@ -568,14 +568,14 @@ const KabaddiRules = () => {
                 All training sessions, practice matches, and tournaments organized by SP Sports Academy follow AKFI guidelines. We believe in developing players who not only excel in skills but also understand and respect the spirit of the game.
               </p>
               <div className="flex flex-wrap gap-4 mt-6">
-                <Link 
-                  to="/register" 
+                <Link
+                  to="/register"
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
                 >
                   Join SP Sports Academy
                 </Link>
-                <Link 
-                  to="/terms-conditions" 
+                <Link
+                  to="/terms-conditions"
                   className="inline-flex items-center px-6 py-3 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition-all duration-300"
                 >
                   View Terms & Conditions

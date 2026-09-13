@@ -1814,7 +1814,7 @@ const RegistrationDetail = () => {
                               NOC Notice Email
                             </span>
                             <span className="text-[10px] bg-indigo-200/80 text-indigo-900 font-semibold px-2 py-0.5 rounded-full">
-                              CC & BCC Integrated
+                              CC Integrated
                             </span>
                           </div>
                           <p className="text-[11px] text-slate-600 leading-snug">
@@ -1823,7 +1823,6 @@ const RegistrationDetail = () => {
                           <div className="text-[10px] text-slate-600 bg-white/90 rounded p-2 border border-indigo-100 font-mono space-y-0.5">
                             <div><strong className="text-slate-800">To:</strong> {registration.email}</div>
                             <div><strong className="text-slate-800">CC:</strong> pappukrpappu.1234@gmail.com, spkabaddigroupdhanbad@gmail.com</div>
-                            <div><strong className="text-slate-800">BCC:</strong> praveen.pr105@gmail.com</div>
                           </div>
                           <Button
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-xs"

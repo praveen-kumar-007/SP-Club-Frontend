@@ -154,8 +154,8 @@ const Contact = () => {
                       <div>
                         <h3 className="font-bold text-lg mb-2">Call Us</h3>
                         <p className="text-gray-300">
-                          Main Office: +91 9876543210<br />
-                          Membership: +91 9876543211
+                          Primary Helpdesk: +91 8271882034<br />
+                          Academy Inquiries: +91 9504904499
                         </p>
                       </div>
                     </div>
@@ -171,9 +171,8 @@ const Contact = () => {
                       <div>
                         <h3 className="font-bold text-lg mb-2">Email Us</h3>
                         <p className="text-gray-300">
-                          General: info@spclub.in<br />
-                          Membership: join@spclub.in<br />
-                          Coaching: coaches@spclub.in
+                          Official Desk: spkabaddigroupdhanbad@gmail.com<br />
+                          Admissions & NOC: info@spkabaddi.me
                         </p>
                       </div>
                     </div>
@@ -187,11 +186,11 @@ const Contact = () => {
                         <Clock className="w-6 h-6 text-[#0a192f]" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg mb-2">Operating Hours</h3>
+                        <h3 className="font-bold text-lg mb-2">Office & Visiting Hours</h3>
                         <p className="text-gray-300">
-                          Monday - Friday: 6:00 AM - 10:00 PM<br />
-                          Saturday - Sunday: 7:00 AM - 9:00 PM<br />
-                          Public Holidays: 8:00 AM - 6:00 PM
+                          Daily Office Hours: 02:00 PM – 08:00 PM everyday<br />
+                          Document Verification: 02:00 PM – 08:00 PM daily<br />
+                          Open 7 Days a Week (Mon – Sun)
                         </p>
                       </div>
                     </div>
@@ -302,15 +301,28 @@ const Contact = () => {
               </Card>
 
               {/* Map Section */}
-              <Card className="bg-[#1e3a5f] border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-white">Find Us on Map</CardTitle>
+              <Card className="bg-[#1e3a5f] border-gray-700 overflow-hidden shadow-xl">
+                <CardHeader className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-950 border-b border-gray-700 py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-xl md:text-2xl text-white flex items-center gap-2">
+                        <MapPin className="text-[#facc15] w-6 h-6 shrink-0" />
+                        SP Sports Academy — Campus Location
+                      </CardTitle>
+                      <p className="text-xs text-blue-200 mt-1">
+                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Official Campus & Office
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#facc15] text-[#0a192f] shadow-sm">
+                      SP SPORTS ACADEMY PIN ✓
+                    </span>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="overflow-hidden rounded-lg border border-gray-600 bg-[#0a192f]">
-                    <div className="aspect-video">
+                <CardContent className="p-4 sm:p-6 space-y-4">
+                  <div className="overflow-hidden rounded-xl border border-gray-600 bg-[#0a192f] shadow-inner">
+                    <div className="aspect-video relative">
                       <iframe
-                        title="SP Sports Academy Map"
+                        title="SP Sports Academy Official Campus Map"
                         src={GOOGLE_MAPS_EMBED_URL}
                         className="h-full w-full"
                         loading="lazy"
@@ -319,13 +331,30 @@ const Contact = () => {
                       />
                     </div>
                   </div>
-                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                  {/* Coordinates & Visiting Info Box */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3.5 bg-[#0a192f]/80 rounded-xl border border-blue-900/60 text-xs">
+                    <div>
+                      <span className="text-gray-400 block font-medium">GPS Coordinates & Plus Code:</span>
+                      <span className="font-mono font-bold text-yellow-400 text-sm">
+                        {SP_KABADDI_LOCATION.latitude}° N, {SP_KABADDI_LOCATION.longitude}° E
+                      </span>
+                      <span className="text-blue-300 ml-2">(QCJF+F93 Dhanbad)</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block font-medium">Office & Verification Visiting Hours:</span>
+                      <span className="font-bold text-emerald-400 text-sm">02:00 PM – 08:00 PM everyday</span>
+                      <span className="text-gray-400 block text-[11px]">(2:00 PM to 8:00 PM daily)</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1">
                     <p className="text-sm text-gray-300">
                       {mapAddress}
                     </p>
-                    <Button asChild className="bg-transparent border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0a192f]">
+                    <Button asChild className="bg-[#facc15] hover:bg-[#eab308] text-[#0a192f] font-bold shadow-md">
                       <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer">
-                        Open in Google Maps
+                        🧭 Get Directions to SP Sports Academy
                       </a>
                     </Button>
                   </div>
