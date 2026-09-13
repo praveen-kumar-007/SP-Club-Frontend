@@ -635,7 +635,7 @@ const AdminMasterExtract = () => {
                                         Official Player Dossier & Master Record Extraction Ledger
                                     </p>
                                     <p className="text-[11px] text-slate-600 mt-0.5">
-                                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • SP Sports Academy Central Registry
+                                        Shakti Mandir Path, Dhanbad, Jharkhand 826001 • SP Sports Academy Central Registry
                                     </p>
                                     <p className="text-[10px] text-slate-500">
                                         Email: spkabaddigroupdhanbad@gmail.com • Web: https://spkabaddi.me • Phone: +91 8271882034

@@ -1038,7 +1038,7 @@ const AdminMailCenter = () => {
                                                 <span className="text-base">📍</span>
                                                 <div>
                                                     <div className="text-xs font-bold text-blue-950">SP Sports Academy — Campus & Office Location</div>
-                                                    <div className="text-[11px] text-blue-700">Shakti Mandir Path, Dhanbad, Jharkhand 826007</div>
+                                                    <div className="text-[11px] text-blue-700">Shakti Mandir Path, Dhanbad, Jharkhand 826001</div>
                                                 </div>
                                             </div>
                                             <span className="text-[10px] uppercase font-bold tracking-wider bg-blue-600 text-white px-2.5 py-0.5 rounded-full">

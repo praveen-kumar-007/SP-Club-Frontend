@@ -136,7 +136,7 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
                   Department of Athletics & Player Development • Dhanbad, Jharkhand
                 </p>
                 <p className="text-[11px] text-slate-600 mt-0.5">
-                  Shakti Mandir Path, Dhanbad – 826007, Jharkhand (India)
+                  Shakti Mandir Path, Dhanbad – 826001, Jharkhand (India)
                 </p>
                 <p className="text-[10px] text-slate-500 mt-0.5">
                   Email: spkabaddigroupdhanbad@gmail.com • Website: https://spkabaddi.me
@@ -335,7 +335,7 @@ export const NocCertificateDocument = forwardRef<HTMLDivElement, { data: NocCert
 
           {/* 8. Institutional Footer */}
           <div className="pt-1 border-t-2 border-slate-900 text-center text-[8.5px] text-slate-500">
-            Shakti Mandir Path, Dhanbad – 826007, Jharkhand • Email: spkabaddigroupdhanbad@gmail.com • Portal: https://spkabaddi.me
+            Shakti Mandir Path, Dhanbad – 826001, Jharkhand • Email: spkabaddigroupdhanbad@gmail.com • Portal: https://spkabaddi.me
             <br />
             (Computer-generated official document under Information Technology Act, 2000. Digitally signed — valid without physical signature or stamp.)
           </div>

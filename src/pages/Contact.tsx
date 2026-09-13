@@ -171,8 +171,7 @@ const Contact = () => {
                       <div>
                         <h3 className="font-bold text-lg mb-2">Email Us</h3>
                         <p className="text-gray-300">
-                          Official Desk: spkabaddigroupdhanbad@gmail.com<br />
-                          Admissions & NOC: info@spkabaddi.me
+                          Official Desk: spkabaddigroupdhanbad@gmail.com
                         </p>
                       </div>
                     </div>
@@ -310,7 +309,7 @@ const Contact = () => {
                         SP Sports Academy — Campus Location
                       </CardTitle>
                       <p className="text-xs text-blue-200 mt-1">
-                        Shakti Mandir Path, Dhanbad, Jharkhand 826007 • Official Campus & Office
+                        Shakti Mandir Path, Dhanbad, Jharkhand 826001 • Official Campus & Office
                       </p>
                     </div>
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#facc15] text-[#0a192f] shadow-sm">
