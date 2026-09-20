@@ -72,6 +72,7 @@ export const API_ENDPOINTS = {
   ADMIN_RECOVERY_GENERATE_LINK: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/recovery/generate-link`,
   ADMIN_RECOVERY_SUBMIT: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/recovery/admin-submit`,
   ADMIN_RECOVERY_REVIEW: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/recovery/review`,
+  ADMIN_RECOVERY_DELETE_LETTER: (id: string) => `${API_BASE_URL}/api/admin/registrations/${id}/recovery/letter`,
   PLAYER_RECOVERY_VERIFY: (token: string) => `${API_BASE_URL}/api/player/recovery/verify/${token}`,
   PLAYER_RECOVERY_SUBMIT: (token: string) => `${API_BASE_URL}/api/player/recovery/submit/${token}`,
   PLAYER_NOC_CERTIFICATE: `${API_BASE_URL}/api/player/noc/certificate`,

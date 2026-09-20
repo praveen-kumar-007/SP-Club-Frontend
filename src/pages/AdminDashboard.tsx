@@ -1037,6 +1037,17 @@ const AdminDashboard = () => {
                                   >
                                     View Details
                                   </Button>
+                                  {reg.recovery?.applicationLetterUrl && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-amber-800 border-amber-300 bg-amber-50 hover:bg-amber-100 font-semibold"
+                                      onClick={() => window.open(reg.recovery?.applicationLetterUrl, "_blank")}
+                                      title="Open and view uploaded re-admission application letter"
+                                    >
+                                      View Application
+                                    </Button>
+                                  )}
                                   {reg.status === 'pending' && (
                                     <>
                                       <Button
