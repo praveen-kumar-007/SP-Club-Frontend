@@ -141,7 +141,7 @@ interface FullPlayer {
     feeAccessEnabled?: boolean;
     feePayments?: FeePaymentRecord[];
     noc?: {
-        status?: "none" | "applied" | "approved" | "relieved";
+        status?: "none" | "applied" | "approved" | "relieved" | "rejected" | "cancelled";
         appliedAt?: string;
         coolingEndsAt?: string;
         generatedAt?: string;

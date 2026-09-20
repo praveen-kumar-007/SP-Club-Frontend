@@ -54,6 +54,7 @@ const PlayerForgotPassword = lazyWithPreload(() => import("./pages/PlayerForgotP
 const PlayerChangePassword = lazyWithPreload(() => import("./pages/PlayerChangePassword"));
 const PlayerFeeStatus = lazyWithPreload(() => import("./pages/PlayerFeeStatus"));
 const IDCardGenerator = lazyWithPreload(() => import("./pages/IDCard/IDCardGenerator"));
+const NocRecovery = lazyWithPreload(() => import("./pages/NocRecovery"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -171,6 +172,7 @@ const App = () => {
                   <Route path="/player/change-password" element={<PlayerChangePassword />} />
                   <Route path="/player/fees" element={<PlayerFeeStatus />} />
                   <Route path="/id-card/:id" element={<IDCardGenerator />} />
+                  <Route path="/noc-recovery/:token" element={<NocRecovery />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

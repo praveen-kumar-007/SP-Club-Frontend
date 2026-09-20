@@ -6,7 +6,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, Trash2, CreditCard, ExternalLink, Edit3, Save, X, FileCheck, Clock, ShieldCheck, Award, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ArrowLeft,
+  Download,
+  Trash2,
+  CreditCard,
+  ExternalLink,
+  Edit3,
+  Save,
+  X,
+  FileCheck,
+  Clock,
+  ShieldCheck,
+  Award,
+  Mail,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  RotateCcw,
+  Send,
+  Copy,
+  FileText,
+  Upload,
+  UserCheck,
+} from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
@@ -108,7 +132,7 @@ interface Registration {
   jerseyNumber?: number | null;
   jerseyAssignedAt?: string;
   noc?: {
-    status?: 'none' | 'applied' | 'approved' | 'relieved';
+    status?: 'none' | 'applied' | 'approved' | 'relieved' | 'rejected' | 'cancelled';
     appliedAt?: string;
     coolingEndsAt?: string;
     generatedAt?: string;
@@ -123,6 +147,40 @@ interface Registration {
     digitalSignatureHash?: string;
     downloadCount?: number;
     lastDownloadedAt?: string;
+    clearances?: {
+      feeCleared?: boolean;
+      feeClearedAt?: string;
+      kitReturned?: boolean;
+      kitReturnedAt?: string;
+      idCardReturned?: boolean;
+      idCardReturnedAt?: string;
+      duesCleared?: boolean;
+      duesClearedAt?: string;
+      remarks?: string;
+    };
+    cancellation?: {
+      cancelledAt?: string;
+      reasons?: string[];
+      adminNote?: string;
+      mailSent?: boolean;
+    };
+  };
+  recovery?: {
+    status?: 'none' | 'link_sent' | 'pending_review' | 'approved' | 'rejected';
+    recoveryToken?: string;
+    tokenExpiresAt?: string;
+    applicationLetterUrl?: string;
+    applicationNote?: string;
+    submittedVia?: string;
+    submittedAt?: string;
+    termsAgreed?: boolean;
+    termsAgreedAt?: string;
+    policyAgreed?: boolean;
+    policyAgreedAt?: string;
+    ipAddress?: string;
+    userAgent?: string;
+    reviewedAt?: string;
+    reviewRemarks?: string;
   };
 }
 
@@ -234,6 +292,30 @@ const RegistrationDetail = () => {
   const [nocCertData, setNocCertData] = useState<NocCertificateData | null>(null);
   const [isLoadingNocCert, setIsLoadingNocCert] = useState(false);
 
+  // NOC Clearance Checklist & Rejection States
+  const [isUpdatingClearance, setIsUpdatingClearance] = useState(false);
+  const [showNocRejectDialog, setShowNocRejectDialog] = useState(false);
+  const [selectedRejectReasons, setSelectedRejectReasons] = useState<string[]>([
+    "Payment / Fee Clearance Pending",
+    "Sports Kit / Equipment Submission Pending",
+  ]);
+  const [rejectAdminNote, setRejectAdminNote] = useState("");
+  const [isRejectingNoc, setIsRejectingNoc] = useState(false);
+
+  // Student Recovery (Re-admission / Comeback) States
+  const [showAdminRecoveryDialog, setShowAdminRecoveryDialog] = useState(false);
+  const [recoveryFile, setRecoveryFile] = useState<File | null>(null);
+  const [recoveryNote, setRecoveryNote] = useState("");
+  const [recoveryTermsAgreed, setRecoveryTermsAgreed] = useState(false);
+  const [recoveryTermsAgreedAt, setRecoveryTermsAgreedAt] = useState<Date | null>(null);
+  const [recoveryPolicyAgreed, setRecoveryPolicyAgreed] = useState(false);
+  const [recoveryPolicyAgreedAt, setRecoveryPolicyAgreedAt] = useState<Date | null>(null);
+  const [isSubmittingRecovery, setIsSubmittingRecovery] = useState(false);
+  const [isGeneratingRecoveryLink, setIsGeneratingRecoveryLink] = useState(false);
+  const [isReviewingRecovery, setIsReviewingRecovery] = useState(false);
+  const [recoveryReviewRemarks, setRecoveryReviewRemarks] = useState("");
+
+
   const handleApplyNoc = async () => {
     if (!token || !id) return;
     setIsApplyingNoc(true);
@@ -279,6 +361,23 @@ const RegistrationDetail = () => {
     );
     if (!confirmBypass) return;
 
+    const isFeeCleared = Boolean(registration?.noc?.clearances?.feeCleared);
+    const isKitReturned = Boolean(registration?.noc?.clearances?.kitReturned);
+
+    let forceBypass = false;
+    if (!isFeeCleared || !isKitReturned) {
+      const confirmIncomplete = window.confirm(
+        `⚠️ Institutional Clearance Incomplete!\n\n` +
+        `• Fee / Payment Cleared: ${isFeeCleared ? "✓ YES" : "✗ PENDING"}\n` +
+        `• Kit / Equipment Returned: ${isKitReturned ? "✓ YES" : "✗ PENDING"}\n\n` +
+        `Both clearances must be verified and checked before NOC generation.\n` +
+        `If items are pending, use "Reject / Cancel NOC with Deficiencies" instead.\n\n` +
+        `Do you still want to OVERRIDE and force-generate the NOC?`
+      );
+      if (!confirmIncomplete) return;
+      forceBypass = true;
+    }
+
     setIsBypassingNoc(true);
     try {
       const response = await fetch(API_ENDPOINTS.ADMIN_NOC_BYPASS(id), {
@@ -287,6 +386,7 @@ const RegistrationDetail = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ force: forceBypass }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -294,7 +394,7 @@ const RegistrationDetail = () => {
       }
       toast({
         title: "NOC Certificate Generated!",
-        description: `Certificate ${data.noc?.nocNumber || ""} generated instantly via Super Admin bypass. Email sent to member.`,
+        description: `Certificate ${data.noc?.nocNumber || data.player?.noc?.nocNumber || ""} generated instantly via Super Admin authorization. Email sent to member.`,
       });
       await fetchRegistration();
     } catch (err: unknown) {
@@ -341,6 +441,241 @@ const RegistrationDetail = () => {
       });
     } finally {
       setIsCancellingNoc(false);
+    }
+  };
+
+  const handleToggleClearance = async (
+    field: "feeCleared" | "kitReturned" | "idCardReturned" | "duesCleared",
+    value: boolean
+  ) => {
+    if (!token || !id) return;
+    setIsUpdatingClearance(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_CLEARANCES(id), {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ [field]: value }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update clearance checklist");
+      }
+      const labels = {
+        feeCleared: "Payment / Fee Clearance",
+        kitReturned: "Kit / Equipment Return",
+        idCardReturned: "ID Card / Property Return",
+        duesCleared: "Institutional Accounts Dues",
+      };
+      toast({
+        title: "Clearance Updated",
+        description: `${labels[field]} marked as ${value ? "CLEARED ✓" : "PENDING ✗"}.`,
+      });
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Update Error",
+        description: err instanceof Error ? err.message : "Could not update clearance checklist",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingClearance(false);
+    }
+  };
+
+  const handleRejectNoc = async () => {
+    if (!token || !id) return;
+    if (selectedRejectReasons.length === 0) {
+      toast({
+        title: "Selection Required",
+        description: "Please check at least one pending clearance reason for NOC rejection.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRejectingNoc(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_NOC_REJECT(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reasons: selectedRejectReasons,
+          adminNote: rejectAdminNote.trim(),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to reject NOC");
+      }
+      toast({
+        title: "NOC Rejected & Email Dispatched",
+        description: "Official cancellation notification detailing the pending clearance reasons sent to member.",
+      });
+      setShowNocRejectDialog(false);
+      setSelectedRejectReasons([
+        "Payment / Fee Clearance Pending",
+        "Sports Kit / Equipment Submission Pending",
+      ]);
+      setRejectAdminNote("");
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Rejection Error",
+        description: err instanceof Error ? err.message : "Could not reject NOC",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRejectingNoc(false);
+    }
+  };
+
+  const handleAdminRecoverySubmit = async () => {
+    if (!token || !id) return;
+    if (!recoveryFile) {
+      toast({
+        title: "Application Letter Required",
+        description: "Please select the applicant's written re-admission letter (PDF or image).",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!recoveryTermsAgreed || !recoveryPolicyAgreed) {
+      toast({
+        title: "Individual Declarations Required",
+        description: "Both separate agreement confirmations (Terms & Conditions and Academy Rules & Policy) must be checked.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmittingRecovery(true);
+    try {
+      const formData = new FormData();
+      formData.append("letter", recoveryFile);
+      formData.append("applicationNote", recoveryNote.trim());
+      formData.append("termsAgreed", "true");
+      formData.append("policyAgreed", "true");
+
+      const response = await fetch(API_ENDPOINTS.ADMIN_RECOVERY_SUBMIT(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to complete recovery");
+      }
+      toast({
+        title: "Athlete Re-Admitted!",
+        description: "Player restored to active standing, previous NOC reset, and welcome email sent.",
+      });
+      setShowAdminRecoveryDialog(false);
+      setRecoveryFile(null);
+      setRecoveryNote("");
+      setRecoveryTermsAgreed(false);
+      setRecoveryPolicyAgreed(false);
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Recovery Error",
+        description: err instanceof Error ? err.message : "Could not execute recovery",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingRecovery(false);
+    }
+  };
+
+  const handleGenerateRecoveryLink = async () => {
+    if (!token || !id) return;
+    setIsGeneratingRecoveryLink(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_RECOVERY_GENERATE_LINK(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to generate recovery link");
+      }
+
+      if (data.recoveryUrl) {
+        try {
+          await navigator.clipboard.writeText(data.recoveryUrl);
+          toast({
+            title: "Recovery Link Dispatched & Copied!",
+            description: "Self-service recovery invitation emailed to member and copied to your clipboard.",
+          });
+        } catch {
+          toast({
+            title: "Recovery Link Dispatched",
+            description: "Official re-admission link has been emailed to the member.",
+          });
+        }
+      }
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Link Error",
+        description: err instanceof Error ? err.message : "Could not generate recovery link",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingRecoveryLink(false);
+    }
+  };
+
+  const handleReviewRecovery = async (decision: "approve" | "reject") => {
+    if (!token || !id) return;
+    const confirmDecision = window.confirm(
+      decision === "approve"
+        ? "Approve Re-admission:\n\nAre you sure you want to approve this student's re-admission application and reinstate them to active academy membership?"
+        : "Reject Application:\n\nAre you sure you want to reject this re-admission application?"
+    );
+    if (!confirmDecision) return;
+
+    setIsReviewingRecovery(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ADMIN_RECOVERY_REVIEW(id), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          decision,
+          reviewRemarks: recoveryReviewRemarks.trim(),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to review recovery");
+      }
+      toast({
+        title: decision === "approve" ? "Re-Admission Approved!" : "Application Rejected",
+        description: data.message,
+      });
+      setRecoveryReviewRemarks("");
+      await fetchRegistration();
+    } catch (err: unknown) {
+      toast({
+        title: "Review Error",
+        description: err instanceof Error ? err.message : "Could not process recovery review",
+        variant: "destructive",
+      });
+    } finally {
+      setIsReviewingRecovery(false);
     }
   };
 
@@ -1790,9 +2125,15 @@ const RegistrationDetail = () => {
                           Relieved
                         </Badge>
                       )}
+                      {(registration.noc?.status === "rejected" || registration.noc?.status === "cancelled") && (
+                        <Badge className="bg-red-600 hover:bg-red-600 text-white font-bold text-[11px] shrink-0">
+                          Clearance Rejected
+                        </Badge>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="p-3 sm:p-4 space-y-3">
+                    {/* State 1: Not applied */}
                     {(!registration.noc || registration.noc.status === "none") && (
                       <div className="space-y-3">
                         <p className="text-xs text-slate-600 leading-relaxed">
@@ -1808,6 +2149,7 @@ const RegistrationDetail = () => {
                       </div>
                     )}
 
+                    {/* State 2: Cooling in progress */}
                     {registration.noc?.status === "applied" && (
                       <div className="space-y-3 min-w-0 w-full overflow-hidden">
                         <NocCountdownBanner
@@ -1819,6 +2161,132 @@ const RegistrationDetail = () => {
                           onCancelClick={handleCancelNoc}
                           onComplete={fetchRegistration}
                         />
+
+                        {/* Clearance Audit Checklist Box */}
+                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-3">
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                              Clearance & Handover Audit Checklist
+                            </span>
+                            {registration.noc?.clearances?.feeCleared && registration.noc?.clearances?.kitReturned ? (
+                              <Badge className="bg-emerald-600 text-white text-[10px] font-semibold">
+                                ✓ Ready for NOC Issuance
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50 text-[10px] font-semibold">
+                                ⚠️ Clearances Pending
+                              </Badge>
+                            )}
+                          </div>
+
+                          <p className="text-[11px] text-slate-600 leading-snug">
+                            Check items as cleared. Both <strong>Payment Cleared</strong> and <strong>Kit Submission</strong> are required before NOC can be generated:
+                          </p>
+
+                          <div className="space-y-2 bg-white rounded-md p-2.5 border border-slate-200 text-xs">
+                            {/* Checkbox 1: Payment / Fee Cleared */}
+                            <div className="flex items-start gap-2.5">
+                              <Checkbox
+                                id="chk-fee-cleared"
+                                checked={Boolean(registration.noc?.clearances?.feeCleared)}
+                                onCheckedChange={(checked) => handleToggleClearance("feeCleared", Boolean(checked))}
+                                disabled={isUpdatingClearance}
+                                className="mt-0.5"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <label htmlFor="chk-fee-cleared" className="font-semibold text-slate-800 cursor-pointer block">
+                                  Fee & Payment Cleared
+                                </label>
+                                <p className="text-[11px] text-slate-500">
+                                  {registration.noc?.clearances?.feeCleared
+                                    ? `Cleared on ${formatDisplayDate(registration.noc.clearances.feeClearedAt)}`
+                                    : "Monthly fee dues / balance not verified yet"}
+                                </p>
+                              </div>
+                              <Badge
+                                variant={registration.noc?.clearances?.feeCleared ? "default" : "outline"}
+                                className={registration.noc?.clearances?.feeCleared ? "bg-emerald-600 text-[10px]" : "text-amber-700 border-amber-300 text-[10px]"}
+                              >
+                                {registration.noc?.clearances?.feeCleared ? "CLEARED" : "PENDING"}
+                              </Badge>
+                            </div>
+
+                            {/* Checkbox 2: Kit / Equipment Returned */}
+                            <div className="flex items-start gap-2.5 pt-1.5 border-t border-slate-100">
+                              <Checkbox
+                                id="chk-kit-returned"
+                                checked={Boolean(registration.noc?.clearances?.kitReturned)}
+                                onCheckedChange={(checked) => handleToggleClearance("kitReturned", Boolean(checked))}
+                                disabled={isUpdatingClearance}
+                                className="mt-0.5"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <label htmlFor="chk-kit-returned" className="font-semibold text-slate-800 cursor-pointer block">
+                                  Kit & Training Equipment Returned
+                                </label>
+                                <p className="text-[11px] text-slate-500">
+                                  {registration.noc?.clearances?.kitReturned
+                                    ? `Returned on ${formatDisplayDate(registration.noc.clearances.kitReturnedAt)}`
+                                    : "Academy jersey, training kit, or gear submission pending"}
+                                </p>
+                              </div>
+                              <Badge
+                                variant={registration.noc?.clearances?.kitReturned ? "default" : "outline"}
+                                className={registration.noc?.clearances?.kitReturned ? "bg-emerald-600 text-[10px]" : "text-amber-700 border-amber-300 text-[10px]"}
+                              >
+                                {registration.noc?.clearances?.kitReturned ? "RETURNED" : "PENDING"}
+                              </Badge>
+                            </div>
+
+                            {/* Checkbox 3: ID Card / Property Returned */}
+                            <div className="flex items-start gap-2.5 pt-1.5 border-t border-slate-100">
+                              <Checkbox
+                                id="chk-id-returned"
+                                checked={Boolean(registration.noc?.clearances?.idCardReturned)}
+                                onCheckedChange={(checked) => handleToggleClearance("idCardReturned", Boolean(checked))}
+                                disabled={isUpdatingClearance}
+                                className="mt-0.5"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <label htmlFor="chk-id-returned" className="font-semibold text-slate-800 cursor-pointer block">
+                                  Academy ID Card / Key Returned
+                                </label>
+                                <p className="text-[11px] text-slate-500">Physical identity credentials deposited at academy office</p>
+                              </div>
+                            </div>
+
+                            {/* Checkbox 4: General Dues Cleared */}
+                            <div className="flex items-start gap-2.5 pt-1.5 border-t border-slate-100">
+                              <Checkbox
+                                id="chk-dues-cleared"
+                                checked={Boolean(registration.noc?.clearances?.duesCleared)}
+                                onCheckedChange={(checked) => handleToggleClearance("duesCleared", Boolean(checked))}
+                                disabled={isUpdatingClearance}
+                                className="mt-0.5"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <label htmlFor="chk-dues-cleared" className="font-semibold text-slate-800 cursor-pointer block">
+                                  Accounts & Disciplinary Clearance
+                                </label>
+                                <p className="text-[11px] text-slate-500">No disciplinary holds or hostel/library dues</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Quick Deficiencies Rejection Trigger */}
+                          <div className="pt-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 text-xs font-semibold"
+                              onClick={() => setShowNocRejectDialog(true)}
+                            >
+                              <XCircle className="w-3.5 h-3.5 mr-1.5 text-red-500" />
+                              Reject / Cancel NOC with Clearance Deficiencies Notice
+                            </Button>
+                          </div>
+                        </div>
 
                         {/* Direct Resend NOC Notice Email Section */}
                         <div className="bg-indigo-50/80 border border-indigo-200 rounded-lg p-3 space-y-2">
@@ -1850,6 +2318,53 @@ const RegistrationDetail = () => {
                       </div>
                     )}
 
+                    {/* State 3: Rejected / Cancelled */}
+                    {(registration.noc?.status === "rejected" || registration.noc?.status === "cancelled") && (
+                      <div className="space-y-3">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3.5 space-y-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-red-900 flex items-center gap-1.5 text-sm">
+                              <AlertTriangle className="w-4 h-4 text-red-600" />
+                              NOC Rejected / Cancelled
+                            </span>
+                            <span className="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded">
+                              DEFICIENCIES RECORDED
+                            </span>
+                          </div>
+
+                          {registration.noc.cancellation?.reasons && registration.noc.cancellation.reasons.length > 0 && (
+                            <div className="space-y-1 bg-white/80 rounded p-2 border border-red-100">
+                              <p className="font-semibold text-red-950 text-[11px]">Clearance Items Pending:</p>
+                              <ul className="list-disc list-inside text-red-800 space-y-0.5">
+                                {registration.noc.cancellation.reasons.map((r, i) => (
+                                  <li key={i}>{r}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {registration.noc.cancellation?.adminNote && (
+                            <p className="text-slate-700">
+                              <strong>Admin Remarks:</strong> {registration.noc.cancellation.adminNote}
+                            </p>
+                          )}
+
+                          <div className="text-[11px] text-slate-500 pt-1 border-t border-red-200/60">
+                            Cancelled on {formatDisplayDate(registration.noc.cancellation?.cancelledAt)}. Member was notified via Brevo email to clear pending items and reapply.
+                          </div>
+                        </div>
+
+                        <Button
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs"
+                          onClick={() => setShowNocApplyDialog(true)}
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                          Re-Initiate 14-Day NOC Clearance
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* State 4: Approved */}
                     {registration.noc?.status === "approved" && (
                       <div className="space-y-3">
                         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 space-y-1.5">
@@ -1892,6 +2407,7 @@ const RegistrationDetail = () => {
                       </div>
                     )}
 
+                    {/* State 5: Relieved */}
                     {registration.noc?.status === "relieved" && (
                       <div className="bg-slate-100 border border-slate-300 rounded-lg p-3 text-xs text-slate-700 space-y-1">
                         <p className="font-semibold text-slate-800">Member Relieved</p>
@@ -1952,8 +2468,373 @@ const RegistrationDetail = () => {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+
+                {/* Reject / Cancel NOC Modal with Deficiency Checklist */}
+                <Dialog open={showNocRejectDialog} onOpenChange={setShowNocRejectDialog}>
+                  <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-red-600">
+                        <XCircle className="w-5 h-5" />
+                        Reject / Cancel NOC with Deficiency Notice
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2 text-xs">
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-900 leading-relaxed">
+                        Select the deficiency reasons why this NOC cannot be issued. A formal institutional email will be automatically sent to <strong>{registration.email}</strong> informing them of the rejected status and instructing them to clear pending items and reapply.
+                      </div>
+
+                      {/* Checklist Options */}
+                      <div className="space-y-2">
+                        <label className="font-bold text-slate-800 block">
+                          Reason(s) for NOC Clearance Rejection: *
+                        </label>
+                        {[
+                          "Payment / Fee Clearance Pending",
+                          "Sports Kit / Equipment Submission Pending",
+                          "ID Card / Academy Property Not Returned",
+                          "Pending Disciplinary or Audit Inquiry",
+                        ].map((reason) => {
+                          const isChecked = selectedRejectReasons.includes(reason);
+                          return (
+                            <div
+                              key={reason}
+                              onClick={() => {
+                                if (isChecked) {
+                                  setSelectedRejectReasons(selectedRejectReasons.filter((r) => r !== reason));
+                                } else {
+                                  setSelectedRejectReasons([...selectedRejectReasons, reason]);
+                                }
+                              }}
+                              className={`p-2.5 rounded-lg border cursor-pointer flex items-center gap-2.5 transition-colors ${
+                                isChecked ? "bg-red-50 border-red-300" : "bg-white border-slate-200 hover:bg-slate-50"
+                              }`}
+                            >
+                              <Checkbox checked={isChecked} />
+                              <span className="font-medium text-slate-800 text-xs">{reason}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Additional Note */}
+                      <div>
+                        <label className="font-bold text-slate-800 block mb-1">
+                          Official Administrative Remark / Explanation (Sent in Email):
+                        </label>
+                        <Textarea
+                          placeholder="Provide specific details (e.g., Pending January/February training kit dues of ₹2,500; please submit kit at desk)..."
+                          value={rejectAdminNote}
+                          onChange={(e) => setRejectAdminNote(e.target.value)}
+                          className="min-h-20 text-xs"
+                        />
+                      </div>
+
+                      {/* Email Preview Snippet */}
+                      <div className="bg-slate-100 rounded-lg p-2.5 text-[11px] text-slate-600 border border-slate-200 space-y-1">
+                        <p className="font-semibold text-slate-700">Automated Mail Notice Preview:</p>
+                        <p className="italic">
+                          "Due to the following reason(s) verified by administrative audit, your NOC is rejected / cancelled by our system: [Selected Checklist Items]. Please clear all outstanding kit submissions and/or payment dues and reapply for the NOC once resolved. Thank you."
+                        </p>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowNocRejectDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                        onClick={handleRejectNoc}
+                        disabled={isRejectingNoc || selectedRejectReasons.length === 0}
+                      >
+                        {isRejectingNoc ? "Dispatching Notice..." : "Reject NOC & Email Member"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </>
             )}
+
+            {/* Athlete Re-Admission & Recovery (Comeback) Card */}
+            {(registration.noc?.status === "approved" ||
+              registration.noc?.status === "relieved" ||
+              registration.noc?.status === "rejected" ||
+              registration.status === "rejected" ||
+              registration.recovery?.status !== "none") && (
+              <Card className="border-amber-300 bg-gradient-to-br from-amber-50/40 via-white to-amber-50/20 shadow-sm overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-amber-950 via-amber-900 to-slate-900 text-white py-3 px-4">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+                      <RotateCcw className="w-4 h-4 text-amber-400" />
+                      Athlete Recovery & Re-Admission
+                    </CardTitle>
+                    {registration.recovery?.status === "pending_review" && (
+                      <Badge className="bg-amber-500 text-slate-950 font-bold text-[10px] animate-pulse">
+                        Application Pending Review
+                      </Badge>
+                    )}
+                    {registration.recovery?.status === "approved" && (
+                      <Badge className="bg-emerald-500 text-slate-950 font-bold text-[10px]">
+                        Re-admitted ✓
+                      </Badge>
+                    )}
+                    {registration.recovery?.status === "link_sent" && (
+                      <Badge className="bg-blue-600 text-white text-[10px]">
+                        Portal Link Active
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-3 sm:p-4 space-y-3">
+                  {/* Sub-state: Pending Review by Admin */}
+                  {registration.recovery?.status === "pending_review" ? (
+                    <div className="bg-amber-50 border border-amber-300 rounded-lg p-3.5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-950 text-xs flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-amber-700" />
+                          Re-Admission Request Submitted
+                        </span>
+                        <span className="text-[10px] bg-amber-200/80 text-amber-900 font-semibold px-2 py-0.5 rounded">
+                          {registration.recovery.submittedVia === "student_link" ? "Portal Submission" : "Admin Intake"}
+                        </span>
+                      </div>
+
+                      {registration.recovery.applicationLetterUrl && (
+                        <div className="bg-white rounded p-2.5 border border-amber-200 flex items-center justify-between gap-2">
+                          <span className="text-xs font-medium text-slate-700 flex items-center gap-1.5 truncate">
+                            <FileCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            Official Application Letter
+                          </span>
+                          <a
+                            href={registration.recovery.applicationLetterUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1 shrink-0"
+                          >
+                            View / Download <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      )}
+
+                      {registration.recovery.applicationNote && (
+                        <p className="text-xs text-slate-700 bg-white/80 rounded p-2 border border-amber-100">
+                          <strong>Member Statement:</strong> {registration.recovery.applicationNote}
+                        </p>
+                      )}
+
+                      {/* Separate Agreement Timestamps Verification */}
+                      <div className="bg-slate-100/90 rounded p-2.5 space-y-1 text-[11px] font-mono border border-slate-200">
+                        <div className="text-[11px] font-sans font-bold text-slate-700 pb-1 border-b border-slate-200">
+                          Legal Agreement Audit Timestamps:
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Terms & Conditions Agreed:</span>
+                          <span className="font-semibold text-emerald-700">
+                            {registration.recovery.termsAgreedAt
+                              ? new Date(registration.recovery.termsAgreedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                              : "Verified"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Academy Code & Policy Agreed:</span>
+                          <span className="font-semibold text-emerald-700">
+                            {registration.recovery.policyAgreedAt
+                              ? new Date(registration.recovery.policyAgreedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                              : "Verified"}
+                          </span>
+                        </div>
+                        {registration.recovery.ipAddress && (
+                          <div className="flex justify-between text-slate-500 pt-0.5">
+                            <span>IP / Origin:</span>
+                            <span>{registration.recovery.ipAddress}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-semibold text-slate-700 block">
+                          Review Remarks / Coaching Notes:
+                        </label>
+                        <Input
+                          placeholder="e.g. Verified by head coach; squad slot available"
+                          value={recoveryReviewRemarks}
+                          onChange={(e) => setRecoveryReviewRemarks(e.target.value)}
+                          className="text-xs h-8"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <Button
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold h-9"
+                          onClick={() => handleReviewRecovery("approve")}
+                          disabled={isReviewingRecovery}
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                          {isReviewingRecovery ? "Approving..." : "Approve Re-admission"}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="text-xs font-semibold h-9"
+                          onClick={() => handleReviewRecovery("reject")}
+                          disabled={isReviewingRecovery}
+                        >
+                          <XCircle className="w-3.5 h-3.5 mr-1.5" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Normal Pathway Selection */
+                    <div className="space-y-2">
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Students relieved or granted an NOC can be re-admitted via two pathways:
+                      </p>
+
+                      {/* Pathway 1: Direct Admin Intake */}
+                      <Button
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium"
+                        onClick={() => setShowAdminRecoveryDialog(true)}
+                      >
+                        <Upload className="w-3.5 h-3.5 mr-1.5" />
+                        Direct Admin Recovery (Upload Application Letter)
+                      </Button>
+
+                      {/* Pathway 2: Send Link to Student */}
+                      <Button
+                        variant="outline"
+                        className="w-full border-indigo-300 text-indigo-900 hover:bg-indigo-50 text-xs font-medium"
+                        onClick={handleGenerateRecoveryLink}
+                        disabled={isGeneratingRecoveryLink}
+                      >
+                        <Send className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+                        {isGeneratingRecoveryLink ? "Dispatching..." : "Send Self-Service Recovery Link to Student"}
+                      </Button>
+
+                      {registration.recovery?.status === "link_sent" && (
+                        <p className="text-[11px] text-indigo-700 bg-indigo-50/80 p-2 rounded border border-indigo-200">
+                          ✓ A secure one-time re-admission portal link was dispatched to <strong>{registration.email}</strong>.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Direct Admin Recovery Modal */}
+            <Dialog open={showAdminRecoveryDialog} onOpenChange={setShowAdminRecoveryDialog}>
+              <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-amber-700">
+                    <RotateCcw className="w-5 h-5" />
+                    Direct Athlete Re-Admission & Recovery
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-2 text-xs">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-900 leading-relaxed">
+                    Upload the athlete's re-admission application letter and verify individual agreements to reinstate their membership back to <strong>Active</strong> standing.
+                  </div>
+
+                  {/* File upload */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">
+                      Official Application Letter (PDF or Image, max 10MB) *
+                    </label>
+                    <Input
+                      type="file"
+                      accept=".pdf,image/jpeg,image/png,image/webp,image/jpg"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setRecoveryFile(file);
+                      }}
+                      className="text-xs"
+                    />
+                    {recoveryFile && (
+                      <p className="text-[11px] text-emerald-600 mt-1 font-semibold">
+                        ✓ Selected: {recoveryFile.name} ({(recoveryFile.size / (1024 * 1024)).toFixed(2)} MB)
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">
+                      Application Notes / Intake Remarks:
+                    </label>
+                    <Textarea
+                      placeholder="e.g. Member application reviewed by coach; all previous dues settled."
+                      value={recoveryNote}
+                      onChange={(e) => setRecoveryNote(e.target.value)}
+                      className="min-h-16 text-xs"
+                    />
+                  </div>
+
+                  {/* SEPARATE Checkbox 1: Terms & Conditions */}
+                  <div
+                    onClick={() => {
+                      const next = !recoveryTermsAgreed;
+                      setRecoveryTermsAgreed(next);
+                      setRecoveryTermsAgreedAt(next ? new Date() : null);
+                    }}
+                    className={`p-3 rounded-lg border cursor-pointer flex items-start gap-2.5 transition-colors ${
+                      recoveryTermsAgreed ? "bg-indigo-50/80 border-indigo-300" : "bg-white border-slate-200"
+                    }`}
+                  >
+                    <Checkbox checked={recoveryTermsAgreed} className="mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-slate-800 block">
+                        I verify the member has agreed to SP Sports Academy Terms & Conditions.
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        Acknowledged academy constitution, operational procedures & membership terms.
+                      </span>
+                      {recoveryTermsAgreed && recoveryTermsAgreedAt && (
+                        <span className="text-[10px] text-indigo-700 block font-mono mt-0.5">
+                          ✓ Verified timestamp: {recoveryTermsAgreedAt.toLocaleTimeString("en-IN")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SEPARATE Checkbox 2: Academy Code & Policy */}
+                  <div
+                    onClick={() => {
+                      const next = !recoveryPolicyAgreed;
+                      setRecoveryPolicyAgreed(next);
+                      setRecoveryPolicyAgreedAt(next ? new Date() : null);
+                    }}
+                    className={`p-3 rounded-lg border cursor-pointer flex items-start gap-2.5 transition-colors ${
+                      recoveryPolicyAgreed ? "bg-emerald-50/80 border-emerald-300" : "bg-white border-slate-200"
+                    }`}
+                  >
+                    <Checkbox checked={recoveryPolicyAgreed} className="mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-slate-800 block">
+                        I verify the member has agreed to Academy Code of Conduct & Policies.
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        Strict adherence to training discipline, squad rules & anti-doping policies.
+                      </span>
+                      {recoveryPolicyAgreed && recoveryPolicyAgreedAt && (
+                        <span className="text-[10px] text-emerald-700 block font-mono mt-0.5">
+                          ✓ Verified timestamp: {recoveryPolicyAgreedAt.toLocaleTimeString("en-IN")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowAdminRecoveryDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                    onClick={handleAdminRecoverySubmit}
+                    disabled={isSubmittingRecovery || !recoveryFile || !recoveryTermsAgreed || !recoveryPolicyAgreed}
+                  >
+                    {isSubmittingRecovery ? "Re-Admitting..." : "Re-Admit Athlete & Restore Active Standing"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             {/* Engagement */}
             <Card>

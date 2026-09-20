@@ -63,7 +63,7 @@ interface Registration {
   aadharFront: string;
   aadharBack: string;
   noc?: {
-    status?: 'none' | 'applied' | 'approved' | 'relieved';
+    status?: 'none' | 'applied' | 'approved' | 'relieved' | 'rejected' | 'cancelled';
     coolingEndsAt?: string;
     expiresAt?: string;
     nocNumber?: string;
@@ -449,6 +449,11 @@ const AdminDashboard = () => {
         {noc?.status === 'relieved' && (
           <Badge className="bg-slate-600 hover:bg-slate-600 text-white text-[10px]">
             Relieved (NOC)
+          </Badge>
+        )}
+        {(noc?.status === 'rejected' || noc?.status === 'cancelled') && (
+          <Badge className="bg-red-600 hover:bg-red-600 text-white font-bold text-[10px]">
+            NOC: Rejected
           </Badge>
         )}
       </div>
