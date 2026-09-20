@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, History, Loader2, Monitor, Search, Shield, User } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
+import { clearSession } from "@/utils/adminSessionManager";
 import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -108,6 +109,11 @@ const AdminLoginHistory = () => {
 
             const data = await response.json().catch(() => ({}));
             if (!response.ok) {
+                if (response.status === 401) {
+                    clearSession();
+                    navigate("/admin/login");
+                    return;
+                }
                 throw new Error(data.message || "Failed to load login history");
             }
 

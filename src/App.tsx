@@ -13,10 +13,26 @@ import NotFound from "./pages/NotFound";
 const lazyWithPreload = <P extends object, T extends React.ComponentType<P>>(
   importer: () => Promise<{ default: T }>
 ) => {
-  const Component = lazy(importer) as React.LazyExoticComponent<T> & {
+  const retryImporter = () =>
+    importer().catch((error) => {
+      const isChunkError =
+        error?.message?.includes("dynamically imported module") ||
+        error?.message?.includes("Failed to fetch") ||
+        error?.name === "TypeError";
+      const key = "spa_chunk_reload_lock";
+      const lastReload = Number(sessionStorage.getItem(key) || "0");
+      if (isChunkError && Date.now() - lastReload > 10000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+        return new Promise<{ default: T }>(() => {});
+      }
+      throw error;
+    });
+
+  const Component = lazy(retryImporter) as React.LazyExoticComponent<T> & {
     preload?: () => Promise<{ default: T }>;
   };
-  Component.preload = importer;
+  Component.preload = retryImporter;
   return Component;
 };
 
