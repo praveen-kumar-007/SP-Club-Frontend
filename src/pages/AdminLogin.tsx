@@ -90,10 +90,13 @@ const AdminLogin = () => {
       localStorage.setItem("adminToken", result.token);
       localStorage.setItem("adminUser", JSON.stringify(result.admin));
       localStorage.setItem("adminDeviceName", getDeviceName());
+      localStorage.setItem("adminDeviceId", deviceId);
+      localStorage.setItem("adminLastActivity", Date.now().toString());
+      sessionStorage.setItem("adminSessionActive", "true");
 
       toast({
         title: "Login Successful",
-        description: `Welcome to Admin Dashboard (Active sessions: ${result.activeSessions}/2)`,
+        description: `Welcome to Admin Dashboard`,
       });
 
       // Redirect to dashboard
