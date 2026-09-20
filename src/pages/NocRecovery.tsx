@@ -296,7 +296,7 @@ const NocRecovery: React.FC = () => {
               <p>• Request the Super Admin to issue an updated recovery invitation link.</p>
             </div>
             <Link to="/">
-              <Button variant="outline" className="w-full border-slate-700 hover:bg-slate-800 text-slate-200">
+              <Button className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold shadow-md">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Return to Academy Home
               </Button>
@@ -416,7 +416,8 @@ const NocRecovery: React.FC = () => {
 
               <div className="text-center pt-2">
                 <Link to="/">
-                  <Button variant="outline" className="border-slate-700 hover:bg-slate-800 text-slate-200">
+                  <Button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-lg shadow-lg shadow-emerald-950/50 hover:shadow-emerald-500/25 transition-all inline-flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4" />
                     Return to Academy Homepage
                   </Button>
                 </Link>
