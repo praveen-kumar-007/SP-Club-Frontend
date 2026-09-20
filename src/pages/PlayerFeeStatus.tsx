@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Seo from "@/components/Seo";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Loader2, Wallet } from "lucide-react";
 
 interface FeeHistoryItem {
@@ -193,7 +194,7 @@ const PlayerFeeStatus = () => {
                       <p className="font-semibold text-slate-800">{formatMonthLabel(item.month)}</p>
                       <p className="text-xs text-slate-500">
                         {item.updatedAt
-                          ? `Updated: ${new Date(item.updatedAt).toLocaleString("en-IN")}`
+                          ? `Updated: ${formatDateTimeDDMMYYYY(item.updatedAt)}`
                           : "No update from admin"}
                       </p>
                     </div>

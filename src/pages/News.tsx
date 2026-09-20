@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_ENDPOINTS, getNewsShareUrl } from "@/config/api";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 import { useToast } from "@/hooks/use-toast";
 
 interface NewsArticle {
@@ -57,12 +58,7 @@ const News = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    return formatDateDDMMYYYY(dateString);
   };
 
   const handleShare = (article: NewsArticle, e: React.MouseEvent) => {

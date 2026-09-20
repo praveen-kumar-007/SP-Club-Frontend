@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { API_ENDPOINTS } from "@/config/api";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 import { Search, Edit3, Save, X } from "lucide-react";
 import Seo from "@/components/Seo";
 
@@ -250,7 +251,7 @@ const AdminPlayers = () => {
                               <span>{formatKitSizeWithRange(player.kitSize, "-")}</span>
                               {player.kitSize && (player.kitSizeSelectedAt || player.registeredAt) && (
                                 <span className="block text-[10px] text-slate-500">
-                                  {new Date(player.kitSizeSelectedAt || player.registeredAt || "").toLocaleDateString()}
+                                  {formatDateDDMMYYYY(player.kitSizeSelectedAt || player.registeredAt)}
                                 </span>
                               )}
                             </div>
@@ -271,7 +272,7 @@ const AdminPlayers = () => {
                               <span>{player.jerseyNumber ?? "-"}</span>
                               {player.jerseyNumber && (player.jerseyAssignedAt || player.registeredAt) && (
                                 <span className="block text-[10px] text-slate-500">
-                                  {new Date(player.jerseyAssignedAt || player.registeredAt || "").toLocaleDateString()}
+                                  {formatDateDDMMYYYY(player.jerseyAssignedAt || player.registeredAt)}
                                 </span>
                               )}
                             </div>
@@ -282,7 +283,7 @@ const AdminPlayers = () => {
                             <span className="font-mono">{player.idCardNumber || "N/A"}</span>
                             {player.idCardNumber && (player.idCardGeneratedAt || player.registeredAt) && (
                               <span className="block text-[10px] text-slate-500">
-                                {new Date(player.idCardGeneratedAt || player.registeredAt || "").toLocaleDateString()}
+                                {formatDateDDMMYYYY(player.idCardGeneratedAt || player.registeredAt)}
                               </span>
                             )}
                           </div>

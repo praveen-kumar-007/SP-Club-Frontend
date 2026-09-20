@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
 import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCalendar";
+import { formatDateDDMMYYYY, formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Search, ShieldCheck } from "lucide-react";
 import {
     getAdminAttendanceGeoEnabled,
@@ -497,7 +498,7 @@ const AdminPlayerAttendance = () => {
                                                 <tbody>
                                                     {attendance.map((record) => (
                                                         <tr key={`${record.date}-${record.markedAt || "na"}`} className="border-t">
-                                                            <td className="p-2">{record.date}</td>
+                                                            <td className="p-2">{formatDateDDMMYYYY(record.date)}</td>
                                                             <td className="p-2 capitalize">{record.status}</td>
                                                             <td className="p-2">{record.location?.latitude?.toFixed(5) ?? "-"}</td>
                                                             <td className="p-2">{record.location?.longitude?.toFixed(5) ?? "-"}</td>
@@ -524,7 +525,7 @@ const AdminPlayerAttendance = () => {
                                                             </td>
                                                             <td className="p-2">{typeof record.markedByAdminId === "string" ? record.markedByAdminId : record.markedByAdminId?._id || "-"}</td>
                                                             <td className="p-2">{record.adminNote || "-"}</td>
-                                                            <td className="p-2">{record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</td>
+                                                            <td className="p-2">{record.markedAt ? formatDateTimeDDMMYYYY(record.markedAt) : "-"}</td>
                                                         </tr>
                                                     ))}
                                                     {!attendance.length && (
@@ -542,7 +543,7 @@ const AdminPlayerAttendance = () => {
                                             {attendance.map((record) => (
                                                 <div key={`${record.date}-${record.markedAt || "na"}`} className="rounded-md border bg-white p-3">
                                                     <div className="flex items-center justify-between gap-2">
-                                                        <p className="font-semibold text-slate-900">{record.date}</p>
+                                                        <p className="font-semibold text-slate-900">{formatDateDDMMYYYY(record.date)}</p>
                                                         <span className="text-xs font-medium capitalize text-slate-700">{record.status}</span>
                                                     </div>
                                                     <p className="mt-2 text-xs text-slate-600 break-all">
@@ -553,7 +554,7 @@ const AdminPlayerAttendance = () => {
                                                     <p className="mt-1 text-xs text-slate-600">Device: {record.deviceName || "-"}</p>
                                                     <p className="mt-1 text-xs text-slate-600">Marked by: {record.markedByType || "player"}</p>
                                                     <p className="mt-1 text-xs text-slate-600">Admin note: {record.adminNote || "-"}</p>
-                                                    <p className="mt-1 text-xs text-slate-500">{record.markedAt ? new Date(record.markedAt).toLocaleString() : "-"}</p>
+                                                    <p className="mt-1 text-xs text-slate-500">{record.markedAt ? formatDateTimeDDMMYYYY(record.markedAt) : "-"}</p>
                                                 </div>
                                             ))}
 

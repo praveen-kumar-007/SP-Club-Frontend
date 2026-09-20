@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import Seo from "@/components/Seo";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Loader2, Search, Users, Wallet } from "lucide-react";
 
 interface FeePlayer {
@@ -601,7 +602,7 @@ const AdminFeePayments = () => {
                           <p className="font-semibold text-slate-800">{formatMonthLabel(item.month)}</p>
                           <p className="text-xs text-slate-500">
                             {item.updatedAt
-                              ? `Updated: ${new Date(item.updatedAt).toLocaleString("en-IN")}`
+                              ? `Updated: ${formatDateTimeDDMMYYYY(item.updatedAt)}`
                               : "No update yet"}
                           </p>
                         </div>

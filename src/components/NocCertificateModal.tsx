@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Download, FileCheck, Loader2 } from "lucide-react";
 import html2pdf from "html2pdf.js";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 
 export interface NocCertificateData {
   player: {
@@ -54,16 +55,7 @@ export interface NocCertificateModalProps {
   onDownloaded?: () => void;
 }
 
-const formatDate = (val?: string | Date) => {
-  if (!val) return "N/A";
-  const d = new Date(val);
-  if (isNaN(d.getTime())) return "N/A";
-  return d.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-};
+const formatDate = formatDateDDMMYYYY;
 
 const maskAadhaar = (num?: string) => {
   if (!num) return "Verified";

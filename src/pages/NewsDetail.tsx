@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_ENDPOINTS, getNewsShareUrl } from "@/config/api";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { useToast } from "@/hooks/use-toast";
 
 interface NewsArticle {
@@ -63,14 +64,7 @@ const NewsDetail = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDateTimeDDMMYYYY(dateString);
   };
 
   const nextImage = () => {

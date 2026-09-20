@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { ArrowLeft, Bell, Loader2, Send } from "lucide-react";
 
 interface PlayerMessageItem {
@@ -248,7 +249,7 @@ const PlayerMessages = () => {
                                                             {item.status}
                                                         </span>
                                                     </div>
-                                                    <p className="text-xs text-slate-500 mt-1">{new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                                                    <p className="text-xs text-slate-500 mt-1">{formatDateTimeDDMMYYYY(item.createdAt)}</p>
                                                     <p className="text-sm text-slate-700 mt-2 whitespace-pre-wrap">{item.message}</p>
                                                 </div>
                                             ))}
@@ -272,7 +273,7 @@ const PlayerMessages = () => {
                                                             {item.status}
                                                         </span>
                                                     </div>
-                                                    <p className="text-xs text-slate-500 mt-1">{new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                                                    <p className="text-xs text-slate-500 mt-1">{formatDateTimeDDMMYYYY(item.createdAt)}</p>
                                                     <p className="text-sm text-slate-700 mt-2 whitespace-pre-wrap">{item.message}</p>
                                                 </div>
                                             ))}

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 
 export interface AttendanceEntry {
     date: string;
@@ -97,7 +98,7 @@ const AttendanceCalendar = ({ month, attendance, practiceDates = [] }: Attendanc
                     tone,
                     dayIso === todayIso ? "ring-2 ring-amber-300 border-amber-300" : "border-transparent"
                 )}
-                title={title}
+                title={`${title} (${formatDateDDMMYYYY(dayIso)})`}
             >
                 {day}
             </div>

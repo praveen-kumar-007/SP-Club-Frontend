@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import {
   ShieldCheck,
   FileText,
@@ -247,20 +248,7 @@ const NocRecovery: React.FC = () => {
     }
   };
 
-  const formatDateTime = (dateString?: string | Date | null) => {
-    if (!dateString) return "N/A";
-    const d = typeof dateString === "string" ? new Date(dateString) : dateString;
-    return d.toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
-  };
+  const formatDateTime = formatDateTimeDDMMYYYY;
 
   if (isLoading) {
     return (

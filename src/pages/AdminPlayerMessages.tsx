@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/config/api";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { ArrowLeft, CheckCircle, Loader2, Reply, Send, Trash2, Users } from "lucide-react";
 
 interface PlayerOption {
@@ -497,7 +498,7 @@ const AdminPlayerMessages = () => {
                                                         <div>
                                                             <p className="font-semibold text-slate-800">{item.subject}</p>
                                                             <p className="text-xs text-slate-500 mt-1">{item.playerName} ({item.playerEmail})</p>
-                                                            <p className="text-xs text-slate-500">{new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                                                            <p className="text-xs text-slate-500">{formatDateTimeDDMMYYYY(item.createdAt)}</p>
                                                         </div>
 
                                                         <span className={`text-xs px-2 py-1 rounded-full ${item.status === "completed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
@@ -565,7 +566,7 @@ const AdminPlayerMessages = () => {
                                                         <div>
                                                             <p className="font-semibold text-slate-800">{item.subject}</p>
                                                             <p className="text-xs text-slate-500 mt-1">To: {item.playerName} ({item.playerEmail})</p>
-                                                            <p className="text-xs text-slate-500">{new Date(item.createdAt).toLocaleString("en-IN")}</p>
+                                                            <p className="text-xs text-slate-500">{formatDateTimeDDMMYYYY(item.createdAt)}</p>
                                                         </div>
 
                                                         <span className={`text-xs px-2 py-1 rounded-full ${item.status === "completed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>

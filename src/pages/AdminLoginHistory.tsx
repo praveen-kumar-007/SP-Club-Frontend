@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, History, Loader2, Monitor, Search, Shield, User } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,9 +38,8 @@ interface PlayerLoginUser {
 
 const formatDate = (value?: string | null) => {
     if (!value) return "Never";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "Invalid date";
-    return date.toLocaleString();
+    const formatted = formatDateTimeDDMMYYYY(value);
+    return formatted === "N/A" ? "Invalid date" : formatted;
 };
 
 const LoginHistoryPreview = ({ logs }: { logs: LoginHistoryItem[] }) => {

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Lock, User } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
 import { getOrCreateDeviceId, getDeviceName } from "@/utils/deviceManager";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -67,7 +68,7 @@ const AdminLogin = () => {
           let deviceList = '';
           if (result.currentDevices && Array.isArray(result.currentDevices)) {
             deviceList = result.currentDevices
-              .map((d: any) => `• ${d.deviceName} (${new Date(d.loginTime).toLocaleString()})`)
+              .map((d: any) => `• ${d.deviceName} (${formatDateTimeDDMMYYYY(d.loginTime)})`)
               .join('\n');
           }
 

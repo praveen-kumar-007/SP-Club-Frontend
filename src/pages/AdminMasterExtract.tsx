@@ -22,6 +22,7 @@ import {
     Wallet,
 } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/api";
+import { formatDateDDMMYYYY, formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import Seo from "@/components/Seo";
 import html2pdf from "html2pdf.js";
 
@@ -338,27 +339,14 @@ const AdminMasterExtract = () => {
 
     const formatDate = (val?: string) => {
         if (!val) return "N/A";
-        const d = new Date(val);
-        if (isNaN(d.getTime())) return val;
-        return d.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
+        const formatted = formatDateDDMMYYYY(val);
+        return formatted === "N/A" ? val : formatted;
     };
 
     const formatDateTime = (val?: string) => {
         if (!val) return "N/A";
-        const d = new Date(val);
-        if (isNaN(d.getTime())) return val;
-        return d.toLocaleString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-        });
+        const formatted = formatDateTimeDDMMYYYY(val);
+        return formatted === "N/A" ? val : formatted;
     };
 
     // Standardized cross-device PDF export without truncation

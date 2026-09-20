@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Seo from "@/components/Seo";
 import API_BASE_URL from "@/config/api";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 
 interface MemberData {
   _id: string;
@@ -51,19 +52,11 @@ const IDCardGenerator = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return formatDateDDMMYYYY(dateString);
   };
 
   const formatValidDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return formatDateDDMMYYYY(dateString);
   };
 
   if (isLoading) {

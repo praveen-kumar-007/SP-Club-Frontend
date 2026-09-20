@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from "@/config/api";
 import { PLAYER_ATTENDANCE_RADIUS_METERS, SP_KABADDI_LOCATION } from "@/config/maps";
 import AttendanceCalendar, { AttendanceEntry } from "@/components/AttendanceCalendar";
 import { getDeviceName, getOrCreatePlayerDeviceId } from "@/utils/deviceManager";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 import { ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, MapPin } from "lucide-react";
 
 const getCurrentMonth = () => {
@@ -102,13 +103,11 @@ const PlayerAttendance = () => {
     }, [month]);
 
     const todayMarkDateLabel = useMemo(() => {
-        return new Intl.DateTimeFormat("en-IN", {
+        const weekday = new Intl.DateTimeFormat("en-IN", {
             timeZone: "Asia/Kolkata",
             weekday: "long",
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
         }).format(new Date());
+        return `${weekday}, ${formatDateDDMMYYYY(new Date())}`;
     }, []);
 
     const isCurrentMonthSelected = month === getCurrentMonth();

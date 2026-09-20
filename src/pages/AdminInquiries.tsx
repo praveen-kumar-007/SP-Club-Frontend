@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { CheckCircle, Trash2, LogOut, Search, Mail, Phone, ArrowLeft } from "lucide-react";
 import API_BASE_URL from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
+import { formatDateDDMMYYYY } from "@/utils/dateFormatter";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -523,7 +524,7 @@ const AdminInquiries = () => {
                             </TableCell>
                             <TableCell>
                               <p className="text-sm">
-                                {newsletter.subscribedAt ? new Date(newsletter.subscribedAt).toLocaleDateString() : 'N/A'}
+                                {newsletter.subscribedAt ? formatDateDDMMYYYY(newsletter.subscribedAt) : 'N/A'}
                               </p>
                             </TableCell>
                             <TableCell className="text-right">

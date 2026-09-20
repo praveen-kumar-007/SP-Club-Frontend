@@ -35,6 +35,7 @@ import {
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
 import { KIT_SIZE_OPTIONS, formatKitSizeWithRange } from "@/utils/kitSizes";
+import { formatDateDDMMYYYY, formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import NocCountdownBanner from "@/components/NocCountdownBanner";
 import NocCertificateModal, { NocCertificateData, downloadNocPdfFromData } from "@/components/NocCertificateModal";
 import {
@@ -73,18 +74,8 @@ const calculateAgeGroup = (dob: string): string => {
   return 'Over 25';
 };
 
-const formatDisplayDate = (dateStr?: string | Date | null): string => {
-  if (!dateStr) return "N/A";
-  const d = new Date(dateStr);
-  return Number.isNaN(d.getTime())
-    ? "N/A"
-    : d.toLocaleDateString("en-IN", {
-        timeZone: "Asia/Kolkata",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
-};
+const formatDisplayDate = formatDateDDMMYYYY;
+const formatDisplayDateTime = formatDateTimeDDMMYYYY;
 
 const formatDobToInputYMD = (dob?: string | Date): string => {
   if (!dob) return "";
@@ -1656,7 +1647,7 @@ const RegistrationDetail = () => {
                         onChange={(e) => setEditForm((prev) => prev ? { ...prev, dob: e.target.value } : prev)}
                       />
                     ) : (
-                      <p className="font-medium">{new Date(registration.dob).toLocaleDateString()}</p>
+                      <p className="font-medium">{formatDisplayDate(registration.dob)}</p>
                     )}
                   </div>
                   <div>
@@ -1835,12 +1826,12 @@ const RegistrationDetail = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Registered Date</p>
-                  <p className="font-medium">{new Date(registration.registeredAt).toLocaleDateString()}</p>
+                  <p className="font-medium">{formatDisplayDate(registration.registeredAt)}</p>
                 </div>
                 {registration.approvedAt && (
                   <div>
                     <p className="text-sm text-gray-600">Approved Date</p>
-                    <p className="font-medium">{new Date(registration.approvedAt).toLocaleDateString()}</p>
+                    <p className="font-medium">{formatDisplayDate(registration.approvedAt)}</p>
                   </div>
                 )}
               </CardContent>
@@ -2446,10 +2437,10 @@ const RegistrationDetail = () => {
                             {registration.noc.nocNumber}
                           </p>
                           <div className="text-[11px] text-emerald-700 space-y-0.5 pt-1 border-t border-emerald-200/60">
-                            <p>Issued: {registration.noc.generatedAt ? new Date(registration.noc.generatedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" }) : "N/A"}</p>
+                            <p>Issued: {formatDisplayDate(registration.noc.generatedAt)}</p>
                             {registration.noc.expiresAt && (
                               <p className="text-amber-800 font-medium">
-                                Archival Deadline: {new Date(registration.noc.expiresAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}
+                                Archival Deadline: {formatDisplayDate(registration.noc.expiresAt)}
                               </p>
                             )}
                             <p>Downloads: {registration.noc.downloadCount || 0} times</p>
@@ -2711,7 +2702,7 @@ const RegistrationDetail = () => {
                           <span className="text-slate-600">Terms & Conditions Agreed:</span>
                           <span className="font-semibold text-emerald-700">
                             {registration.recovery.termsAgreedAt
-                              ? new Date(registration.recovery.termsAgreedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                              ? formatDisplayDateTime(registration.recovery.termsAgreedAt)
                               : "Verified"}
                           </span>
                         </div>
@@ -2719,7 +2710,7 @@ const RegistrationDetail = () => {
                           <span className="text-slate-600">Academy Code & Policy Agreed:</span>
                           <span className="font-semibold text-emerald-700">
                             {registration.recovery.policyAgreedAt
-                              ? new Date(registration.recovery.policyAgreedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                              ? formatDisplayDateTime(registration.recovery.policyAgreedAt)
                               : "Verified"}
                           </span>
                         </div>
@@ -2779,8 +2770,8 @@ const RegistrationDetail = () => {
                             {registration.recovery.archivedApplications.map((archive, idx) => (
                               <div key={idx} className="bg-slate-50 p-2.5 rounded border border-slate-200 text-[11px] space-y-1">
                                 <div className="flex items-center justify-between text-slate-600">
-                                  <span>Submitted: {archive.submittedAt ? new Date(archive.submittedAt).toLocaleDateString("en-IN") : "N/A"}</span>
-                                  <span className="text-red-700 font-semibold">Rejected: {archive.rejectedAt ? new Date(archive.rejectedAt).toLocaleDateString("en-IN") : "Past"}</span>
+                                  <span>Submitted: {archive.submittedAt ? formatDisplayDate(archive.submittedAt) : "N/A"}</span>
+                                  <span className="text-red-700 font-semibold">Rejected: {archive.rejectedAt ? formatDisplayDate(archive.rejectedAt) : "Past"}</span>
                                 </div>
                                 {archive.rejectionReason && (
                                   <p className="text-red-800 font-medium">
@@ -2870,8 +2861,8 @@ const RegistrationDetail = () => {
                             {registration.recovery.archivedApplications.map((archive, idx) => (
                               <div key={idx} className="bg-white p-2.5 rounded border border-slate-200 text-[11px] space-y-1">
                                 <div className="flex items-center justify-between text-slate-600">
-                                  <span>Submitted: {archive.submittedAt ? new Date(archive.submittedAt).toLocaleDateString("en-IN") : "N/A"}</span>
-                                  <span className="text-red-700 font-semibold">Rejected: {archive.rejectedAt ? new Date(archive.rejectedAt).toLocaleDateString("en-IN") : "Past"}</span>
+                                  <span>Submitted: {archive.submittedAt ? formatDisplayDate(archive.submittedAt) : "N/A"}</span>
+                                  <span className="text-red-700 font-semibold">Rejected: {archive.rejectedAt ? formatDisplayDate(archive.rejectedAt) : "Past"}</span>
                                 </div>
                                 {archive.rejectionReason && (
                                   <p className="text-red-800 font-medium">
@@ -2974,7 +2965,7 @@ const RegistrationDetail = () => {
                       </span>
                       {recoveryTermsAgreed && recoveryTermsAgreedAt && (
                         <span className="text-[10px] text-indigo-700 block font-mono mt-0.5">
-                          ✓ Verified timestamp: {recoveryTermsAgreedAt.toLocaleTimeString("en-IN")}
+                          ✓ Verified timestamp: {formatDisplayDateTime(recoveryTermsAgreedAt)}
                         </span>
                       )}
                     </div>
@@ -3001,7 +2992,7 @@ const RegistrationDetail = () => {
                       </span>
                       {recoveryPolicyAgreed && recoveryPolicyAgreedAt && (
                         <span className="text-[10px] text-emerald-700 block font-mono mt-0.5">
-                          ✓ Verified timestamp: {recoveryPolicyAgreedAt.toLocaleTimeString("en-IN")}
+                          ✓ Verified timestamp: {formatDisplayDateTime(recoveryPolicyAgreedAt)}
                         </span>
                       )}
                     </div>

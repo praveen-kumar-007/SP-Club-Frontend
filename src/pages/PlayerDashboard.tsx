@@ -12,6 +12,7 @@ import { KIT_SIZE_OPTIONS, formatKitSizeWithRange, getKitSizeRange } from "@/uti
 import { AlertTriangle, Award, Bell, CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, Clock, CreditCard, Download, FileCheck, KeyRound, Loader2, LogOut, MapPin, Send, UserCircle2, Wallet } from "lucide-react";
 import NocCountdownBanner from "@/components/NocCountdownBanner";
 import NocCertificateModal, { NocCertificateData, downloadNocPdfFromData } from "@/components/NocCertificateModal";
+import { formatDateDDMMYYYY, formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 
 export interface NocInfo {
     status?: "none" | "applied" | "approved" | "relieved";
@@ -105,17 +106,7 @@ const formatDistanceAway = (distanceMeters: number) => {
     return `${kilometers} km and ${meters} meter`;
 };
 
-const formatDisplayDate = (dateStr?: string | Date | null): string => {
-    if (!dateStr) return "N/A";
-    const d = new Date(dateStr);
-    return Number.isNaN(d.getTime())
-        ? "N/A"
-        : d.toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-          });
-};
+const formatDisplayDate = formatDateDDMMYYYY;
 
 const getCurrentMonth = () => {
     const now = new Date();
@@ -576,16 +567,7 @@ const PlayerDashboard = () => {
         }
     };
 
-    const formatDate = (isoDate?: string) => {
-        if (!isoDate) return "N/A";
-        const date = new Date(isoDate);
-        if (Number.isNaN(date.getTime())) return "N/A";
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
-    };
+    const formatDate = formatDateDDMMYYYY;
 
     if (isLoading) {
         return (
@@ -695,7 +677,7 @@ const PlayerDashboard = () => {
                                     <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
                                     <div>
                                         <strong>14-Day Post-Issuance Download Notice:</strong> Per academy regulations, your dashboard credentials and certificate download will remain accessible until{" "}
-                                        <strong className="text-amber-100">{new Date(player.noc.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</strong>.
+                                        <strong className="text-amber-100">{formatDateTimeDDMMYYYY(player.noc.expiresAt)}</strong>.
                                         Please download and archive your official PDF before this period ends, after which player records are archived.
                                     </div>
                                 </div>
@@ -1068,7 +1050,7 @@ const PlayerDashboard = () => {
                                         <div>
                                             <p className="text-sm font-medium text-slate-800">{cert.title}</p>
                                             <p className="text-xs text-slate-500">
-                                                {cert.issuedAt ? `Issued: ${new Date(cert.issuedAt).toLocaleDateString("en-IN")}` : "Issued date not available"}
+                                                {cert.issuedAt ? `Issued: ${formatDateDDMMYYYY(cert.issuedAt)}` : "Issued date not available"}
                                             </p>
                                         </div>
                                         <a

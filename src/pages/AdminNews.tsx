@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import API_BASE_URL, { API_ENDPOINTS } from "@/config/api";
 import { initializeSessionManager, clearSession } from "@/utils/adminSessionManager";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -373,13 +374,7 @@ const AdminNews = () => {
   );
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDateTimeDDMMYYYY(dateString);
   };
 
   return (

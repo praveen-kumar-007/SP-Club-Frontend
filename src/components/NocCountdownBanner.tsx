@@ -9,6 +9,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { formatDateTimeDDMMYYYY } from "@/utils/dateFormatter";
 
 export interface NocCountdownBannerProps {
   noc?: {
@@ -119,14 +120,9 @@ const NocCountdownBanner = ({
 
   const targetDateLabel = useMemo(() => {
     try {
-      return new Date(coolingEndsAt).toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata",
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      if (!coolingEndsAt) return "14 Days from Application";
+      const formatted = formatDateTimeDDMMYYYY(coolingEndsAt);
+      return formatted === "N/A" ? "14 Days from Application" : formatted;
     } catch {
       return "14 Days from Application";
     }
