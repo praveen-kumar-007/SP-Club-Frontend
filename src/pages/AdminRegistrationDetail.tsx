@@ -1343,6 +1343,11 @@ const RegistrationDetail = () => {
                 {isResendingNocEmail ? "Sending Notice..." : "Resend NOC Mail"}
               </Button>
             )}
+            {registration.recovery?.status === "pending_review" && (
+              <Badge className="bg-amber-600 hover:bg-amber-600 text-white font-bold text-xs animate-pulse">
+                Re-Admission Pending Review
+              </Badge>
+            )}
             {getStatusBadge(registration.status)}
           </div>
         </div>

@@ -68,6 +68,12 @@ interface Registration {
     expiresAt?: string;
     nocNumber?: string;
   };
+  recovery?: {
+    status?: 'none' | 'link_sent' | 'pending_review' | 'approved' | 'rejected';
+    submittedAt?: string;
+    applicationNote?: string;
+    applicationLetterUrl?: string;
+  };
 }
 
 interface Stats {
@@ -427,7 +433,7 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  const getStatusBadge = (status: string, noc?: Registration['noc']) => {
+  const getStatusBadge = (status: string, noc?: Registration['noc'], recovery?: Registration['recovery']) => {
     return (
       <div className="flex flex-col gap-1 items-start">
         {status === 'approved' && <Badge className="bg-green-500 text-white">Approved</Badge>}
@@ -435,6 +441,11 @@ const AdminDashboard = () => {
         {status === 'pending' && <Badge className="bg-yellow-400 text-slate-900">Pending</Badge>}
         {status !== 'approved' && status !== 'rejected' && status !== 'pending' && (
           <Badge className="bg-slate-200 text-slate-700">Unknown</Badge>
+        )}
+        {recovery?.status === 'pending_review' && (
+          <Badge className="bg-amber-600 hover:bg-amber-600 text-white font-bold text-[10px] animate-pulse">
+            Re-Admission Review
+          </Badge>
         )}
         {noc?.status === 'applied' && (
           <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-bold text-[10px] animate-pulse">
@@ -1015,7 +1026,7 @@ const AdminDashboard = () => {
                                 <Badge variant="outline">{reg.role}</Badge>
                               </TableCell>
                               <TableCell>
-                                {getStatusBadge(reg.status, reg.noc)}
+                                {getStatusBadge(reg.status, reg.noc, reg.recovery)}
                               </TableCell>
                               <TableCell className="text-right whitespace-nowrap">
                                 <div className="flex gap-2 justify-end items-center">
@@ -1047,6 +1058,15 @@ const AdminDashboard = () => {
                                         Reject
                                       </Button>
                                     </>
+                                  )}
+                                  {reg.status === 'rejected' && (
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+                                      onClick={() => handleApprove(reg._id)}
+                                    >
+                                      Approve
+                                    </Button>
                                   )}
                                   {reg.status === 'approved' && (
                                     <Button
